@@ -1,0 +1,6 @@
+/build
+*.log
+/vendor
+.vscode
+vivado.jou
+vivado.log

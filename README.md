@@ -1,0 +1,1 @@
+# Mage: a decoupled access-execute CGRA tailored for static control applications

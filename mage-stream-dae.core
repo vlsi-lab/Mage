@@ -1,0 +1,162 @@
+CAPI=2:
+
+name: "vlsi:polito:mage-stream-dae"
+description: "Mage - decoupled access-execute cgra"
+
+filesets:
+
+  files_packages:
+    files:  
+    - hw/mage/packages/obi_pkg.sv
+    - hw/mage/packages/reg_pkg.sv
+    - hw/mage/packages/stream_intf_pkg.sv
+    - hw/mage/packages/mage_pkg.sv
+    - hw/mage/packages/pea_pkg.sv
+    - hw/mage/packages/xbar_pkg.sv  
+    - hw/mage/packages/hw_fifo_pkg.sv
+    file_type: systemVerilogSource
+
+  files_execute:
+    depend:
+    - pulp-platform.org::common_cells
+    - pulp-platform.org::register_interface
+    - lowrisc:prim:subreg
+    files:  
+    - hw/mage/execute/fsm.sv
+    - hw/mage/execute/cfg_regs_out_pea.sv
+    - hw/mage/execute/cfg_regs_pea.sv
+    - hw/mage/execute/cfg_regs_ls_stream_sel.sv
+    - hw/mage/execute/cfg_regs_xbar_banks_pea.sv
+    - hw/mage/execute/peripheral_regs/mage_reg_pkg.sv
+    - hw/mage/execute/peripheral_regs/mage_reg_top.sv
+    - hw/mage/execute/peripheral_regs/peripheral_regs.sv
+    - hw/mage/execute/xbars/age_to_banks/xbar_age_to_banks.sv
+    - hw/mage/execute/xbars/banks_pea/load_store_stream.sv
+    - hw/mage/execute/xbars/banks_pea/xbar_banks_pea_bb.sv
+    - hw/mage/execute/xbars/banks_pea/xbar_banks_pea.sv
+    - hw/mage/execute/xbars/banks_pea/xbar_banks_pea_pipelined.sv
+    - hw/mage/execute/pea/pe/cv32e40p_ff_one.sv
+    - hw/mage/execute/pea/pe/cv32e40p_alu_div.sv
+    - hw/mage/execute/pea/pe/fu_partitioned.sv
+    - hw/mage/execute/pea/acc_pe.sv
+    - hw/mage/execute/pea/pe.sv
+    - hw/mage/execute/pea/pea.sv
+    - hw/mage/execute/mage_top.sv
+    file_type: systemVerilogSource
+
+  files_access:
+    files:  
+    - hw/mage/access/hwlp.sv
+    - hw/mage/access/hwlp_rf.sv
+    - hw/mage/access/hwlp_rou.sv
+    - hw/mage/access/k_controller.sv
+    - hw/mage/access/subscripts_gen.sv
+    - hw/mage/access/ba_gen.sv
+    - hw/mage/access/flat_address_gen.sv
+    - hw/mage/access/age.sv
+    - hw/mage/access/age_unit.sv
+    - hw/mage/access/cfg_dispatcher.sv
+    - hw/mage/access/mage.sv
+    file_type: systemVerilogSource
+
+  files_memory:
+    depend:
+    - pulp-platform.org::tech_cells_generic
+    files:  
+    - hw/mage/memory/sram_wrapper.sv
+    - hw/mage/memory/data_memory.sv
+    file_type: systemVerilogSource
+
+  files_stream:
+    files:   
+    - hw/mage/stream/dma_pea_xbar.sv
+    - hw/mage/stream/pea_dma_xbar.sv
+    - hw/mage/stream/streaming_interface.sv
+    file_type: systemVerilogSource
+
+  files_wrapper:
+    files:  
+    - hw/mage/dmem_decoder.sv
+    - hw/mage/mage_wrapper.sv
+    file_type: systemVerilogSource
+
+  files_postsyn:
+    depend:
+    - x-heep::packages
+    - pulp-platform.org::common_cells
+    files:
+    - rtl/mage/mage_pkg.sv
+    - rtl/mage-cgra/pea_pkg.sv
+    #- rtl/mage-cgra/data_memory.sv
+    #- rtl/mage-cgra/dmem_decoder.sv
+    - postsyn/netlist.sv
+    #- rtl/mage-cgra/mage_wrapper.sv
+    file_type: systemVerilogSource
+
+  files_verilator_waiver:
+    files:
+    - tb/tb.vlt
+    file_type: vlt 
+
+  files_verilator_tb:
+    files:
+    - tb/tb_top.cpp
+    file_type: cppSource
+
+  files_fpga:
+    files:
+    - rtl/fpga/fpga_sram_wrapper.sv
+    file_type: systemVerilogSource
+
+parameters:
+  FPGA_SYNTHESIS:
+    datatype: bool
+    paramtype: vlogdefine
+    default: false
+
+targets:
+  default: &default
+    filesets:
+    - files_packages
+    - files_access
+    - files_execute
+    - files_stream
+    - files_memory
+    - files_wrapper
+
+  sim:
+    <<: *default
+
+    description: Simulate the design
+    default_tool: verilator
+
+    filesets_append:
+    - files_verilator_tb
+    - files_verilator_waiver
+
+    toplevel: mage_wrapper
+
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+          - '--cc'
+          - '--trace'
+          - '--exe tb_top.cpp'
+          - '-CFLAGS "-std=c++11 -Wall -g -fpermissive"'
+          - '-LDFLAGS "-pthread -lutil -lelf"'
+          - "-Wall"
+
+  pynq-z2:
+    <<: *default
+    default_tool: vivado
+    description: TUL Pynq-Z2 Board
+    filesets_append:
+    - files_fpga
+    parameters:
+    - FPGA_SYNTHESIS=true
+    tools:
+      vivado:
+        part: xc7z020clg400-1
+        board_part: tul.com.tw:pynq-z2:part0:1.0
+    toplevel: [mage_wrapper]

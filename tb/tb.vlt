@@ -1,0 +1,13 @@
+`verilator_config
+lint_off -rule PINCONNECTEMPTY
+lint_off -rule DECLFILENAME
+lint_off -rule CASEINCOMPLETE
+lint_off -rule UNUSED
+lint_off -rule WIDTH
+lint_off -rule ASSIGNDLY
+lint_off -rule UNSIGNED
+lint_off -rule UNDRIVEN
+lint_off -rule BLKLOOPINIT
+lint_off -rule SYNCASYNCNET
+lint_off -rule WIDTH -file "*/hw/mage/execute/pea/pe/cv32e40p_ff_one.sv" -match "Operator ASSIGNW expects 5 bits on the Assign RHS, but Assign RHS's UNSIGNED generates 32 bits."
+lint_off -rule UNOPTFLAT -file "*/hw/mage/execute/pea/pe/cv32e40p_ff_one.sv" -match "*"

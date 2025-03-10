@@ -1,12 +1,5 @@
 // Generated register defines for mage
 
-// Copyright information found in source file:
-// Copyright Politecnico di Torino contributors.
-
-// Licensing information found in source file:
-// Licensed under the Apache License, Version 2.0, see LICENSE for details.
-// SPDX-License-Identifier: Apache-2.0
-
 #ifndef _MAGE_REG_DEFS_
 #define _MAGE_REG_DEFS_
 

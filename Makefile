@@ -143,6 +143,31 @@ mage-gen:
 	--kernel_len $(KERNEL_LEN) 
 	$(PYTHON) util/mage-gen.py --num_words 1024 \
 	  --outdir hw/fpga/scripts/ --tpl-sv hw/fpga/scripts/generate_sram.tcl.tpl
+	$(PYTHON) util/mage-gen.py  --outdir sw/ --tpl-sv sw/mage.h.tpl \
+	--kernel_len $(KERNEL_LEN) \
+	--n_pea_cols $(N_PEA_COLS) \
+	--n_pea_rows $(N_PEA_ROWS) \
+	--n_age_tot $(N_AGE_TOT) \
+	--n_age_per_stream $(N_AGE_PER_STREAM) \
+	--enable_decoupling $(ENABLE_DECOUPLED) \
+	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE)
+	$(PYTHON) util/mage-gen.py  --outdir sw/ --tpl-sv sw/mage.c.tpl \
+	--kernel_len $(KERNEL_LEN) \
+	--n_pea_cols $(N_PEA_COLS) \
+	--n_pea_rows $(N_PEA_ROWS) \
+	--n_age_tot $(N_AGE_TOT) \
+	--n_age_per_stream $(N_AGE_PER_STREAM) \
+	--enable_decoupling $(ENABLE_DECOUPLED) \
+	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE)
+	util/format-verible;
+	$(PYTHON) util/mage-gen.py  --outdir sw/ --tpl-sv sw/mage_x_heep.h.tpl \
+	--kernel_len $(KERNEL_LEN) \
+	--n_pea_cols $(N_PEA_COLS) \
+	--n_pea_rows $(N_PEA_ROWS) \
+	--n_age_tot $(N_AGE_TOT) \
+	--n_age_per_stream $(N_AGE_PER_STREAM) \
+	--enable_decoupling $(ENABLE_DECOUPLED) \
+	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE)
 	util/format-verible;
 
 verible:

@@ -13,34 +13,44 @@ module pe
 (
     input  logic                                     clk_i,
     input  logic                                     rst_n_i,
-    input  logic [      N_INPUTS_PE-1:0][N_BITS-1:0] pe_op_i,
     input  logic [    N_CFG_BITS_PE-1:0]             ctrl_pe_i,
     // Streaming Interface
+    input  logic [      N_INPUTS_PE-2:0][N_BITS-1:0] pe_op_i,
+    input  logic [       N_NEIGH_PE-1:0][N_BITS-1:0] delay_op_i,
     input  logic [                  7:0]             reg_acc_value_i,
     input  logic [N_INPUTS_VALID_PE-1:0]             stream_valid_i,
     output logic                                     stream_valid_o,
+    output logic [           N_BITS-1:0]             pe_res_o,
+    output logic [           N_BITS-1:0]             delay_op_o
     // end Streaming Interface
-    output logic [           N_BITS-1:0]             pe_res_o
 );
 
   //output of input muxes
-  logic      [         N_BITS-1:0] mux1_out;
-  logic      [         N_BITS-1:0] mux2_out;
-  logic                            stream_valid_a;
-  logic                            stream_valid_b;
-  logic      [LOG_N_INPUTS_PE-1:0] mux1_sel;
-  logic      [LOG_N_INPUTS_PE-1:0] mux2_sel;
-  logic      [LOG_N_INPUTS_PE-1:0] mux1_sel_valid;
-  logic      [LOG_N_INPUTS_PE-1:0] mux2_sel_valid;
-  logic      [                1:0] vec_mode;
-  logic                            acc_counter_sel;
+  logic      [         N_BITS-1:0]             mux1_out;
+  logic      [         N_BITS-1:0]             mux2_out;
+  logic                                        stream_valid_a;
+  logic                                        stream_valid_b;
+  logic      [LOG_N_INPUTS_PE-1:0]             mux1_sel;
+  logic      [LOG_N_INPUTS_PE-1:0]             mux2_sel;
+  logic      [LOG_N_INPUTS_PE-1:0]             mux1_sel_valid;
+  logic      [LOG_N_INPUTS_PE-1:0]             mux2_sel_valid;
+  logic      [         N_BITS-1:0]             delay_op;
+  logic      [    N_INPUTS_PE-1:0][N_BITS-1:0] pe_op;
+  logic      [                1:0]             vec_mode;
+  logic                                        acc_counter_sel;
 
   //fu signals
-  logic      [         N_BITS-1:0] fu_out;
-  fu_instr_t                       fu_sel;
-  logic      [                7:0] acc_cnt;
-  logic                            acc_ready;
+  logic      [         N_BITS-1:0]             fu_out;
+  fu_instr_t                                   fu_sel;
+  logic      [                7:0]             acc_cnt;
+  logic                                        acc_ready;
 
+  always_comb begin
+    for (int i = 0; i < N_INPUTS_PE - 1; i++) begin
+      pe_op[i] = pe_op_i;
+    end
+    pe_op[N_INPUTS_PE-1] = delay_op;
+  end
 
   ////////////////////////////////////////////////////////////////
   //                      PE Control Word                       //
@@ -67,6 +77,7 @@ module pe
   end
   assign stream_valid_a = (mux1_sel_valid == 3'b110) ? 1'b1 : stream_valid_i[mux1_sel_valid];
   assign stream_valid_b = (mux2_sel_valid == 3'b110) ? 1'b1 : stream_valid_i[mux2_sel_valid];
+  assign delay_op = delay_op_i[mux1_sel-3];
 
   ////////////////////////////////////////////////////////////////
   //                Partitioned Functional Unit                 //
@@ -91,7 +102,7 @@ module pe
     if (!rst_n_i) begin
       pe_res_o <= 0;
     end else begin
-      pe_res_o <= fu_out;
+      pe_res_o <= {delay_op, fu_out};
     end
   end
 
@@ -114,15 +125,15 @@ module pe
   always_comb begin
     if (fu_sel == ACC) begin
       if (acc_cnt == 8'd0) begin
-        mux1_out = pe_op_i[mux1_sel];
-        mux2_out = pe_op_i[mux2_sel];
+        mux1_out = pe_op[mux1_sel];
+        mux2_out = pe_op[mux2_sel];
       end else begin
         mux1_out = pe_res_o;
-        mux2_out = pe_op_i[mux2_sel];
+        mux2_out = pe_op[mux2_sel];
       end
     end else begin
-      mux1_out = pe_op_i[mux1_sel];
-      mux2_out = pe_op_i[mux2_sel];
+      mux1_out = pe_op[mux1_sel];
+      mux2_out = pe_op[mux2_sel];
     end
   end
 endmodule

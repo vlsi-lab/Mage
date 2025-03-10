@@ -82,6 +82,18 @@ module pea
     %endfor
 %endfor
 
+%for r in range(n_pea_rows):
+    %for c in range(n_pea_cols):
+logic [N_NEIGH_PE-1:0][N_BITS-1:0] in_delay_op${r}${c};  
+    %endfor
+%endfor
+
+%for r in range(n_pea_rows):
+    %for c in range(n_pea_cols):
+logic [N_BITS-1:0] out_delay_op${r}${c};  
+    %endfor
+%endfor
+
   logic  [M*N-1:0] stream_valid_pe_out_arr; 
 
 %for c in range(n_pea_cols):
@@ -273,6 +285,44 @@ module pea
 
 %endif
 %if enable_streaming_interface == str(1):
+  <% k = 0 %>
+  %for r in range(n_pea_rows):
+    %for c in range(n_pea_cols): 
+      %for r1 in range(r-1,r+2,1):
+        %for c1 in range(c-1,c+2,1):
+          %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
+            %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
+              %if r1 == -1 and c1 == c:
+                %for n in range(n_pe_in_stream):
+                  % for i in range(len(pea_in_stream_placement)):
+                    % for j in range(len(pea_in_stream_placement[i])):
+                      % if i == r:
+                        % if j == n:
+                          %if pea_in_stream_placement[i][j] != None:
+  assign in_delay_op${r}${c}[${k}] = stream_data_in_reg[${pea_in_stream_placement[i][j]}]; <% k = k + 1 %>
+                          %else:
+  assign in_delay_op${r}${c}[${k}] = '0; <% k = k + 1 %>
+                          %endif
+                        %endif
+                      %endif
+                    %endfor
+                  %endfor
+                %endfor  
+              %else:
+  assign in_delay_op${r}${c}[${k}] = '0; <% k = k + 1 %>
+              %endif
+            %else:
+  assign in_delay_op${r}${c}[${k}] = out_delay_op${r1}${c1}; <% k = k + 1 %>                  
+            %endif
+          %endif
+        %endfor
+      %endfor
+    <% k = 0 %>
+    %endfor
+  %endfor
+
+%endif
+%if enable_streaming_interface == str(1):
 ////////////////////////////////////////////////////////////////
 //               Assignments for PEs Valid I/O                //
 ////////////////////////////////////////////////////////////////
@@ -330,9 +380,11 @@ module pea
       .acc_match_i(acc_match_i),
 %endif
 %if enable_streaming_interface == str(1):
+      .delay_op_i(in_delay_op${r}${c}),
       .stream_valid_i(stream_valid_pe_in${r}${c}),
       .stream_valid_o(stream_valid_pe_out${r}${c}),
       .reg_acc_value_i(reg_acc_value_pe[${r}][${c}]),
+      .delay_op_o(out_delay_op${r}${c}),
 %endif
       .ctrl_pe_i(ctrl_pea_i[${r}][${c}]),
       .pe_res_o(out_data_pe${r}${c})

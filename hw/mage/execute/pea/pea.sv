@@ -102,6 +102,40 @@ module pea
   logic                                          stream_valid_pe_out32;
   logic                                          stream_valid_pe_out33;
 
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op00;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op01;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op02;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op03;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op10;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op11;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op12;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op13;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op20;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op21;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op22;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op23;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op30;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op31;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op32;
+  logic [       N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op33;
+
+  logic [           N_BITS-1:0]                  out_delay_op00;
+  logic [           N_BITS-1:0]                  out_delay_op01;
+  logic [           N_BITS-1:0]                  out_delay_op02;
+  logic [           N_BITS-1:0]                  out_delay_op03;
+  logic [           N_BITS-1:0]                  out_delay_op10;
+  logic [           N_BITS-1:0]                  out_delay_op11;
+  logic [           N_BITS-1:0]                  out_delay_op12;
+  logic [           N_BITS-1:0]                  out_delay_op13;
+  logic [           N_BITS-1:0]                  out_delay_op20;
+  logic [           N_BITS-1:0]                  out_delay_op21;
+  logic [           N_BITS-1:0]                  out_delay_op22;
+  logic [           N_BITS-1:0]                  out_delay_op23;
+  logic [           N_BITS-1:0]                  out_delay_op30;
+  logic [           N_BITS-1:0]                  out_delay_op31;
+  logic [           N_BITS-1:0]                  out_delay_op32;
+  logic [           N_BITS-1:0]                  out_delay_op33;
+
   logic [              M*N-1:0]                  stream_valid_pe_out_arr;
 
   logic [                N-1:0][N_BITS-1:0]      out_data_col0;
@@ -301,6 +335,88 @@ module pea
   assign in_data_pe33[6] = '0;
 
 
+
+  assign in_delay_op00[0] = stream_data_in_reg[0];
+  assign in_delay_op00[1] = '0;
+  assign in_delay_op00[2] = out_delay_op01;
+  assign in_delay_op00[3] = out_delay_op10;
+
+  assign in_delay_op01[0] = stream_data_in_reg[0];
+  assign in_delay_op01[1] = out_delay_op00;
+  assign in_delay_op01[2] = out_delay_op02;
+  assign in_delay_op01[3] = out_delay_op11;
+
+  assign in_delay_op02[0] = stream_data_in_reg[0];
+  assign in_delay_op02[1] = out_delay_op01;
+  assign in_delay_op02[2] = out_delay_op03;
+  assign in_delay_op02[3] = out_delay_op12;
+
+  assign in_delay_op03[0] = stream_data_in_reg[0];
+  assign in_delay_op03[1] = out_delay_op02;
+  assign in_delay_op03[2] = '0;
+  assign in_delay_op03[3] = out_delay_op13;
+
+  assign in_delay_op10[0] = out_delay_op00;
+  assign in_delay_op10[1] = '0;
+  assign in_delay_op10[2] = out_delay_op11;
+  assign in_delay_op10[3] = out_delay_op20;
+
+  assign in_delay_op11[0] = out_delay_op01;
+  assign in_delay_op11[1] = out_delay_op10;
+  assign in_delay_op11[2] = out_delay_op12;
+  assign in_delay_op11[3] = out_delay_op21;
+
+  assign in_delay_op12[0] = out_delay_op02;
+  assign in_delay_op12[1] = out_delay_op11;
+  assign in_delay_op12[2] = out_delay_op13;
+  assign in_delay_op12[3] = out_delay_op22;
+
+  assign in_delay_op13[0] = out_delay_op03;
+  assign in_delay_op13[1] = out_delay_op12;
+  assign in_delay_op13[2] = '0;
+  assign in_delay_op13[3] = out_delay_op23;
+
+  assign in_delay_op20[0] = out_delay_op10;
+  assign in_delay_op20[1] = '0;
+  assign in_delay_op20[2] = out_delay_op21;
+  assign in_delay_op20[3] = out_delay_op30;
+
+  assign in_delay_op21[0] = out_delay_op11;
+  assign in_delay_op21[1] = out_delay_op20;
+  assign in_delay_op21[2] = out_delay_op22;
+  assign in_delay_op21[3] = out_delay_op31;
+
+  assign in_delay_op22[0] = out_delay_op12;
+  assign in_delay_op22[1] = out_delay_op21;
+  assign in_delay_op22[2] = out_delay_op23;
+  assign in_delay_op22[3] = out_delay_op32;
+
+  assign in_delay_op23[0] = out_delay_op13;
+  assign in_delay_op23[1] = out_delay_op22;
+  assign in_delay_op23[2] = '0;
+  assign in_delay_op23[3] = out_delay_op33;
+
+  assign in_delay_op30[0] = out_delay_op20;
+  assign in_delay_op30[1] = '0;
+  assign in_delay_op30[2] = out_delay_op31;
+  assign in_delay_op30[3] = '0;
+
+  assign in_delay_op31[0] = out_delay_op21;
+  assign in_delay_op31[1] = out_delay_op30;
+  assign in_delay_op31[2] = out_delay_op32;
+  assign in_delay_op31[3] = '0;
+
+  assign in_delay_op32[0] = out_delay_op22;
+  assign in_delay_op32[1] = out_delay_op31;
+  assign in_delay_op32[2] = out_delay_op33;
+  assign in_delay_op32[3] = '0;
+
+  assign in_delay_op33[0] = out_delay_op23;
+  assign in_delay_op33[1] = out_delay_op32;
+  assign in_delay_op33[2] = '0;
+  assign in_delay_op33[3] = '0;
+
+
   ////////////////////////////////////////////////////////////////
   //               Assignments for PEs Valid I/O                //
   ////////////////////////////////////////////////////////////////
@@ -429,9 +545,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe00),
+      .delay_op_i(in_delay_op00),
       .stream_valid_i(stream_valid_pe_in00),
       .stream_valid_o(stream_valid_pe_out00),
       .reg_acc_value_i(reg_acc_value_pe[0][0]),
+      .delay_op_o(out_delay_op00),
       .ctrl_pe_i(ctrl_pea_i[0][0]),
       .pe_res_o(out_data_pe00)
   );
@@ -439,9 +557,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe01),
+      .delay_op_i(in_delay_op01),
       .stream_valid_i(stream_valid_pe_in01),
       .stream_valid_o(stream_valid_pe_out01),
       .reg_acc_value_i(reg_acc_value_pe[0][1]),
+      .delay_op_o(out_delay_op01),
       .ctrl_pe_i(ctrl_pea_i[0][1]),
       .pe_res_o(out_data_pe01)
   );
@@ -449,9 +569,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe02),
+      .delay_op_i(in_delay_op02),
       .stream_valid_i(stream_valid_pe_in02),
       .stream_valid_o(stream_valid_pe_out02),
       .reg_acc_value_i(reg_acc_value_pe[0][2]),
+      .delay_op_o(out_delay_op02),
       .ctrl_pe_i(ctrl_pea_i[0][2]),
       .pe_res_o(out_data_pe02)
   );
@@ -459,9 +581,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe03),
+      .delay_op_i(in_delay_op03),
       .stream_valid_i(stream_valid_pe_in03),
       .stream_valid_o(stream_valid_pe_out03),
       .reg_acc_value_i(reg_acc_value_pe[0][3]),
+      .delay_op_o(out_delay_op03),
       .ctrl_pe_i(ctrl_pea_i[0][3]),
       .pe_res_o(out_data_pe03)
   );
@@ -469,9 +593,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe10),
+      .delay_op_i(in_delay_op10),
       .stream_valid_i(stream_valid_pe_in10),
       .stream_valid_o(stream_valid_pe_out10),
       .reg_acc_value_i(reg_acc_value_pe[1][0]),
+      .delay_op_o(out_delay_op10),
       .ctrl_pe_i(ctrl_pea_i[1][0]),
       .pe_res_o(out_data_pe10)
   );
@@ -479,9 +605,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe11),
+      .delay_op_i(in_delay_op11),
       .stream_valid_i(stream_valid_pe_in11),
       .stream_valid_o(stream_valid_pe_out11),
       .reg_acc_value_i(reg_acc_value_pe[1][1]),
+      .delay_op_o(out_delay_op11),
       .ctrl_pe_i(ctrl_pea_i[1][1]),
       .pe_res_o(out_data_pe11)
   );
@@ -489,9 +617,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe12),
+      .delay_op_i(in_delay_op12),
       .stream_valid_i(stream_valid_pe_in12),
       .stream_valid_o(stream_valid_pe_out12),
       .reg_acc_value_i(reg_acc_value_pe[1][2]),
+      .delay_op_o(out_delay_op12),
       .ctrl_pe_i(ctrl_pea_i[1][2]),
       .pe_res_o(out_data_pe12)
   );
@@ -499,9 +629,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe13),
+      .delay_op_i(in_delay_op13),
       .stream_valid_i(stream_valid_pe_in13),
       .stream_valid_o(stream_valid_pe_out13),
       .reg_acc_value_i(reg_acc_value_pe[1][3]),
+      .delay_op_o(out_delay_op13),
       .ctrl_pe_i(ctrl_pea_i[1][3]),
       .pe_res_o(out_data_pe13)
   );
@@ -509,9 +641,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe20),
+      .delay_op_i(in_delay_op20),
       .stream_valid_i(stream_valid_pe_in20),
       .stream_valid_o(stream_valid_pe_out20),
       .reg_acc_value_i(reg_acc_value_pe[2][0]),
+      .delay_op_o(out_delay_op20),
       .ctrl_pe_i(ctrl_pea_i[2][0]),
       .pe_res_o(out_data_pe20)
   );
@@ -519,9 +653,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe21),
+      .delay_op_i(in_delay_op21),
       .stream_valid_i(stream_valid_pe_in21),
       .stream_valid_o(stream_valid_pe_out21),
       .reg_acc_value_i(reg_acc_value_pe[2][1]),
+      .delay_op_o(out_delay_op21),
       .ctrl_pe_i(ctrl_pea_i[2][1]),
       .pe_res_o(out_data_pe21)
   );
@@ -529,9 +665,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe22),
+      .delay_op_i(in_delay_op22),
       .stream_valid_i(stream_valid_pe_in22),
       .stream_valid_o(stream_valid_pe_out22),
       .reg_acc_value_i(reg_acc_value_pe[2][2]),
+      .delay_op_o(out_delay_op22),
       .ctrl_pe_i(ctrl_pea_i[2][2]),
       .pe_res_o(out_data_pe22)
   );
@@ -539,9 +677,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe23),
+      .delay_op_i(in_delay_op23),
       .stream_valid_i(stream_valid_pe_in23),
       .stream_valid_o(stream_valid_pe_out23),
       .reg_acc_value_i(reg_acc_value_pe[2][3]),
+      .delay_op_o(out_delay_op23),
       .ctrl_pe_i(ctrl_pea_i[2][3]),
       .pe_res_o(out_data_pe23)
   );
@@ -549,9 +689,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe30),
+      .delay_op_i(in_delay_op30),
       .stream_valid_i(stream_valid_pe_in30),
       .stream_valid_o(stream_valid_pe_out30),
       .reg_acc_value_i(reg_acc_value_pe[3][0]),
+      .delay_op_o(out_delay_op30),
       .ctrl_pe_i(ctrl_pea_i[3][0]),
       .pe_res_o(out_data_pe30)
   );
@@ -559,9 +701,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe31),
+      .delay_op_i(in_delay_op31),
       .stream_valid_i(stream_valid_pe_in31),
       .stream_valid_o(stream_valid_pe_out31),
       .reg_acc_value_i(reg_acc_value_pe[3][1]),
+      .delay_op_o(out_delay_op31),
       .ctrl_pe_i(ctrl_pea_i[3][1]),
       .pe_res_o(out_data_pe31)
   );
@@ -569,9 +713,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe32),
+      .delay_op_i(in_delay_op32),
       .stream_valid_i(stream_valid_pe_in32),
       .stream_valid_o(stream_valid_pe_out32),
       .reg_acc_value_i(reg_acc_value_pe[3][2]),
+      .delay_op_o(out_delay_op32),
       .ctrl_pe_i(ctrl_pea_i[3][2]),
       .pe_res_o(out_data_pe32)
   );
@@ -579,9 +725,11 @@ module pea
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pe_op_i(in_data_pe33),
+      .delay_op_i(in_delay_op33),
       .stream_valid_i(stream_valid_pe_in33),
       .stream_valid_o(stream_valid_pe_out33),
       .reg_acc_value_i(reg_acc_value_pe[3][3]),
+      .delay_op_o(out_delay_op33),
       .ctrl_pe_i(ctrl_pea_i[3][3]),
       .pe_res_o(out_data_pe33)
   );

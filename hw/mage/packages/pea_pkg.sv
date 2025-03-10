@@ -28,7 +28,8 @@ package pea_pkg;
 
 
   localparam unsigned N_OPERATIONS = 16;
-  localparam unsigned N_INPUTS_PE = 7;
+  localparam unsigned N_NEIGH_PE = 4;
+  localparam unsigned N_INPUTS_PE = 8;
   localparam unsigned N_INPUTS_VALID_PE = 6;
   localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
   localparam unsigned LOG_N_INPUTS_PE = (N_INPUTS_PE == 1) ? 1 : $clog2(N_INPUTS_PE);
@@ -58,6 +59,7 @@ package pea_pkg;
     UP         = 3'b011,
     LEFT       = 3'b100,
     RIGHT      = 3'b101,
-    DOWN       = 3'b110
+    DOWN       = 3'b110,
+    DELAY_OP   = 3'b111
   } pe_mux_sel_t;
 endpackage : pea_pkg

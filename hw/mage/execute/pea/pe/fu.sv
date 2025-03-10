@@ -40,7 +40,7 @@ module fu
       ACC: begin
         valid = acc_ready_i;
       end
-      default: valid = 1;
+      default: valid = stream_valid_b_i & stream_valid_a_i;
     endcase
   end
 

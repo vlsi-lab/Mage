@@ -45,11 +45,12 @@ package pea_pkg;
 %endif
 
   localparam unsigned N_OPERATIONS = 16;
+  localparam unsigned N_NEIGH_PE = ${n_neigh_pe};
 %if enable_streaming_interface == str(1) and enable_decoupling == str(1):
-  localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + n_pe_in_mem + 2};
+  localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + n_pe_in_mem + 3};
   localparam unsigned N_INPUTS_VALID_PE = ${n_pe_in_stream + n_neigh_pe + 1} ;
 %elif enable_streaming_interface == str(1) and enable_decoupling == str(0):
-  localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + 2};
+  localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + 3};
   localparam unsigned N_INPUTS_VALID_PE = ${n_pe_in_stream + n_neigh_pe + 1};
 %elif enable_streaming_interface == str(0) and enable_decoupling == str(1):
   localparam unsigned N_INPUTS_PE = ${n_neigh_pe + n_pe_in_mem + 2};
@@ -113,7 +114,8 @@ package pea_pkg;
     UP         = 3'b011,
     LEFT       = 3'b100,
     RIGHT      = 3'b101,
-    DOWN       = 3'b110
+    DOWN       = 3'b110,
+    DELAY_OP   = 3'b111
 %elif  enable_streaming_interface == str(0) and enable_decoupling == str(1):
     MEMLEFT0   = 4'b0000,
     MEMLEFT1   = 4'b0001,

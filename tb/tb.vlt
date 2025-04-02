@@ -9,5 +9,6 @@ lint_off -rule UNSIGNED
 lint_off -rule UNDRIVEN
 lint_off -rule BLKLOOPINIT
 lint_off -rule SYNCASYNCNET
-lint_off -rule WIDTH -file "*/hw/mage/execute/pea/pe/cv32e40p_ff_one.sv" -match "Operator ASSIGNW expects 5 bits on the Assign RHS, but Assign RHS's UNSIGNED generates 32 bits."
-lint_off -rule UNOPTFLAT -file "*/hw/mage/execute/pea/pe/cv32e40p_ff_one.sv" -match "*"
+lint_off -rule WIDTH -file "*/hw/mage/execute/pe/fu/div/mage_cv32e40p_ff_one.sv" -match "Operator ASSIGNW expects 5 bits on the Assign RHS, but Assign RHS's UNSIGNED generates 32 bits."
+lint_off -rule UNOPTFLAT -file "*/hw/mage/execute/pe/fu/div/mage_cv32e40p_ff_one.sv" -match "*"
+lint_off -rule UNOPTFLAT -file "*/hw/mage/execute/pe/fu/div/r_div_stage.sv" -match "*"

@@ -20,18 +20,22 @@ filesets:
     - pulp-platform.org::register_interface
     - lowrisc:prim:subreg
     files:
-    - hw/mage/execute/cfg_regs_pea.sv
-    - hw/mage/execute/peripheral_regs/mage_reg_pkg.sv
-    - hw/mage/execute/peripheral_regs/mage_reg_top.sv
-    - hw/mage/execute/peripheral_regs/peripheral_regs.sv
-    - hw/mage/execute/pea/pe/cv32e40p_ff_one.sv
-    - hw/mage/execute/pea/pe/cv32e40p_alu_div.sv
-    - hw/mage/execute/pea/pe/fu.sv
-    #- hw/mage/execute/pea/pe/fu_partitioned.sv
-    #- hw/mage/execute/pea/acc_pe.sv
-    - hw/mage/execute/pea/pe.sv
-    - hw/mage/execute/pea/pea.sv
-    - hw/mage/execute/mage_top.sv
+    - hw/mage/configuration/cfg_regs_pea.sv
+    - hw/mage/configuration/mage_reg_pkg.sv
+    - hw/mage/configuration/mage_reg_top.sv
+    - hw/mage/configuration/peripheral_regs.sv
+    - hw/mage/execute/pe/fu/div/mage_cv32e40p_ff_one.sv
+    - hw/mage/execute/pe/fu/div/mage_cv32e40p_alu_div.sv
+    - hw/mage/execute/pe/fu/shifter/p_shifter.sv
+    - hw/mage/execute/pe/fu/div/r_div_cell.sv
+    - hw/mage/execute/pe/fu/div/r_div_stage.sv
+    - hw/mage/execute/pe/fu/div/r_div.sv
+    - hw/mage/execute/pe/fu/div/div_wrapper.sv
+    - hw/mage/execute/pe/fu/fu.sv
+    - hw/mage/execute/pe/fu/fu_wrapper.sv
+    - hw/mage/execute/pe/pe.sv
+    - hw/mage/execute/pea.sv
+    - hw/mage/mage_top.sv
     file_type: systemVerilogSource
 
   files_stream:
@@ -44,19 +48,6 @@ filesets:
   files_wrapper:
     files:
     - hw/mage/mage_wrapper.sv
-    file_type: systemVerilogSource
-
-  files_postsyn:
-    depend:
-    - x-heep::packages
-    - pulp-platform.org::common_cells
-    files:
-    - rtl/mage/mage_pkg.sv
-    - rtl/mage-cgra/pea_pkg.sv
-    #- rtl/mage-cgra/data_memory.sv
-    #- rtl/mage-cgra/dmem_decoder.sv
-    - postsyn/netlist.sv
-    #- rtl/mage-cgra/mage_wrapper.sv
     file_type: systemVerilogSource
 
   files_verilator_waiver:

@@ -20,26 +20,23 @@ filesets:
     - pulp-platform.org::register_interface
     - lowrisc:prim:subreg
     files:  
-    - hw/mage/execute/fsm.sv
-    - hw/mage/execute/cfg_regs_out_pea.sv
-    - hw/mage/execute/cfg_regs_pea.sv
-    - hw/mage/execute/cfg_regs_ls_stream_sel.sv
-    - hw/mage/execute/cfg_regs_xbar_banks_pea.sv
-    - hw/mage/execute/peripheral_regs/mage_reg_pkg.sv
-    - hw/mage/execute/peripheral_regs/mage_reg_top.sv
-    - hw/mage/execute/peripheral_regs/peripheral_regs.sv
-    - hw/mage/execute/xbars/age_to_banks/xbar_age_to_banks.sv
-    - hw/mage/execute/xbars/banks_pea/load_store_stream.sv
-    - hw/mage/execute/xbars/banks_pea/xbar_banks_pea_bb.sv
-    - hw/mage/execute/xbars/banks_pea/xbar_banks_pea.sv
-    - hw/mage/execute/xbars/banks_pea/xbar_banks_pea_pipelined.sv
-    - hw/mage/execute/pea/pe/cv32e40p_ff_one.sv
-    - hw/mage/execute/pea/pe/cv32e40p_alu_div.sv
-    - hw/mage/execute/pea/pe/fu_partitioned.sv
-    - hw/mage/execute/pea/acc_pe.sv
-    - hw/mage/execute/pea/pe.sv
-    - hw/mage/execute/pea/pea.sv
-    - hw/mage/execute/mage_top.sv
+    - hw/mage/fsm.sv
+    - hw/mage/configuration/cfg_regs_out_pea.sv
+    - hw/mage/configuration/cfg_regs_pea.sv
+    - hw/mage/configuration/cfg_regs_ls_stream_sel.sv
+    - hw/mage/configuration/mage_reg_pkg.sv
+    - hw/mage/configuration/mage_reg_top.sv
+    - hw/mage/configuration/peripheral_regs.sv
+    - hw/mage/xbars/age_to_banks/xbar_age_to_banks.sv
+    - hw/mage/xbars/banks_pea/load_store_stream.sv
+    - hw/mage/xbars/banks_pea/xbar_banks_pea_bb.sv
+    - hw/mage/xbars/banks_pea/xbar_banks_pea.sv
+    - hw/mage/xbars/banks_pea/xbar_banks_pea_pipelined.sv
+    - hw/mage/execute/pe/fu/fu_partitioned.sv
+    - hw/mage/execute/pe/acc_pe.sv
+    - hw/mage/execute/pe/pe.sv
+    - hw/mage/execute/pea.sv
+    - hw/mage/mage_top.sv
     file_type: systemVerilogSource
 
   files_access:
@@ -69,19 +66,6 @@ filesets:
     files:  
     - hw/mage/dmem_decoder.sv
     - hw/mage/mage_wrapper.sv
-    file_type: systemVerilogSource
-
-  files_postsyn:
-    depend:
-    - x-heep::packages
-    - pulp-platform.org::common_cells
-    files:
-    - rtl/mage/mage_pkg.sv
-    - rtl/mage-cgra/pea_pkg.sv
-    #- rtl/mage-cgra/data_memory.sv
-    #- rtl/mage-cgra/dmem_decoder.sv
-    - postsyn/netlist.sv
-    #- rtl/mage-cgra/mage_wrapper.sv
     file_type: systemVerilogSource
 
   files_verilator_waiver:

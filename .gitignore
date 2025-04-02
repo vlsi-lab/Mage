@@ -4,3 +4,5 @@
 .vscode
 vivado.jou
 vivado.log
+/util/reggen/__pycache__
+/util/topgen/__pycache__

@@ -23,7 +23,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-module cv32e40p_alu_div #(
+module mage_cv32e40p_alu_div #(
     parameter C_WIDTH     = 32,
     parameter C_LOG_WIDTH = 6
 ) (
@@ -135,7 +135,7 @@ module cv32e40p_alu_div #(
     case (State_SP)
       /////////////////////////////////
       IDLE: begin
-        OutVld_SO = 1'b1;
+        //OutVld_SO = 1'b1;
 
         if (InVld_SI) begin
           OutVld_SO = 1'b0;

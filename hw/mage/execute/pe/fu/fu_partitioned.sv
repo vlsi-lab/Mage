@@ -18,9 +18,6 @@ module fu_partitioned
     input  logic             rst_n_i,
     input  logic      [31:0] a_i,
     input  logic      [31:0] b_i,
-    input  logic             stream_valid_a_i,
-    input  logic             stream_valid_b_i,
-    output logic             stream_valid_o,
     input  logic      [ 1:0] vec_mode_i,
     input  fu_instr_t        instr_i,
     output logic      [31:0] res_o
@@ -56,29 +53,8 @@ module fu_partitioned
     no_vec_mode = vec_mode_i == 2'b00;
   end
 
-  logic valid;
-
-  always_comb begin
-    case (instr_i)
-      DIV || DIVU: begin
-        valid = div_ready;
-      end
-      default: valid = 1;
-    endcase
-  end
-
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
-    if (!rst_n_i) begin
-      stream_valid_o <= '0;
-    end else begin
-      stream_valid_o <= valid;
-    end
-  end
-
   ////////////////////////////////////////////////////////////////
-  //                                                            //
   //               Partitioned Integer Multiplier               //
-  //                                                            //
   ////////////////////////////////////////////////////////////////
 
   always_comb begin
@@ -146,9 +122,7 @@ module fu_partitioned
 
 
   ////////////////////////////////////////////////////////////////
-  //                                                            //
   // Partitioned Integer Adder/Subtractor (based on RI5CY ALU)  //
-  //                                                            //
   ////////////////////////////////////////////////////////////////
 
   // Adder
@@ -245,9 +219,7 @@ module fu_partitioned
   };
 
   ////////////////////////////////////////////////////////////////
-  //                                                            //
   //                  Partitioned Shifter                       //
-  //                                                            //
   ////////////////////////////////////////////////////////////////
 
   logic        shift_left;  // should we shift left
@@ -307,9 +279,9 @@ module fu_partitioned
   end
 
   // ALU_FL1 and ALU_CBL are used for the bit counting ops later
-  assign shift_left = (instr_i == ALHS) || (instr_i == LSH);
+  assign shift_left = (instr_i == LSH);
 
-  assign shift_arithmetic = (instr_i == ARSH)  || (instr_i == ALHS);
+  assign shift_arithmetic = (instr_i == ARSH)  || (instr_i == LRSH);
 
   // choose the bit reversed or the normal input for shift operand a
   assign shift_op_a    = shift_left ? operand_a_rev : a_i;
@@ -358,97 +330,8 @@ module fu_partitioned
 
   assign shift_result = shift_left ? shift_left_result : shift_right_result;
 
-  /////////////////////////////////////////////////////////////////////
-  //   ____  _ _      ____                  _      ___               //
-  //  | __ )(_) |_   / ___|___  _   _ _ __ | |_   / _ \ _ __  ___    //
-  //  |  _ \| | __| | |   / _ \| | | | '_ \| __| | | | | '_ \/ __|   //
-  //  | |_) | | |_  | |__| (_) | |_| | | | | |_  | |_| | |_) \__ \_  //
-  //  |____/|_|\__|  \____\___/ \__,_|_| |_|\__|  \___/| .__/|___(_) //
-  //                                                   |_|           //
-  /////////////////////////////////////////////////////////////////////
-
-  logic [31:0] ff_input;  // either op_a_i or its bit reversed version
-  logic [ 5:0] clb_result;  // count leading bits
-  logic [ 4:0] ff1_result;  // holds the index of the first '1'
-  logic        ff_no_one;  // if no ones are found
-
-  cv32e40p_popcnt popcnt_i (
-      .in_i    (operand_a_i),
-      .result_o(cnt_result)
-  );
-
-  always_comb begin
-    ff_input = '0;
-
-    case (instr_i)
-      DIVU: ff_input = operand_a_rev;
-
-      DIV: begin
-        if (operand_a_i[31]) ff_input = operand_a_neg_rev;
-        else ff_input = operand_a_rev;
-      end
-    endcase
-  end
-
-  cv32e40p_ff_one ff_one_i (
-      .in_i       (ff_input),
-      .first_one_o(ff1_result),
-      .no_ones_o  (ff_no_one)
-  );
-
-  assign clb_result = ff1_result - 5'd1;
-
-
-  ////////////////////////////////////////////////////
-  //  ____ _____     __     __  ____  _____ __  __  //
-  // |  _ \_ _\ \   / /    / / |  _ \| ____|  \/  | //
-  // | | | | | \ \ / /    / /  | |_) |  _| | |\/| | //
-  // | |_| | |  \ V /    / /   |  _ <| |___| |  | | //
-  // |____/___|  \_/    /_/    |_| \_\_____|_|  |_| //
-  //                                                //
-  ////////////////////////////////////////////////////
-
-  logic [31:0] result_div;
-  logic        div_ready;
-  logic        div_signed;
-  logic        div_op_a_signed;
-  logic [ 5:0] div_shift_int;
-
-  assign div_signed = (instr_i == DIV);
-
-  assign div_op_a_signed = a_i[31] & div_signed;
-
-  assign div_shift_int = ff_no_one ? 6'd31 : clb_result;
-  assign div_shift = div_shift_int + (div_op_a_signed ? 6'd0 : 6'd1);
-
-  assign div_valid = (stream_valid_a_i & stream_valid_b_i) & ((instr_i == DIV) || (instr_i == DIVU));
-
-  // inputs A and B are swapped
-  cv32e40p_alu_div alu_div_i (
-      .Clk_CI (clk),
-      .Rst_RBI(rst_n),
-
-      // input IF
-      .OpA_DI      (b_i),
-      .OpB_DI      (shift_left_result),
-      .OpBShift_DI (div_shift),
-      .OpBIsZero_SI((a_i == 0)),
-
-      .OpBSign_SI(div_op_a_signed),
-      .OpCode_SI (operator_i[1:0]),
-
-      .Res_DO(result_div),
-
-      // Hand-Shake
-      .InVld_SI (div_valid),
-      .OutRdy_SI(div_valid),  //TO BE CHECKED
-      .OutVld_SO(div_ready)
-  );
-
   ////////////////////////////////////////////////////////////////
-  //                                                            //
   //                        Comparator                          //
-  //                                                            //
   ////////////////////////////////////////////////////////////////
 
   logic comparator_res;
@@ -458,14 +341,14 @@ module fu_partitioned
     case (instr_i)
       MAX: comp_inst_res = comparator_res ? a_i : b_i;
       MIN: comp_inst_res = comparator_res ? b_i : a_i;
+      ABS: comp_inst_res = a_i[31] ? ~a_i + 1 : a_i;
+      SGNMUL: comp_inst_res = a_i[31] ? ~b_i + 1 : b_i;
       default: comp_inst_res = 0;
     endcase
   end
 
   ////////////////////////////////////////////////////////////////
-  //                                                            //
   //                  Result Selection Stage                    //
-  //                                                            //
   ////////////////////////////////////////////////////////////////
 
   always_comb begin
@@ -488,10 +371,6 @@ module fu_partitioned
         res_o = adder_result;
       end
 
-      ALHS: begin
-        res_o = shift_result;
-      end
-
       LSH: begin
         res_o = shift_result;
       end
@@ -504,19 +383,15 @@ module fu_partitioned
         res_o = shift_result;
       end
 
-      AND: res_o = a_i & b_i;
-
-      OR: res_o = a_i | b_i;
-
-      XOR: res_o = a_i ^ b_i;
-
       MAX: res_o = comp_inst_res;
 
       MIN: res_o = comp_inst_res;
 
-      DIV: res_o = result_div;
+      NOP: res_o = '0;
 
-      DIVU: res_o = result_div;
+      ABS: res_o = comp_inst_res;
+
+      SGNMUL: res_o = comp_inst_res;
 
       default: res_o = 0;
     endcase

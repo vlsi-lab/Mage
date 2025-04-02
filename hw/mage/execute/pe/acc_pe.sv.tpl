@@ -28,19 +28,19 @@ module acc_pe
   logic                             acc_match;
 %endif
   //output of input muxes
-  logic      [          N_BITS-1:0] mux1_out;
-  logic      [          N_BITS-1:0] mux2_out;
+  logic      [          N_BITS-1:0] op_a;
+  logic      [          N_BITS-1:0] op_b;
   logic      [          N_BITS-1:0] pe_res;
   logic      [          N_BITS-1:0] tmp_pe_res;
-  logic      [ LOG_N_INPUTS_PE-1:0] mux1_sel;
-  logic      [ LOG_N_INPUTS_PE-1:0] mux2_sel;
+  logic      [ LOG_N_INPUTS_PE-1:0] mux_a_sel;
+  logic      [ LOG_N_INPUTS_PE-1:0] mux_b_sel;
   logic      [                 1:0] vec_mode;
   logic                             acc_counter_sel;
 
   //fu signals
   logic      [          N_BITS-1:0] fu_out;
   logic      [          N_BITS-1:0] fu_out_d;
-  fu_instr_t                        fu_sel;
+  fu_instr_t                        fu_instr;
 
   //Accumulation signals
   logic                             vec_mode_8;
@@ -54,29 +54,16 @@ module acc_pe
   logic      [                 7:0] adder_8_res;
 
   ////////////////////////////////////////////////////////////////
-  //                                                            //
   //                      PE Control Word                       //
-  //                                                            //
   ////////////////////////////////////////////////////////////////
-  assign mux1_sel = ctrl_pe_i[LOG_N_INPUTS_PE-1 : 0];
-  assign mux2_sel = ctrl_pe_i[LOG_N_INPUTS_PE+LOG_N_INPUTS_PE-1 : LOG_N_INPUTS_PE];
-  assign fu_sel = fu_instr_t'(ctrl_pe_i[LOG_N_INPUTS_PE+LOG_N_INPUTS_PE+LOG_N_OPERATIONS-1 : LOG_N_INPUTS_PE+LOG_N_INPUTS_PE]);
-  assign acc_counter_sel = ctrl_pe_i[LOG_N_INPUTS_PE+LOG_N_INPUTS_PE+LOG_N_OPERATIONS];
-  assign vec_mode = ctrl_pe_i[LOG_N_INPUTS_PE+LOG_N_INPUTS_PE+LOG_N_OPERATIONS+2 : LOG_N_INPUTS_PE+LOG_N_INPUTS_PE+LOG_N_OPERATIONS+1];
-
-  // First accumulation match
-  // The first accumulation must be ignored, it only serves for giving the right first input to acc PE
-  /* always_ff @(posedge clk_i or negedge rst_n_i) begin
-    if (~rst_n_i) begin
-      first_acc_match <= 1'b0;
-    end else begin
-      if(acc_match_i == 1'b1) begin
-        first_acc_match <= 1'b1;
-      end else begin
-        first_acc_match <= first_acc_match;
-      end
-    end
-  end */
+  always_comb begin
+    mux_a_sel = pe_mux_sel_t'(ctrl_pe_i[LOG_N_INPUTS_PE-1 : 0]);
+    mux_b_sel = pe_mux_sel_t'(ctrl_pe_i[2*LOG_N_INPUTS_PE-1 : LOG_N_INPUTS_PE]);
+  end
+  assign fu_instr         = fu_instr_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS - 1 : 2 * LOG_N_INPUTS_PE]);
+  assign vec_mode         = ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS];
+  //assign rf_en = ctrl_pe_i[2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+2];
+  assign acc_counter_sel = ctrl_pe_i[2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+3];
 
   /* Accumulation match signal to be asserted if
     1. The PE is in accumulation mode
@@ -90,34 +77,28 @@ module acc_pe
     Management of PE actual inputs
     They are always equal to the output of the input muxes,
     except when the PE is in accumulation mode. In this case, as long as the accumulation match signal is not asserted
-    the output of the FU is fed back to the input of the FU. When asserted, the output of the mux1 is fed to the input of the FU
+    the output of the FU is fed back to the input of the FU. When asserted, the output of the muxa is fed to the input of the FU
   */
   always_comb begin
+    op_a = pe_op_i[mux_a_sel];
+    op_b = pe_op_i[mux_b_sel];
     if (acc_counter_sel) begin
       if (!acc_match_i) begin
-        mux1_out = fu_out_d;  //pe_op_i[4'b0110];
-        mux2_out = pe_op_i[mux2_sel];
-      end else begin
-        mux1_out = pe_op_i[mux1_sel];
-        mux2_out = pe_op_i[mux2_sel];
+        op_a = fu_out_d;
+        op_b = pe_op_i[mux_b_sel];
       end
-    end else begin
-      mux1_out = pe_op_i[mux1_sel];
-      mux2_out = pe_op_i[mux2_sel];
     end
   end
 
   ////////////////////////////////////////////////////////////////
-  //                                                            //
   //                Partitioned Functional Unit                 //
-  //                                                            //
   ////////////////////////////////////////////////////////////////
   fu_partitioned int_fu (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
-      .a_i(mux1_out),
-      .b_i(mux2_out),
-      .instr_i(fu_sel),
+      .a_i(op_a),
+      .b_i(op_b),
+      .instr_i(fu_instr),
       .vec_mode_i(vec_mode),
       .res_o(fu_out)
   );
@@ -132,9 +113,7 @@ module acc_pe
   end
 
   ////////////////////////////////////////////////////////////////
-  //                                                            //
   // 16-bit and 8-bit Adders for Vector Mode Final Accumulation //
-  //                                                            //
   ////////////////////////////////////////////////////////////////
 
   //PE temporary output register holding the operand to consider for vecmode 8 and 16 accumulation final stage
@@ -152,9 +131,9 @@ module acc_pe
 
   //Vector mode detection
   always_comb begin
-    vec_mode_8  = vec_mode == 2'b01;
-    vec_mode_16 = vec_mode == 2'b10;
-    no_vec_mode = vec_mode == 2'b00;
+    vec_mode_8  = (vec_mode == 2'b01);
+    vec_mode_16 = (vec_mode == 2'b10);
+    no_vec_mode = (vec_mode == 2'b00);
   end
 
   // delay acc_match to create the signal that is asserted when the output is ready
@@ -163,10 +142,9 @@ module acc_pe
       output_ready_ff <= 0;
     end else begin
       output_ready_ff[0] <= acc_match;
-      output_ready_ff[1] <= output_ready_ff[0];
-      output_ready_ff[2] <= output_ready_ff[1];
-      output_ready_ff[3] <= output_ready_ff[2];
-      output_ready_ff[4] <= output_ready_ff[3];
+      for (int i = 1; i < 5; i++) begin
+        output_ready_ff[i] <= output_ready_ff[i-1];
+      end
     end
   end
 

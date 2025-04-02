@@ -22,7 +22,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-module cv32e40p_ff_one #(
+module mage_cv32e40p_ff_one #(
     parameter LEN = 32
 ) (
     input logic [LEN-1:0] in_i,

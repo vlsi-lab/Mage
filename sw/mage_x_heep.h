@@ -6,7 +6,7 @@ extern "C"
 {
 #endif // __cplusplus
 
-//#include "core_v_mini_mcu.h"
+#include "core_v_mini_mcu.h"
 #include "mage_regs.h"
 
 #define EXT_XBAR_NMASTER 4
@@ -32,8 +32,11 @@ extern "C"
 // Column Result selection
 #define MAGE_COL_RES_SEL_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_SEL_OUT_COL_PEA_REG_OFFSET)
 // Accumulation values
-#define MAGE_ACC_VALUE_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_ACC_VALUE_0_REG_OFFSET)
-
+#define MAGE_ACC_VALUES_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_ACC_VALUE_0_REG_OFFSET)
+// Output xbar
+#define MAGE_OUT_XBAR_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_STREAM_OUT_XBAR_SEL_REG_OFFSET)
+// Output xbar
+#define MAGE_IN_XBAR_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_STREAM_IN_XBAR_SEL_REG_OFFSET)
 
 #ifdef __cplusplus
 } // extern "C"

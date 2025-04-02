@@ -6,7 +6,7 @@
 #include "mage_regs.h"
 
 // kernel memory size
-#define MAGE_KMEM_SIZE ${kernel_len}
+#define KMEM_SIZE ${kernel_len}
 // number of rows and columns of the PEA array
 #define MAGE_PEA_ROWS ${n_pea_rows}
 #define MAGE_PEA_COLS ${n_pea_cols}
@@ -47,27 +47,16 @@
 extern "C"
 {
 #endif
-/**
- * @brief Sets the constants for each PE.
- * 
- * @param pea_constants The PEA constants array.
- */
-void mage_set_pea_constants(uint8_t pea_constants[MAGE_PEA_ROWS][MAGE_PEA_COLS]);
 
-/**
- * @brief Sets a specific constant for a PE.
- * 
- * @param pea_constant The constant value.
- * @param reg The register index.
- */
-void mage_set_pe_constant(uint8_t pea_constant, uint8_t row, uint8_t col);
+static inline void write_mage_register(uint32_t p_val, uint32_t p_addr, uint32_t p_mask, uint8_t p_sel);
+
 
 /**
  * @brief Sets the PEA configuration.
  * 
  * @param mage_pea_cfg The PEA configuration array that contains the configuration for each PE.
  */
-void mage_set_pea_cfg(uint32_t mage_pea_cfg[MAGE_PEA_ROWS][MAGE_PEA_COLS][MAGE_KMEM_SIZE]);
+void mage_set_pea_cfg(uint32_t mage_pea_cfg[MAGE_PEA_ROWS][MAGE_PEA_COLS][KMEM_SIZE]);
 
 /**
  * @brief Sets the configuration for a specific PE.
@@ -75,9 +64,24 @@ void mage_set_pea_cfg(uint32_t mage_pea_cfg[MAGE_PEA_ROWS][MAGE_PEA_COLS][MAGE_K
  * @param pe_cfg The PE configuration value.
  * @param pe_row The row index of the PE.
  * @param pe_col The column index of the PE.
- * @param n_reg The configuration register index.
+ * @param time The time instant for configuration pe_cfg.
  */
-void mage_set_pe_cfg(uint32_t pe_cfg, uint32_t pe_row, uint32_t pe_col, uint32_t n_reg);
+void mage_set_pe_cfg(uint32_t pe_cfg, uint8_t pe_row, uint8_t pe_col, uint8_t time);
+
+/**
+ * @brief Sets the constants for each PE.
+ * 
+ * @param pea_constants The PEA constants array.
+ */
+void mage_set_pea_constants(uint32_t pea_constants[MAGE_PEA_ROWS][MAGE_PEA_COLS]);
+
+/**
+ * @brief Sets a specific constant for a PE.
+ * 
+ * @param pea_constant The constant value.
+ * @param reg The register index.
+ */
+void mage_set_pe_constant(uint32_t pea_constant, uint8_t row, uint8_t col);
 
 %if enable_decoupling == str(1):
 ////////////////////////////////////////////////////////////////
@@ -103,7 +107,7 @@ uint32_t is_mage_finished();
  * 
  * @param ii The II to set.
  */
-void mage_set_ii(uint32_t ii);
+void mage_set_ii(uint8_t ii);
 
 /**
  * @brief Sets Static/Time-multiplexed mode for AGE-PEA-OutSelectors-Xbars (from LSBs to MSBs)
@@ -168,7 +172,7 @@ void mage_set_li(uint8_t li[MAGE_NUM_HWLP]);
  * 
  * @param strides strides to set.
  */
-void mage_set_age_strides(uint32_t strides[MAGE_N_AGES]);
+void mage_set_all_age_strides(uint32_t strides[MAGE_N_AGES]);
 
 /**
  * @brief Sets the strides for an Address Generation Engine (AGE).
@@ -177,7 +181,7 @@ void mage_set_age_strides(uint32_t strides[MAGE_N_AGES]);
  * @param age_id The age ID.
  * @param strides strides to set.
  */
-void mage_set_one_age_strides(uint32_t stream_id, uint32_t age_id, uint32_t strides);
+void mage_set_age_strides(uint32_t stream_id, uint32_t age_id, uint32_t strides);
 
 
 /**
@@ -195,7 +199,7 @@ void mage_set_pke(uint8_t p, uint8_t k, uint8_t e, uint8_t len_dfg);
  * 
  * @param mage_mage_cfg The MAGE configuration array that contains the configuration for each AGE.
  */
-void mage_set_mage_cfg(uint32_t mage_mage_cfg[MAGE_N_STREAMS][MAGE_N_AGE_PER_STREAM][MAGE_KMEM_SIZE]);
+void mage_set_mage_cfg(uint32_t mage_mage_cfg[MAGE_N_STREAMS][MAGE_N_AGE_PER_STREAM][KMEM_SIZE]);
 
 /**
  * @brief Sets the configuration for a specific AGE.
@@ -266,8 +270,6 @@ void mage_set_store_stream(uint32_t store_stream[STORE_STREAM_SIZE]);
  */
 void mage_set_store_stream_reg(uint32_t store_stream, uint32_t reg);
 
-static inline void write_mage_register(uint32_t p_val, uint32_t p_addr, uint32_t p_mask, uint8_t p_sel);
-
 %endif
 %if enable_streaming_interface == str(1):
 ////////////////////////////////////////////////////////////////
@@ -276,22 +278,40 @@ static inline void write_mage_register(uint32_t p_val, uint32_t p_addr, uint32_t
 //                                                            //
 ////////////////////////////////////////////////////////////////
 /**
- * @brief Sets the selectors for the outputs of PEA columns.
+ * @brief Sets the selector for the outputs of a column of PEA.
  * 
- * @param sel_out_pea_cols The selectors for PEA columns.
+ * @param sel_out The selectors for PEA columns.
+ * @param pea_col PEA column.
  */
-void mage_set_sel_out_pea_cols(uint32_t sel_out_pea_cols);
+void mage_set_sel_out_pea_cols(uint8_t sel_out, uint8_t pea_col);
 
 /**
- * @brief Sets the accumulation values for PEs.
+ * @brief Sets the accumulation values for a PE.
  * 
- * @param acc_values The accumulation values.
+ * @param pe_acc_values The accumulation value.
+ * @param pe_row PE row.
+ * @param pe_col PE col.
  */
-void mage_set_acc_values(uint32_t acc_values[PEA_ACC_VALUES_SIZE]);
+void mage_set_pe_acc_values(uint8_t acc_value, uint8_t pe_row, uint8_t pe_col);
+
+/**
+ * @brief Sets the selector for the outputs of PEA.
+ * 
+ * @param sel_out The selectors for PEA output.
+ */
+void mage_set_sel_out_xbar(uint8_t sel_out);
+
+/**
+ * @brief Sets the configuration for Mage DMA channel.
+ * 
+ * @param n_dma_ch Number of the DMA channel.
+ * @param cfg DMA channel configuration.
+ */
+void mage_set_dma_cfg(uint8_t n_dma_ch, uint8_t cfg);
 
 %endif
 #ifdef __cplusplus
 }
 #endif
 
-#endif // MAGE_CGRA_H_
+#endif // MAGE_H_

@@ -19,7 +19,14 @@ module streaming_interface
     input  hw_fifo_req_t [N_DMA_CH-1:0] hw_fifo_req_i,
     output hw_fifo_resp_t [N_DMA_CH-1:0] hw_fifo_resp_o,
     // PEA Interface
-    input logic pea_ready_i,
+    input logic [M-1:0] pea_ready_i,
+    input logic reg_separate_cols_i,
+%if out_stream_xbar == str(1):
+    input logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_i,
+%endif
+%if in_stream_xbar == str(1):
+    input logic [N_IN_STREAM-1:0][N_DMA_CH_PER_IN_STREAM-1:0][LOG_N_DMA_CH_PER_IN_STREAM-1:0] reg_in_stream_sel_i,
+%endif
     input logic  [M-1:0][N_BITS-1:0] dout_pea_i,
     input logic  [M-1:0] valid_pea_out_i,
     output logic [N_STREAM_IN_PEA-1:0] valid_pea_in_o,
@@ -29,6 +36,8 @@ module streaming_interface
   // Fifo signals
   logic [N_DMA_CH-1:0] hw_r_fifo_pop;
   logic [N_DMA_CH-1:0] hw_r_fifo_empty;
+  logic [N_DMA_CH-1:0] hw_r_fifo_full;
+  logic [N_DMA_CH-1:0][$clog2(4)-1:0] hw_r_usage;
   logic [N_DMA_CH-1:0][N_BITS-1:0] hw_r_fifo_dout;
   logic [N_DMA_CH-1:0] hw_w_fifo_push;
   logic [N_DMA_CH-1:0] hw_w_fifo_full;
@@ -42,11 +51,9 @@ module streaming_interface
 
   // input streaming interface
   logic [N_IN_STREAM-1:0][N_DMA_CH_PER_IN_STREAM-1:0][N_BITS-1:0] stream_in_dma_ch_data;
-  logic [N_IN_STREAM-1:0][N_PEA_DIN_PER_IN_STREAM-1:0][LOG_N_DMA_CH_PER_IN_STREAM-1:0] stream_in_sel;
   logic [N_IN_STREAM-1:0][N_PEA_DIN_PER_IN_STREAM-1:0][N_BITS-1:0] stream_in_pea_data;
   // output streaming interface
   logic [N_OUT_STREAM-1:0][N_PEA_DOUT_PER_OUT_STREAM-1:0][N_BITS-1:0] stream_out_pea_data;
-  logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] stream_out_sel;
   logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][N_BITS-1:0] stream_out_dma_ch_data;
 
   // --------------------------------- HW FIFO
@@ -56,17 +63,17 @@ module streaming_interface
   generate
     for (rf = 0; rf < N_DMA_CH; rf++) begin : gen_hw_r_fifo
       fifo_v3 #(
-        .DEPTH(4),
-        .FALL_THROUGH(1'b0),
-        .DATA_WIDTH(32)
+          .DEPTH(4),
+          .FALL_THROUGH(1'b0),
+          .DATA_WIDTH(32)
       ) hw_r_fifo_i (
           .clk_i(clk_i),
           .rst_ni(rst_n_i),
           .flush_i(),
           .testmode_i(1'b0),
-          .full_o(hw_fifo_resp_o[rf].full),
+          .full_o(hw_r_fifo_full[rf]),
           .empty_o(hw_r_fifo_empty[rf]),
-          .usage_o(),
+          .usage_o(hw_r_usage[rf]),
           .data_i(hw_fifo_req_i[rf].data),
           .push_i(hw_fifo_req_i[rf].push),
           .data_o(hw_r_fifo_dout[rf]),
@@ -80,9 +87,9 @@ module streaming_interface
   generate
     for (wf = 0; wf < N_DMA_CH; wf++) begin : gen_hw_w_fifo
       fifo_v3 #(
-        .DEPTH(4),
-        .FALL_THROUGH(1'b0),
-        .DATA_WIDTH(32)
+          .DEPTH(4),
+          .FALL_THROUGH(1'b0),
+          .DATA_WIDTH(32)
       ) hw_w_fifo_i (
           .clk_i(clk_i),
           .rst_ni(rst_n_i),
@@ -99,11 +106,17 @@ module streaming_interface
     end
   endgenerate
 
+  always_comb begin
+    for (int i = 0; i < N_DMA_CH; i = i + 1) begin
+      hw_fifo_resp_o[i].full = hw_r_fifo_full[i] || (hw_r_usage[i] == 3);
+    end
+  end
+
   // Pop from Read FIFO
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
       hw_r_fifo_pop[i] = 1'b0;
-      if (hw_r_fifo_empty[i] == 1'b0 && pea_ready_i == 1'b1) begin
+      if (hw_r_fifo_empty[i] == 1'b0 && pea_ready_i[i] == 1'b1) begin
         hw_r_fifo_pop[i] = 1'b1;
       end
     end
@@ -112,19 +125,9 @@ module streaming_interface
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
       if (reg_dma_ch_type_i[i] == 1'b1) begin
-        hw_fifo_resp_o[i].push = (hw_w_fifo_full[i] == 1'b0) && (hw_w_fifo_push[i] == 1'b1);
+        hw_fifo_resp_o[i].push = hw_w_fifo_push[i] == 1'b1;
       end else begin
-        hw_fifo_resp_o[i].push = (hw_w_fifo_full[i] == 1'b0) && (hw_fifo_req_i[i].push == 1'b1);
-      end
-    end
-  end
-
-  // Push to Write FIFO
-  always_comb begin
-    for (int i = 0; i < N_DMA_CH; i = i + 1) begin
-      hw_w_fifo_push[i] = '0;
-      if (hw_w_fifo_full[i] == 1'b0) begin
-        hw_w_fifo_push[i] = 1'b1;
+        hw_fifo_resp_o[i].push = hw_fifo_req_i[i].push == 1'b1;
       end
     end
   end
@@ -135,9 +138,9 @@ module streaming_interface
   % for ndc in range(n_dma_ch_per_in_stream):
     % for i in range(len(in_stream_dma_ch_placement)):
       % for j in range(len(in_stream_dma_ch_placement[i])):
-        % if i == nis & j == ndc:
+        % if i == nis and j == ndc:
   assign stream_in_dma_ch_data[${nis}][${ndc}] = hw_r_fifo_dout[${in_stream_dma_ch_placement[i][j]}];
-  assign stream_in_dma_ch_valid[${nis}][${ndc}] = hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}];
+  assign stream_in_dma_ch_valid[${nis}][${ndc}] = hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}] && pea_ready_i[${in_stream_dma_ch_placement[i][j]}] ;
         % endif       
       % endfor
     % endfor
@@ -148,7 +151,7 @@ module streaming_interface
   % for ndc in range(n_pea_dout_per_out_stream):
     % for i in range(len(out_stream_pea_dout_placement)):
       % for j in range(len(out_stream_pea_dout_placement[i])):
-        % if i == nos & j == ndc:
+        % if i == nos and j == ndc:
           %if out_stream_pea_dout_placement[i][j] != None:
   assign stream_out_pea_data[${nos}][${ndc}] = dout_pea_i[${out_stream_pea_dout_placement[i][j]}];
   assign stream_out_pea_valid[${nos}][${ndc}] = valid_pea_out_i[${out_stream_pea_dout_placement[i][j]}];
@@ -162,14 +165,14 @@ module streaming_interface
   % endfor
 % endfor
 
-% if in_stream_xbar == True:
+% if in_stream_xbar == str(1):
   genvar k;
   generate
     for (k = 0; k < N_IN_STREAM; k++) begin : gen_xbar_dma_pea
       dma_pea_xbar dma_pea_xbar_inst (
           .dma_ch_valid_i(stream_in_dma_ch_valid[k]),
           .dma_ch_din_i(stream_in_dma_ch_data[k]),
-          .sel_i(stream_in_sel[k]),
+          .sel_i(reg_in_stream_sel_i[k]),
           .din_pea_o(stream_in_pea_data[k]),
           .valid_pea_o(stream_in_pea_valid[k])
       );
@@ -180,7 +183,7 @@ module streaming_interface
     % for npd in range(n_pea_din_per_in_stream):
     % for i in range(len(in_stream_pea_din_placement)):
       % for j in range(len(in_stream_pea_din_placement[i])):
-        % if i == nis & j == npd:
+        % if i == nis and j == npd:
   assign stream_in_pea_data[${nis}][${npd}] = stream_in_dma_ch_data[${in_stream_pea_din_placement[i][j]}];
   assign stream_in_pea_valid[${nis}][${npd}] = stream_in_dma_ch_valid[${in_stream_pea_din_placement[i][j]}];
           % endif       
@@ -199,14 +202,14 @@ module streaming_interface
     end
   end
 
-% if out_stream_xbar == True:
+% if out_stream_xbar == str(1):
   genvar l;
   generate
     for (l = 0; l < N_OUT_STREAM; l++) begin : gen_xbar_pea_dma
       pea_dma_xbar pea_dma_xbar_inst (
           .dout_pea_i(stream_out_pea_data[l]),
           .valid_pea_i(stream_out_pea_valid[l]),
-          .sel_i(stream_out_sel[l]),
+          .sel_i(reg_out_stream_sel_i[l]),
           .dma_ch_dout_o(stream_out_dma_ch_data[l]),
           .dma_ch_valid_o(stream_out_dma_ch_valid[l])
       );
@@ -217,7 +220,7 @@ module streaming_interface
     % for ndc in range(n_pea_dout_per_out_stream):
     % for i in range(len(out_stream_dma_ch_placement)):
       % for j in range(len(out_stream_dma_ch_placement[i])):
-        % if i == nos & j == ndc:
+        % if i == nos and j == ndc:
   assign stream_out_dma_ch_data[${nos}][${ndc}] = stream_out_pea_data[${out_stream_dma_ch_placement[i][j]}];
   assign stream_out_dma_ch_valid[${nos}][${ndc}] = stream_out_pea_valid[${out_stream_dma_ch_placement[i][j]}];
           % endif       
@@ -231,7 +234,7 @@ module streaming_interface
     for (int i = 0; i < N_OUT_STREAM; i = i + 1) begin
       for (int j = 0; j < N_DMA_CH_PER_OUT_STREAM; j = j + 1) begin
         hw_w_fifo_din[i*N_DMA_CH_PER_OUT_STREAM+j] = stream_out_dma_ch_data[i][j];
-        hw_w_fifo_push[i*N_DMA_CH_PER_OUT_STREAM+j] = stream_out_dma_ch_valid[i][j];
+        hw_w_fifo_push[i*N_DMA_CH_PER_OUT_STREAM+j] = stream_out_dma_ch_valid[i][j] && pea_ready_i[i*N_DMA_CH_PER_OUT_STREAM+j];
       end
     end
   end

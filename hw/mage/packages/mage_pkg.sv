@@ -133,7 +133,7 @@ package mage_pkg;
     logic [NBIT_LP_IV-1:0] inc;
   } loop_vars_t;
 
-  localparam unsigned N_END_SUBS = LOG2_HWLP_RF_SIZE;
+  localparam unsigned N_END_SUBS = LOG2_HWLP_RF_SIZE + (N_SUBSCRIPTS * N_IV_PER_SUBSCRIPT * (LOG2_N_LP + 1));
   localparam unsigned N_END_BANKS = LOG2_HWLP_RF_SIZE + NBIT_N_BANKS;
   localparam unsigned N_END_BANK_START = N_END_BANKS + NBIT_START_BANK;
   localparam unsigned N_END_BS = N_END_BANK_START + NBIT_BLOCK_SIZE;

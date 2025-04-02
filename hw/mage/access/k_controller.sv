@@ -34,7 +34,6 @@ module k_controller
       start[3]  <= start[2];
       start_d_o <= start[3];
     end
-    ;
   end
 
 endmodule

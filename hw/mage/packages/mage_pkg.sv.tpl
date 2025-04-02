@@ -132,6 +132,7 @@ package mage_pkg;
   typedef struct packed {
     logic [NBIT_LP_IV-1:0] iv;
     logic [NBIT_LP_IV-1:0] fv;
+    logic [NBIT_LP_IV-1:0] inc;
   } loop_vars_t;
 
   localparam unsigned N_END_SUBS = LOG2_HWLP_RF_SIZE + (N_SUBSCRIPTS * N_IV_PER_SUBSCRIPT * (LOG2_N_LP + 1));

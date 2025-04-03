@@ -21,7 +21,7 @@ module fu_wrapper
     output logic                   acc_loopback_o,
     output logic                   valid_o,
     output logic                   ready_o,
-    output logic      [N_BITS-1:0] rem_o,
+    output logic      [N_BITS-1:0] rem_q_o,
 %endif
 %if enable_decoupling == str(1):
     input  logic      [       1:0] vec_mode_i,
@@ -136,6 +136,10 @@ module fu_wrapper
         valid = (reg_acc_value_i == '0) ? ops_valid_i : acc_valid;
         ready = 1'b1;
       end
+      ADDPOW: begin
+        valid = valid_mo_instr;
+        ready = 1'b1;
+      end
     endcase
   end
 
@@ -186,10 +190,11 @@ module fu_wrapper
   logic [N_BITS-1:0] mul_op1;
   logic [N_BITS-1:0] mul_op2;
   logic [N_BITS-1:0] temp_res;
+  logic valid_mo_instr;
 
   assign add_res = a_signed + b_signed;
   assign mul_op1 = (instr_i == ADDPOW) ? temp_res : a_signed;
-  assign mul_op2 = (instr_i == ADDMUL) ? temp_res : b_signed;
+  assign mul_op2 = b_signed;
   assign mul_res = mul_op1 * mul_op2;
 
   always_comb begin
@@ -208,18 +213,21 @@ module fu_wrapper
       DIVU: res_o = quotient_div;
       ABS: res_o = (a_i[31]) ? -a_signed : a_signed;
       SGNMUL: res_o = (a_i[31]) ? -b_signed : b_signed;
-      ADDMUL: res_o = mul_res;
-      ADDPOW: res_o = mul_res;
+      REM: res_o = remainder_div;
       default: res_o = 0;
     endcase
   end
 
+  assign rem_q_o = (instr_i == DIVU) ? remainder_div : ((instr_i == REM) ? quotient_div : 0);
+
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
       temp_res <= '0;
+      valid_mo_instr <= 1'b0;
     end else begin
-      if (instr_i == ADDMUL || instr_i == ADDPOW) begin
+      if (instr_i == ADDPOW) begin
         temp_res <= add_res;
+        valid_mo_instr <= ops_valid_i;
       end
     end
   end

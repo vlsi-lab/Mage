@@ -456,7 +456,7 @@ logic out_delay_op_valid${r}${c};
   assign pea_ready_twin_cols[${m.floor(c/2)}] =
   %for c1 in range(c, c+2):
     %for r in range(n_pea_rows):  
-      %if r == n_pea_rows-1:
+      %if c1 == c+1 and r == n_pea_rows-1:
     stream_ready_pe_out${r}${c1};
       %else:
     stream_ready_pe_out${r}${c1} &
@@ -466,9 +466,6 @@ logic out_delay_op_valid${r}${c};
 %endfor
 
   always_comb begin
-%for c in range(n_pea_cols):
-    pea_ready_o[${c}] = ready_in_pe[${c}];
-%endfor
     if(reg_separate_cols_i == 2'b00) begin
 %for c in range(n_pea_cols):
       ready_in_pe[${c}] = pea_ready_all_cols;
@@ -482,6 +479,12 @@ logic out_delay_op_valid${r}${c};
       ready_in_pe[${c}] = pea_ready_twin_cols[${m.floor(c/2)}];
 %endfor
     end
+  end
+
+  always_comb begin
+%for c in range(n_pea_cols):
+    pea_ready_o[${c}] = ready_in_pe[${c}];
+%endfor
   end
 
 endmodule

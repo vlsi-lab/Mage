@@ -20,7 +20,7 @@ module peripheral_regs
     ////////////////////////////////////////////////////////////////
     //               Mage Streaming Configuration                 //
     ////////////////////////////////////////////////////////////////
-    output logic reg_separate_cols_o,
+    output logic [1:0] reg_separate_cols_o,
     output logic [N_DMA_CH-1:0] reg_dma_ch_cfg_o,
     output logic [M-1:0][LOG_N:0] reg_sel_out_col_pea_o,
     output logic [N-1:0][M-1:0][7:0] reg_acc_value_pe_o,

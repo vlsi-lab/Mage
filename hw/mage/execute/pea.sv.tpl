@@ -115,7 +115,9 @@ logic out_delay_op_valid${r}${c};
     %endfor
 %endfor
 
-  logic  [M*N-1:0] stream_valid_pe_out_arr; 
+  logic pea_ready_all_cols;
+  logic [M-1:0] pea_ready_single_cols;
+  logic [M/2-1:0] pea_ready_twin_cols;
 
 %for c in range(n_pea_cols):
   logic [          N:0][N_BITS-1:0] out_data_col${c};   
@@ -428,38 +430,56 @@ logic out_delay_op_valid${r}${c};
     %endfor
 %endfor
 
-  assign stream_valid_pe_out_arr = {
+  assign pea_ready_all_cols = 
 %for r in range(n_pea_rows): 
   %for c in range(n_pea_cols): 
     %if r == n_pea_rows-1 and c == n_pea_cols-1:
-    stream_ready_pe_out${r}${c}
+    stream_ready_pe_out${r}${c};
     %else:
-    stream_ready_pe_out${r}${c},
+    stream_ready_pe_out${r}${c} &
     %endif
   %endfor 
 %endfor
-  };
+
+%for c in range(n_pea_cols):
+  assign pea_ready_single_cols[${c}] =
+  %for r in range(n_pea_rows):  
+    %if r == n_pea_rows-1:
+    stream_ready_pe_out${r}${c};
+    %else:
+    stream_ready_pe_out${r}${c} &
+    %endif
+  %endfor 
+%endfor
+<%import math as m%>
+%for c in range(0, n_pea_cols, 2):
+  assign pea_ready_twin_cols[${m.floor(c/2)}] =
+  %for c1 in range(c, c+2):
+    %for r in range(n_pea_rows):  
+      %if r == n_pea_rows-1:
+    stream_ready_pe_out${r}${c1};
+      %else:
+    stream_ready_pe_out${r}${c1} &
+      %endif
+    %endfor
+  %endfor 
+%endfor
 
   always_comb begin
-    if(reg_separate_cols_i) begin
-
 %for c in range(n_pea_cols):
-      ready_in_pe[${c}] = 
-  %for r in range(n_pea_rows): 
-    %if r == n_pea_rows-1:
-      stream_ready_pe_out${r}${c};
-    %else:
-      stream_ready_pe_out${r}${c} &
-    %endif
-  %endfor 
+    pea_ready_o[${c}] = ready_in_pe[${c}];
 %endfor
+    if(reg_separate_cols_i == 2'b00) begin
 %for c in range(n_pea_cols):
-      pea_ready_o[${c}] = ready_in_pe[${c}];
+      ready_in_pe[${c}] = pea_ready_all_cols;
+%endfor
+    end else if (reg_separate_cols_i == 2'b01) begin
+%for c in range(n_pea_cols):
+      ready_in_pe[${c}] = pea_ready_single_cols[${c}];
 %endfor
     end else begin
 %for c in range(n_pea_cols):
-      ready_in_pe[${c}] = &stream_valid_pe_out_arr;
-      pea_ready_o[${c}] = ready_in_pe[${c}];
+      ready_in_pe[${c}] = pea_ready_twin_cols[${m.floor(c/2)}];
 %endfor
     end
   end

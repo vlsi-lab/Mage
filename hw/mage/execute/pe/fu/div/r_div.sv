@@ -112,7 +112,7 @@ module r_div
   end
 
   assign valid_o = (div_state_c == FINISH);
-  assign r_o = r_out_stage_out_reg;
+  assign r_o = r_out_stage_in_reg;
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin

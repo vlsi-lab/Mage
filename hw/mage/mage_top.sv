@@ -34,7 +34,7 @@ module mage_top
   //                 Stream Peripheral Registers                //
   ////////////////////////////////////////////////////////////////
   logic [N_DMA_CH-1:0] reg_dma_ch_cfg;
-  logic reg_separate_cols;
+  logic [1:0] reg_separate_cols;
   logic [M-1:0][LOG_N:0] reg_stream_sel_out_pea;
   logic [N-1:0][M-1:0][7:0] reg_acc_value_pe;
   // xbar in signals

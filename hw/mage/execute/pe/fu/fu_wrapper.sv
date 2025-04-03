@@ -68,7 +68,7 @@ module fu_wrapper
 
   assign acc_ready = 1'b1;
   assign acc_valid = (acc_cnt == reg_acc_value_i && acc_cnt != '0);
-  assign div_input_valid = (ops_valid_i) & ((instr_i == DIV) || (instr_i == DIVU));
+  assign div_input_valid = (ops_valid_i) & ((instr_i == DIV) || (instr_i == DIVU) || (instr_i ==REM));
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
@@ -117,6 +117,10 @@ module fu_wrapper
         ready = div_ready;
       end
       DIVU: begin
+        valid = out_div_valid && div_used_once;
+        ready = div_ready;
+      end
+      REM: begin
         valid = out_div_valid && div_used_once;
         ready = div_ready;
       end
@@ -184,7 +188,7 @@ module fu_wrapper
 
   assign add_res = a_signed + b_signed;
   assign mul_op1 = (instr_i == ADDPOW) ? temp_res : a_signed;
-  assign mul_op2 = b_signed;
+  assign mul_op2 = (instr_i == ADDPOW) ? temp_res : b_signed;
   assign mul_res = mul_op1 * mul_op2;
 
   always_comb begin
@@ -204,6 +208,7 @@ module fu_wrapper
       ABS: res_o = (a_i[31]) ? -a_signed : a_signed;
       SGNMUL: res_o = (a_i[31]) ? -b_signed : b_signed;
       REM: res_o = remainder_div;
+      ADDPOW: res_o = mul_res;
       default: res_o = 0;
     endcase
   end

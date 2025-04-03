@@ -327,13 +327,13 @@
       ],
     },
     { name: "SEPARATE_COLS",
-      desc: "If set to 1, each column of Mage works in streaming separately from all the other",
+      desc: "If set to 1, each column of Mage works in streaming separately from all the other. If 0, all columns work together. If 2, columns are grouped in 2 groups of 2 each",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
-      { bits: "0", 
+      { bits: "1:0",
         name: "SEP_COLS",
-        desc: "Configuration for separate Mage columns in streaming" 
+        desc: "Configuration for separate Mage columns in streaming"
       },
       ],
     },

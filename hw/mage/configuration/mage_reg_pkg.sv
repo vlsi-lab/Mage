@@ -49,7 +49,7 @@ package mage_reg_pkg;
 
   typedef struct packed {logic [3:0] q;} mage_reg2hw_stream_dma_cfg_reg_t;
 
-  typedef struct packed {logic q;} mage_reg2hw_separate_cols_reg_t;
+  typedef struct packed {logic [1:0] q;} mage_reg2hw_separate_cols_reg_t;
 
   typedef struct packed {
     struct packed {logic [1:0] q;} sel_in_xbar_0;
@@ -81,25 +81,25 @@ package mage_reg_pkg;
 
   // Register -> HW type
   typedef struct packed {
-    mage_reg2hw_cfg_pe_00_mreg_t [0:0] cfg_pe_00;  // [1204:1173]
-    mage_reg2hw_cfg_pe_01_mreg_t [0:0] cfg_pe_01;  // [1172:1141]
-    mage_reg2hw_cfg_pe_02_mreg_t [0:0] cfg_pe_02;  // [1140:1109]
-    mage_reg2hw_cfg_pe_03_mreg_t [0:0] cfg_pe_03;  // [1108:1077]
-    mage_reg2hw_cfg_pe_10_mreg_t [0:0] cfg_pe_10;  // [1076:1045]
-    mage_reg2hw_cfg_pe_11_mreg_t [0:0] cfg_pe_11;  // [1044:1013]
-    mage_reg2hw_cfg_pe_12_mreg_t [0:0] cfg_pe_12;  // [1012:981]
-    mage_reg2hw_cfg_pe_13_mreg_t [0:0] cfg_pe_13;  // [980:949]
-    mage_reg2hw_cfg_pe_20_mreg_t [0:0] cfg_pe_20;  // [948:917]
-    mage_reg2hw_cfg_pe_21_mreg_t [0:0] cfg_pe_21;  // [916:885]
-    mage_reg2hw_cfg_pe_22_mreg_t [0:0] cfg_pe_22;  // [884:853]
-    mage_reg2hw_cfg_pe_23_mreg_t [0:0] cfg_pe_23;  // [852:821]
-    mage_reg2hw_cfg_pe_30_mreg_t [0:0] cfg_pe_30;  // [820:789]
-    mage_reg2hw_cfg_pe_31_mreg_t [0:0] cfg_pe_31;  // [788:757]
-    mage_reg2hw_cfg_pe_32_mreg_t [0:0] cfg_pe_32;  // [756:725]
-    mage_reg2hw_cfg_pe_33_mreg_t [0:0] cfg_pe_33;  // [724:693]
-    mage_reg2hw_pea_constants_mreg_t [15:0] pea_constants;  // [692:181]
-    mage_reg2hw_stream_dma_cfg_reg_t stream_dma_cfg;  // [180:177]
-    mage_reg2hw_separate_cols_reg_t separate_cols;  // [176:176]
+    mage_reg2hw_cfg_pe_00_mreg_t [0:0] cfg_pe_00;  // [1205:1174]
+    mage_reg2hw_cfg_pe_01_mreg_t [0:0] cfg_pe_01;  // [1173:1142]
+    mage_reg2hw_cfg_pe_02_mreg_t [0:0] cfg_pe_02;  // [1141:1110]
+    mage_reg2hw_cfg_pe_03_mreg_t [0:0] cfg_pe_03;  // [1109:1078]
+    mage_reg2hw_cfg_pe_10_mreg_t [0:0] cfg_pe_10;  // [1077:1046]
+    mage_reg2hw_cfg_pe_11_mreg_t [0:0] cfg_pe_11;  // [1045:1014]
+    mage_reg2hw_cfg_pe_12_mreg_t [0:0] cfg_pe_12;  // [1013:982]
+    mage_reg2hw_cfg_pe_13_mreg_t [0:0] cfg_pe_13;  // [981:950]
+    mage_reg2hw_cfg_pe_20_mreg_t [0:0] cfg_pe_20;  // [949:918]
+    mage_reg2hw_cfg_pe_21_mreg_t [0:0] cfg_pe_21;  // [917:886]
+    mage_reg2hw_cfg_pe_22_mreg_t [0:0] cfg_pe_22;  // [885:854]
+    mage_reg2hw_cfg_pe_23_mreg_t [0:0] cfg_pe_23;  // [853:822]
+    mage_reg2hw_cfg_pe_30_mreg_t [0:0] cfg_pe_30;  // [821:790]
+    mage_reg2hw_cfg_pe_31_mreg_t [0:0] cfg_pe_31;  // [789:758]
+    mage_reg2hw_cfg_pe_32_mreg_t [0:0] cfg_pe_32;  // [757:726]
+    mage_reg2hw_cfg_pe_33_mreg_t [0:0] cfg_pe_33;  // [725:694]
+    mage_reg2hw_pea_constants_mreg_t [15:0] pea_constants;  // [693:182]
+    mage_reg2hw_stream_dma_cfg_reg_t stream_dma_cfg;  // [181:178]
+    mage_reg2hw_separate_cols_reg_t separate_cols;  // [177:176]
     mage_reg2hw_stream_in_xbar_sel_reg_t stream_in_xbar_sel;  // [175:168]
     mage_reg2hw_stream_out_xbar_sel_reg_t stream_out_xbar_sel;  // [167:160]
     mage_reg2hw_sel_out_col_pea_mreg_t [0:0] sel_out_col_pea;  // [159:128]

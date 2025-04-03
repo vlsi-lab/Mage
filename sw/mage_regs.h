@@ -198,9 +198,13 @@ extern "C" {
   ((bitfield_field32_t) { .mask = MAGE_STREAM_DMA_CFG_DMA_CH_CFG_MASK, .index = MAGE_STREAM_DMA_CFG_DMA_CH_CFG_OFFSET })
 
 // If set to 1, each column of Mage works in streaming separately from all
-// the other
+// the other. If 0, all columns work together. If 2, columns are grouped in 2
+// groups of 2 each
 #define MAGE_SEPARATE_COLS_REG_OFFSET 0x84
-#define MAGE_SEPARATE_COLS_SEP_COLS_BIT 0
+#define MAGE_SEPARATE_COLS_SEP_COLS_MASK 0x3
+#define MAGE_SEPARATE_COLS_SEP_COLS_OFFSET 0
+#define MAGE_SEPARATE_COLS_SEP_COLS_FIELD \
+  ((bitfield_field32_t) { .mask = MAGE_SEPARATE_COLS_SEP_COLS_MASK, .index = MAGE_SEPARATE_COLS_SEP_COLS_OFFSET })
 
 // Selection signals for input stream crossbars
 #define MAGE_STREAM_IN_XBAR_SEL_REG_OFFSET 0x88

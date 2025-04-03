@@ -166,8 +166,8 @@ module mage_reg_top #(
   logic [3:0] stream_dma_cfg_qs;
   logic [3:0] stream_dma_cfg_wd;
   logic stream_dma_cfg_we;
-  logic separate_cols_qs;
-  logic separate_cols_wd;
+  logic [1:0] separate_cols_qs;
+  logic [1:0] separate_cols_wd;
   logic separate_cols_we;
   logic [1:0] stream_in_xbar_sel_sel_in_xbar_0_qs;
   logic [1:0] stream_in_xbar_sel_sel_in_xbar_0_wd;
@@ -1183,9 +1183,9 @@ module mage_reg_top #(
   // R[separate_cols]: V(False)
 
   prim_subreg #(
-      .DW      (1),
+      .DW      (2),
       .SWACCESS("RW"),
-      .RESVAL  (1'h0)
+      .RESVAL  (2'h0)
   ) u_separate_cols (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
@@ -2154,7 +2154,7 @@ module mage_reg_top #(
   assign stream_dma_cfg_wd = reg_wdata[3:0];
 
   assign separate_cols_we = addr_hit[33] & reg_we & !reg_error;
-  assign separate_cols_wd = reg_wdata[0];
+  assign separate_cols_wd = reg_wdata[1:0];
 
   assign stream_in_xbar_sel_sel_in_xbar_0_we = addr_hit[34] & reg_we & !reg_error;
   assign stream_in_xbar_sel_sel_in_xbar_0_wd = reg_wdata[1:0];
@@ -2377,7 +2377,7 @@ module mage_reg_top #(
       end
 
       addr_hit[33]: begin
-        reg_rdata_next[0] = separate_cols_qs;
+        reg_rdata_next[1:0] = separate_cols_qs;
       end
 
       addr_hit[34]: begin

@@ -220,15 +220,14 @@ logic out_delay_op_valid${r}${c};
           %endif
         %endif
       %endfor
-  assign in_data_pe${r}${c}[${n_pe_in_mem+n_pe_in_stream}] = reg_constant_op_i[${r}][${c}];
-  assign in_data_pe${r}${c}[${1+n_pe_in_mem+n_pe_in_stream}] = out_data_pe${r}${c}; <% k = 0%> 
+  assign in_data_pe${r}${c}[${n_pe_in_mem+n_pe_in_stream}] = reg_constant_op_i[${r}][${c}];<% k = 0%> 
       %for r1 in range(r-1,r+2,1):  
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
             %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
-  assign in_data_pe${r}${c}[${n_pe_in_mem+n_pe_in_stream+2+k}] = '0; <% k = k + 1 %>
+  assign in_data_pe${r}${c}[${n_pe_in_mem+n_pe_in_stream+1+k}] = '0; <% k = k + 1 %>
             %else:
-  assign in_data_pe${r}${c}[${n_pe_in_mem+n_pe_in_stream+2+k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
+  assign in_data_pe${r}${c}[${n_pe_in_mem+n_pe_in_stream+1+k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
             %endif
           %endif
         %endfor
@@ -250,15 +249,14 @@ logic out_delay_op_valid${r}${c};
           %endif
         %endif
       %endfor   
-  assign in_data_pe${r}${c}[${n_pe_in_stream}] = reg_constant_op_i[${r}][${c}];
-  assign in_data_pe${r}${c}[${1+n_pe_in_stream}] = out_data_pe${r}${c}; <% k = 0 %> 
+  assign in_data_pe${r}${c}[${n_pe_in_stream}] = reg_constant_op_i[${r}][${c}];<% k = 0 %> 
       %for r1 in range(r-1,r+2,1):
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
             %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
-  assign in_data_pe${r}${c}[${n_pe_in_stream+2+k}] = '0; <% k = k + 1 %>
+  assign in_data_pe${r}${c}[${n_pe_in_stream+1+k}] = '0; <% k = k + 1 %>
             %else:
-  assign in_data_pe${r}${c}[${n_pe_in_stream+2+k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
+  assign in_data_pe${r}${c}[${n_pe_in_stream+1+k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
             %endif
           %endif
         %endfor
@@ -290,9 +288,9 @@ logic out_delay_op_valid${r}${c};
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
             %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
-  assign in_data_pe${r}${c}[${n_pe_in_mem+2+k}] = '0; <% k = k + 1 %>
+  assign in_data_pe${r}${c}[${n_pe_in_mem+1+k}] = '0; <% k = k + 1 %>
             %else:
-  assign in_data_pe${r}${c}[${n_pe_in_mem+2+k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
+  assign in_data_pe${r}${c}[${n_pe_in_mem+1+k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
             %endif
           %endif
         %endfor
@@ -379,7 +377,6 @@ logic out_delay_op_valid${r}${c};
         %endif
       %endfor
   assign stream_valid_pe_in${r}${c}[${k}] = 1'b1; <% k = k + 1 %>
-  assign stream_valid_pe_in${r}${c}[${k}] = stream_valid_pe_out${r}${c}; <% k = k + 1 %>
       %for r1 in range(r-1,r+2,1):
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc

@@ -92,7 +92,9 @@ package pea_pkg;
     ADD = 4'b1010,
     DIV = 4'b1011,
     DIVU = 4'b1100,
-    ACC = 4'b1101
+    ACC = 4'b1101,
+    ADDMUL = 4'b1110,
+    ADDPOW = 4'b1111
 %else:
     ADD = 4'b1010
 %endif

@@ -20,6 +20,7 @@ module fu_wrapper
     output logic                   acc_loopback_o,
     output logic                   valid_o,
     output logic                   ready_o,
+    output logic      [N_BITS-1:0] rem_o,
     output logic      [N_BITS-1:0] res_o
 );
 
@@ -124,7 +125,7 @@ module fu_wrapper
         ready = acc_ready;
       end
       MAX: begin
-        valid = acc_valid;
+        valid = (reg_acc_value_i == '0) ? ops_valid_i : acc_valid;
         ready = 1'b1;
       end
     endcase
@@ -170,12 +171,23 @@ module fu_wrapper
       .valid_o(shift_valid)
   );
 
+  logic [N_BITS-1:0] add_res;
+  logic [N_BITS-1:0] mul_res;
+  logic [N_BITS-1:0] mul_op1;
+  logic [N_BITS-1:0] mul_op2;
+  logic [N_BITS-1:0] temp_res;
+
+  assign add_res = a_signed + b_signed;
+  assign mul_op1 = (instr_i == ADDPOW) ? temp_res : a_signed;
+  assign mul_op2 = (instr_i == ADDMUL) ? temp_res : b_signed;
+  assign mul_res = mul_op1 * mul_op2;
+
   always_comb begin
     case (instr_i)
       NOP: res_o = 0;
-      ADD: res_o = a_signed + b_signed;
-      ACC: res_o = a_signed + b_signed;
-      MUL: res_o = a_signed * b_signed;
+      ADD: res_o = add_res;
+      ACC: res_o = add_res;
+      MUL: res_o = mul_res;
       SUB: res_o = a_signed - b_signed;
       LSH: res_o = a_signed << b_signed;
       ARSH: res_o = a_signed >>> b_signed;
@@ -186,8 +198,20 @@ module fu_wrapper
       DIVU: res_o = quotient_div;
       ABS: res_o = (a_i[31]) ? -a_signed : a_signed;
       SGNMUL: res_o = (a_i[31]) ? -b_signed : b_signed;
+      ADDMUL: res_o = mul_res;
+      ADDPOW: res_o = mul_res;
       default: res_o = 0;
     endcase
+  end
+
+  always_ff @(posedge clk_i, negedge rst_n_i) begin
+    if (!rst_n_i) begin
+      temp_res <= '0;
+    end else begin
+      if (instr_i == ADDMUL || instr_i == ADDPOW) begin
+        temp_res <= add_res;
+      end
+    end
   end
 
 endmodule

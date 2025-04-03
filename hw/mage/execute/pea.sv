@@ -296,131 +296,115 @@ module pea
 
   assign in_data_pe00[0] = stream_data_in_reg[0];
   assign in_data_pe00[1] = reg_constant_op_i[0][0];
-  assign in_data_pe00[2] = out_data_pe00;
+  assign in_data_pe00[2] = '0;
   assign in_data_pe00[3] = '0;
-  assign in_data_pe00[4] = '0;
-  assign in_data_pe00[5] = out_data_pe01;
-  assign in_data_pe00[6] = out_data_pe10;
+  assign in_data_pe00[4] = out_data_pe01;
+  assign in_data_pe00[5] = out_data_pe10;
 
   assign in_data_pe01[0] = stream_data_in_reg[1];
   assign in_data_pe01[1] = reg_constant_op_i[0][1];
-  assign in_data_pe01[2] = out_data_pe01;
-  assign in_data_pe01[3] = '0;
-  assign in_data_pe01[4] = out_data_pe00;
-  assign in_data_pe01[5] = out_data_pe02;
-  assign in_data_pe01[6] = out_data_pe11;
+  assign in_data_pe01[2] = '0;
+  assign in_data_pe01[3] = out_data_pe00;
+  assign in_data_pe01[4] = out_data_pe02;
+  assign in_data_pe01[5] = out_data_pe11;
 
   assign in_data_pe02[0] = stream_data_in_reg[2];
   assign in_data_pe02[1] = reg_constant_op_i[0][2];
-  assign in_data_pe02[2] = out_data_pe02;
-  assign in_data_pe02[3] = '0;
-  assign in_data_pe02[4] = out_data_pe01;
-  assign in_data_pe02[5] = out_data_pe03;
-  assign in_data_pe02[6] = out_data_pe12;
+  assign in_data_pe02[2] = '0;
+  assign in_data_pe02[3] = out_data_pe01;
+  assign in_data_pe02[4] = out_data_pe03;
+  assign in_data_pe02[5] = out_data_pe12;
 
   assign in_data_pe03[0] = stream_data_in_reg[3];
   assign in_data_pe03[1] = reg_constant_op_i[0][3];
-  assign in_data_pe03[2] = out_data_pe03;
-  assign in_data_pe03[3] = '0;
-  assign in_data_pe03[4] = out_data_pe02;
-  assign in_data_pe03[5] = '0;
-  assign in_data_pe03[6] = out_data_pe13;
+  assign in_data_pe03[2] = '0;
+  assign in_data_pe03[3] = out_data_pe02;
+  assign in_data_pe03[4] = '0;
+  assign in_data_pe03[5] = out_data_pe13;
 
   assign in_data_pe10[0] = stream_data_in_reg[0];
   assign in_data_pe10[1] = reg_constant_op_i[1][0];
-  assign in_data_pe10[2] = out_data_pe10;
-  assign in_data_pe10[3] = out_data_pe00;
-  assign in_data_pe10[4] = '0;
-  assign in_data_pe10[5] = out_data_pe11;
-  assign in_data_pe10[6] = out_data_pe20;
+  assign in_data_pe10[2] = out_data_pe00;
+  assign in_data_pe10[3] = '0;
+  assign in_data_pe10[4] = out_data_pe11;
+  assign in_data_pe10[5] = out_data_pe20;
 
   assign in_data_pe11[0] = stream_data_in_reg[1];
   assign in_data_pe11[1] = reg_constant_op_i[1][1];
-  assign in_data_pe11[2] = out_data_pe11;
-  assign in_data_pe11[3] = out_data_pe01;
-  assign in_data_pe11[4] = out_data_pe10;
-  assign in_data_pe11[5] = out_data_pe12;
-  assign in_data_pe11[6] = out_data_pe21;
+  assign in_data_pe11[2] = out_data_pe01;
+  assign in_data_pe11[3] = out_data_pe10;
+  assign in_data_pe11[4] = out_data_pe12;
+  assign in_data_pe11[5] = out_data_pe21;
 
   assign in_data_pe12[0] = stream_data_in_reg[2];
   assign in_data_pe12[1] = reg_constant_op_i[1][2];
-  assign in_data_pe12[2] = out_data_pe12;
-  assign in_data_pe12[3] = out_data_pe02;
-  assign in_data_pe12[4] = out_data_pe11;
-  assign in_data_pe12[5] = out_data_pe13;
-  assign in_data_pe12[6] = out_data_pe22;
+  assign in_data_pe12[2] = out_data_pe02;
+  assign in_data_pe12[3] = out_data_pe11;
+  assign in_data_pe12[4] = out_data_pe13;
+  assign in_data_pe12[5] = out_data_pe22;
 
   assign in_data_pe13[0] = stream_data_in_reg[3];
   assign in_data_pe13[1] = reg_constant_op_i[1][3];
-  assign in_data_pe13[2] = out_data_pe13;
-  assign in_data_pe13[3] = out_data_pe03;
-  assign in_data_pe13[4] = out_data_pe12;
-  assign in_data_pe13[5] = '0;
-  assign in_data_pe13[6] = out_data_pe23;
+  assign in_data_pe13[2] = out_data_pe03;
+  assign in_data_pe13[3] = out_data_pe12;
+  assign in_data_pe13[4] = '0;
+  assign in_data_pe13[5] = out_data_pe23;
 
   assign in_data_pe20[0] = stream_data_in_reg[0];
   assign in_data_pe20[1] = reg_constant_op_i[2][0];
-  assign in_data_pe20[2] = out_data_pe20;
-  assign in_data_pe20[3] = out_data_pe10;
-  assign in_data_pe20[4] = '0;
-  assign in_data_pe20[5] = out_data_pe21;
-  assign in_data_pe20[6] = out_data_pe30;
+  assign in_data_pe20[2] = out_data_pe10;
+  assign in_data_pe20[3] = '0;
+  assign in_data_pe20[4] = out_data_pe21;
+  assign in_data_pe20[5] = out_data_pe30;
 
   assign in_data_pe21[0] = stream_data_in_reg[1];
   assign in_data_pe21[1] = reg_constant_op_i[2][1];
-  assign in_data_pe21[2] = out_data_pe21;
-  assign in_data_pe21[3] = out_data_pe11;
-  assign in_data_pe21[4] = out_data_pe20;
-  assign in_data_pe21[5] = out_data_pe22;
-  assign in_data_pe21[6] = out_data_pe31;
+  assign in_data_pe21[2] = out_data_pe11;
+  assign in_data_pe21[3] = out_data_pe20;
+  assign in_data_pe21[4] = out_data_pe22;
+  assign in_data_pe21[5] = out_data_pe31;
 
   assign in_data_pe22[0] = stream_data_in_reg[2];
   assign in_data_pe22[1] = reg_constant_op_i[2][2];
-  assign in_data_pe22[2] = out_data_pe22;
-  assign in_data_pe22[3] = out_data_pe12;
-  assign in_data_pe22[4] = out_data_pe21;
-  assign in_data_pe22[5] = out_data_pe23;
-  assign in_data_pe22[6] = out_data_pe32;
+  assign in_data_pe22[2] = out_data_pe12;
+  assign in_data_pe22[3] = out_data_pe21;
+  assign in_data_pe22[4] = out_data_pe23;
+  assign in_data_pe22[5] = out_data_pe32;
 
   assign in_data_pe23[0] = stream_data_in_reg[3];
   assign in_data_pe23[1] = reg_constant_op_i[2][3];
-  assign in_data_pe23[2] = out_data_pe23;
-  assign in_data_pe23[3] = out_data_pe13;
-  assign in_data_pe23[4] = out_data_pe22;
-  assign in_data_pe23[5] = '0;
-  assign in_data_pe23[6] = out_data_pe33;
+  assign in_data_pe23[2] = out_data_pe13;
+  assign in_data_pe23[3] = out_data_pe22;
+  assign in_data_pe23[4] = '0;
+  assign in_data_pe23[5] = out_data_pe33;
 
   assign in_data_pe30[0] = stream_data_in_reg[0];
   assign in_data_pe30[1] = reg_constant_op_i[3][0];
-  assign in_data_pe30[2] = out_data_pe30;
-  assign in_data_pe30[3] = out_data_pe20;
-  assign in_data_pe30[4] = '0;
-  assign in_data_pe30[5] = out_data_pe31;
-  assign in_data_pe30[6] = '0;
+  assign in_data_pe30[2] = out_data_pe20;
+  assign in_data_pe30[3] = '0;
+  assign in_data_pe30[4] = out_data_pe31;
+  assign in_data_pe30[5] = '0;
 
   assign in_data_pe31[0] = stream_data_in_reg[1];
   assign in_data_pe31[1] = reg_constant_op_i[3][1];
-  assign in_data_pe31[2] = out_data_pe31;
-  assign in_data_pe31[3] = out_data_pe21;
-  assign in_data_pe31[4] = out_data_pe30;
-  assign in_data_pe31[5] = out_data_pe32;
-  assign in_data_pe31[6] = '0;
+  assign in_data_pe31[2] = out_data_pe21;
+  assign in_data_pe31[3] = out_data_pe30;
+  assign in_data_pe31[4] = out_data_pe32;
+  assign in_data_pe31[5] = '0;
 
   assign in_data_pe32[0] = stream_data_in_reg[2];
   assign in_data_pe32[1] = reg_constant_op_i[3][2];
-  assign in_data_pe32[2] = out_data_pe32;
-  assign in_data_pe32[3] = out_data_pe22;
-  assign in_data_pe32[4] = out_data_pe31;
-  assign in_data_pe32[5] = out_data_pe33;
-  assign in_data_pe32[6] = '0;
+  assign in_data_pe32[2] = out_data_pe22;
+  assign in_data_pe32[3] = out_data_pe31;
+  assign in_data_pe32[4] = out_data_pe33;
+  assign in_data_pe32[5] = '0;
 
   assign in_data_pe33[0] = stream_data_in_reg[3];
   assign in_data_pe33[1] = reg_constant_op_i[3][3];
-  assign in_data_pe33[2] = out_data_pe33;
-  assign in_data_pe33[3] = out_data_pe23;
-  assign in_data_pe33[4] = out_data_pe32;
+  assign in_data_pe33[2] = out_data_pe23;
+  assign in_data_pe33[3] = out_data_pe32;
+  assign in_data_pe33[4] = '0;
   assign in_data_pe33[5] = '0;
-  assign in_data_pe33[6] = '0;
 
 
 
@@ -591,131 +575,115 @@ module pea
 
   assign stream_valid_pe_in00[0] = stream_valid_in_reg[0];
   assign stream_valid_pe_in00[1] = 1'b1;
-  assign stream_valid_pe_in00[2] = stream_valid_pe_out00;
+  assign stream_valid_pe_in00[2] = 1'b1;
   assign stream_valid_pe_in00[3] = 1'b1;
-  assign stream_valid_pe_in00[4] = 1'b1;
-  assign stream_valid_pe_in00[5] = stream_valid_pe_out01;
-  assign stream_valid_pe_in00[6] = stream_valid_pe_out10;
+  assign stream_valid_pe_in00[4] = stream_valid_pe_out01;
+  assign stream_valid_pe_in00[5] = stream_valid_pe_out10;
 
   assign stream_valid_pe_in01[0] = stream_valid_in_reg[1];
   assign stream_valid_pe_in01[1] = 1'b1;
-  assign stream_valid_pe_in01[2] = stream_valid_pe_out01;
-  assign stream_valid_pe_in01[3] = 1'b1;
-  assign stream_valid_pe_in01[4] = stream_valid_pe_out00;
-  assign stream_valid_pe_in01[5] = stream_valid_pe_out02;
-  assign stream_valid_pe_in01[6] = stream_valid_pe_out11;
+  assign stream_valid_pe_in01[2] = 1'b1;
+  assign stream_valid_pe_in01[3] = stream_valid_pe_out00;
+  assign stream_valid_pe_in01[4] = stream_valid_pe_out02;
+  assign stream_valid_pe_in01[5] = stream_valid_pe_out11;
 
   assign stream_valid_pe_in02[0] = stream_valid_in_reg[2];
   assign stream_valid_pe_in02[1] = 1'b1;
-  assign stream_valid_pe_in02[2] = stream_valid_pe_out02;
-  assign stream_valid_pe_in02[3] = 1'b1;
-  assign stream_valid_pe_in02[4] = stream_valid_pe_out01;
-  assign stream_valid_pe_in02[5] = stream_valid_pe_out03;
-  assign stream_valid_pe_in02[6] = stream_valid_pe_out12;
+  assign stream_valid_pe_in02[2] = 1'b1;
+  assign stream_valid_pe_in02[3] = stream_valid_pe_out01;
+  assign stream_valid_pe_in02[4] = stream_valid_pe_out03;
+  assign stream_valid_pe_in02[5] = stream_valid_pe_out12;
 
   assign stream_valid_pe_in03[0] = stream_valid_in_reg[3];
   assign stream_valid_pe_in03[1] = 1'b1;
-  assign stream_valid_pe_in03[2] = stream_valid_pe_out03;
-  assign stream_valid_pe_in03[3] = 1'b1;
-  assign stream_valid_pe_in03[4] = stream_valid_pe_out02;
-  assign stream_valid_pe_in03[5] = 1'b1;
-  assign stream_valid_pe_in03[6] = stream_valid_pe_out13;
+  assign stream_valid_pe_in03[2] = 1'b1;
+  assign stream_valid_pe_in03[3] = stream_valid_pe_out02;
+  assign stream_valid_pe_in03[4] = 1'b1;
+  assign stream_valid_pe_in03[5] = stream_valid_pe_out13;
 
   assign stream_valid_pe_in10[0] = stream_valid_in_reg[0];
   assign stream_valid_pe_in10[1] = 1'b1;
-  assign stream_valid_pe_in10[2] = stream_valid_pe_out10;
-  assign stream_valid_pe_in10[3] = stream_valid_pe_out00;
-  assign stream_valid_pe_in10[4] = 1'b1;
-  assign stream_valid_pe_in10[5] = stream_valid_pe_out11;
-  assign stream_valid_pe_in10[6] = stream_valid_pe_out20;
+  assign stream_valid_pe_in10[2] = stream_valid_pe_out00;
+  assign stream_valid_pe_in10[3] = 1'b1;
+  assign stream_valid_pe_in10[4] = stream_valid_pe_out11;
+  assign stream_valid_pe_in10[5] = stream_valid_pe_out20;
 
   assign stream_valid_pe_in11[0] = stream_valid_in_reg[1];
   assign stream_valid_pe_in11[1] = 1'b1;
-  assign stream_valid_pe_in11[2] = stream_valid_pe_out11;
-  assign stream_valid_pe_in11[3] = stream_valid_pe_out01;
-  assign stream_valid_pe_in11[4] = stream_valid_pe_out10;
-  assign stream_valid_pe_in11[5] = stream_valid_pe_out12;
-  assign stream_valid_pe_in11[6] = stream_valid_pe_out21;
+  assign stream_valid_pe_in11[2] = stream_valid_pe_out01;
+  assign stream_valid_pe_in11[3] = stream_valid_pe_out10;
+  assign stream_valid_pe_in11[4] = stream_valid_pe_out12;
+  assign stream_valid_pe_in11[5] = stream_valid_pe_out21;
 
   assign stream_valid_pe_in12[0] = stream_valid_in_reg[2];
   assign stream_valid_pe_in12[1] = 1'b1;
-  assign stream_valid_pe_in12[2] = stream_valid_pe_out12;
-  assign stream_valid_pe_in12[3] = stream_valid_pe_out02;
-  assign stream_valid_pe_in12[4] = stream_valid_pe_out11;
-  assign stream_valid_pe_in12[5] = stream_valid_pe_out13;
-  assign stream_valid_pe_in12[6] = stream_valid_pe_out22;
+  assign stream_valid_pe_in12[2] = stream_valid_pe_out02;
+  assign stream_valid_pe_in12[3] = stream_valid_pe_out11;
+  assign stream_valid_pe_in12[4] = stream_valid_pe_out13;
+  assign stream_valid_pe_in12[5] = stream_valid_pe_out22;
 
   assign stream_valid_pe_in13[0] = stream_valid_in_reg[3];
   assign stream_valid_pe_in13[1] = 1'b1;
-  assign stream_valid_pe_in13[2] = stream_valid_pe_out13;
-  assign stream_valid_pe_in13[3] = stream_valid_pe_out03;
-  assign stream_valid_pe_in13[4] = stream_valid_pe_out12;
-  assign stream_valid_pe_in13[5] = 1'b1;
-  assign stream_valid_pe_in13[6] = stream_valid_pe_out23;
+  assign stream_valid_pe_in13[2] = stream_valid_pe_out03;
+  assign stream_valid_pe_in13[3] = stream_valid_pe_out12;
+  assign stream_valid_pe_in13[4] = 1'b1;
+  assign stream_valid_pe_in13[5] = stream_valid_pe_out23;
 
   assign stream_valid_pe_in20[0] = stream_valid_in_reg[0];
   assign stream_valid_pe_in20[1] = 1'b1;
-  assign stream_valid_pe_in20[2] = stream_valid_pe_out20;
-  assign stream_valid_pe_in20[3] = stream_valid_pe_out10;
-  assign stream_valid_pe_in20[4] = 1'b1;
-  assign stream_valid_pe_in20[5] = stream_valid_pe_out21;
-  assign stream_valid_pe_in20[6] = stream_valid_pe_out30;
+  assign stream_valid_pe_in20[2] = stream_valid_pe_out10;
+  assign stream_valid_pe_in20[3] = 1'b1;
+  assign stream_valid_pe_in20[4] = stream_valid_pe_out21;
+  assign stream_valid_pe_in20[5] = stream_valid_pe_out30;
 
   assign stream_valid_pe_in21[0] = stream_valid_in_reg[1];
   assign stream_valid_pe_in21[1] = 1'b1;
-  assign stream_valid_pe_in21[2] = stream_valid_pe_out21;
-  assign stream_valid_pe_in21[3] = stream_valid_pe_out11;
-  assign stream_valid_pe_in21[4] = stream_valid_pe_out20;
-  assign stream_valid_pe_in21[5] = stream_valid_pe_out22;
-  assign stream_valid_pe_in21[6] = stream_valid_pe_out31;
+  assign stream_valid_pe_in21[2] = stream_valid_pe_out11;
+  assign stream_valid_pe_in21[3] = stream_valid_pe_out20;
+  assign stream_valid_pe_in21[4] = stream_valid_pe_out22;
+  assign stream_valid_pe_in21[5] = stream_valid_pe_out31;
 
   assign stream_valid_pe_in22[0] = stream_valid_in_reg[2];
   assign stream_valid_pe_in22[1] = 1'b1;
-  assign stream_valid_pe_in22[2] = stream_valid_pe_out22;
-  assign stream_valid_pe_in22[3] = stream_valid_pe_out12;
-  assign stream_valid_pe_in22[4] = stream_valid_pe_out21;
-  assign stream_valid_pe_in22[5] = stream_valid_pe_out23;
-  assign stream_valid_pe_in22[6] = stream_valid_pe_out32;
+  assign stream_valid_pe_in22[2] = stream_valid_pe_out12;
+  assign stream_valid_pe_in22[3] = stream_valid_pe_out21;
+  assign stream_valid_pe_in22[4] = stream_valid_pe_out23;
+  assign stream_valid_pe_in22[5] = stream_valid_pe_out32;
 
   assign stream_valid_pe_in23[0] = stream_valid_in_reg[3];
   assign stream_valid_pe_in23[1] = 1'b1;
-  assign stream_valid_pe_in23[2] = stream_valid_pe_out23;
-  assign stream_valid_pe_in23[3] = stream_valid_pe_out13;
-  assign stream_valid_pe_in23[4] = stream_valid_pe_out22;
-  assign stream_valid_pe_in23[5] = 1'b1;
-  assign stream_valid_pe_in23[6] = stream_valid_pe_out33;
+  assign stream_valid_pe_in23[2] = stream_valid_pe_out13;
+  assign stream_valid_pe_in23[3] = stream_valid_pe_out22;
+  assign stream_valid_pe_in23[4] = 1'b1;
+  assign stream_valid_pe_in23[5] = stream_valid_pe_out33;
 
   assign stream_valid_pe_in30[0] = stream_valid_in_reg[0];
   assign stream_valid_pe_in30[1] = 1'b1;
-  assign stream_valid_pe_in30[2] = stream_valid_pe_out30;
-  assign stream_valid_pe_in30[3] = stream_valid_pe_out20;
-  assign stream_valid_pe_in30[4] = 1'b1;
-  assign stream_valid_pe_in30[5] = stream_valid_pe_out31;
-  assign stream_valid_pe_in30[6] = 1'b1;
+  assign stream_valid_pe_in30[2] = stream_valid_pe_out20;
+  assign stream_valid_pe_in30[3] = 1'b1;
+  assign stream_valid_pe_in30[4] = stream_valid_pe_out31;
+  assign stream_valid_pe_in30[5] = 1'b1;
 
   assign stream_valid_pe_in31[0] = stream_valid_in_reg[1];
   assign stream_valid_pe_in31[1] = 1'b1;
-  assign stream_valid_pe_in31[2] = stream_valid_pe_out31;
-  assign stream_valid_pe_in31[3] = stream_valid_pe_out21;
-  assign stream_valid_pe_in31[4] = stream_valid_pe_out30;
-  assign stream_valid_pe_in31[5] = stream_valid_pe_out32;
-  assign stream_valid_pe_in31[6] = 1'b1;
+  assign stream_valid_pe_in31[2] = stream_valid_pe_out21;
+  assign stream_valid_pe_in31[3] = stream_valid_pe_out30;
+  assign stream_valid_pe_in31[4] = stream_valid_pe_out32;
+  assign stream_valid_pe_in31[5] = 1'b1;
 
   assign stream_valid_pe_in32[0] = stream_valid_in_reg[2];
   assign stream_valid_pe_in32[1] = 1'b1;
-  assign stream_valid_pe_in32[2] = stream_valid_pe_out32;
-  assign stream_valid_pe_in32[3] = stream_valid_pe_out22;
-  assign stream_valid_pe_in32[4] = stream_valid_pe_out31;
-  assign stream_valid_pe_in32[5] = stream_valid_pe_out33;
-  assign stream_valid_pe_in32[6] = 1'b1;
+  assign stream_valid_pe_in32[2] = stream_valid_pe_out22;
+  assign stream_valid_pe_in32[3] = stream_valid_pe_out31;
+  assign stream_valid_pe_in32[4] = stream_valid_pe_out33;
+  assign stream_valid_pe_in32[5] = 1'b1;
 
   assign stream_valid_pe_in33[0] = stream_valid_in_reg[3];
   assign stream_valid_pe_in33[1] = 1'b1;
-  assign stream_valid_pe_in33[2] = stream_valid_pe_out33;
-  assign stream_valid_pe_in33[3] = stream_valid_pe_out23;
-  assign stream_valid_pe_in33[4] = stream_valid_pe_out32;
+  assign stream_valid_pe_in33[2] = stream_valid_pe_out23;
+  assign stream_valid_pe_in33[3] = stream_valid_pe_out32;
+  assign stream_valid_pe_in33[4] = 1'b1;
   assign stream_valid_pe_in33[5] = 1'b1;
-  assign stream_valid_pe_in33[6] = 1'b1;
 
   always_comb begin
     for (int i = 0; i < N; i++) begin

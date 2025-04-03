@@ -66,6 +66,7 @@ module pe
   logic                                       acc_counter_sel;
   //fu signals
   logic      [          N_BITS-1:0]           fu_out;
+  logic      [          N_BITS-1:0]           rem_out;
   fu_instr_t                                  fu_instr;
   // RF
   logic [          N_BITS-1:0]                rf;
@@ -157,6 +158,7 @@ module pe
       .ops_valid_i(fu_ops_valid),
       .valid_o(fu_valid),
       .ready_o(fu_ready),
+      .rem_o(rem_out),
       .acc_loopback_o(acc_loopback),
 %endif
 %if enable_decoupling == str(1):
@@ -173,7 +175,7 @@ module pe
   assign delay_op_fu    = neigh_delay_op_i[delay_op_sel];
   assign delay_op_valid = neigh_delay_op_valid_i[delay_op_sel];
   always_comb begin
-    delay_op_out = (delay_op_sel == D_PE_RES) ? fu_out : ( 
+    delay_op_out = (delay_op_sel == D_PE_RES) ? ((fu_instr == DIVU) ? -rem_out : fu_out) : ( 
                    (delay_op_sel == D_PE_OP_A) ? op_a : (
                    (delay_op_sel == D_PE_OP_B) ? op_b : delay_op_fu
                   ));

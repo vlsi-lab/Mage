@@ -126,7 +126,7 @@ module fu
         ready = acc_ready;
       end
       MAX: begin
-        valid = acc_valid;
+        valid = (reg_acc_value_i == '0) ? ops_valid_i : acc_valid;
         ready = 1'b1;
       end
     endcase

@@ -15,20 +15,20 @@ package stream_intf_pkg;
   //Number of input streams to Mage
   //An input stream has multiple DMA channels coming in with input data, and they are
   //"reorganized" using crossbars or assignments towards PEA inputs
-  localparam unsigned N_IN_STREAM = 2;
+  localparam unsigned N_IN_STREAM = 1;
   // In each inputs stream, N_DMA_CH_PER_IN_STREAM DMA channels can be grouped
-  localparam unsigned N_DMA_CH_PER_IN_STREAM = 2;
+  localparam unsigned N_DMA_CH_PER_IN_STREAM = 4;
   // In each inputs stream, N_PEA_DIN_PER_IN_STREAM PEA inputs can be grouped
-  localparam unsigned N_PEA_DIN_PER_IN_STREAM = 2;
+  localparam unsigned N_PEA_DIN_PER_IN_STREAM = 4;
 
   //Number of output streams exiting from Mage
   //An output stream has multiple PEA outputs coming in with input data, and they are
   //"reorganized" using crossbars or assignments towards DMA channels
-  localparam unsigned N_OUT_STREAM = 2;
+  localparam unsigned N_OUT_STREAM = 1;
   // In each inputs stream, N_PEA_DOUT_PER_OUT_STREAM PEA outputs can be grouped
-  localparam unsigned N_PEA_DOUT_PER_OUT_STREAM = 2;
+  localparam unsigned N_PEA_DOUT_PER_OUT_STREAM = 4;
   // In each inputs stream, N_DMA_CH_PER_OUT_STREAM DMA channels can be grouped
-  localparam unsigned N_DMA_CH_PER_OUT_STREAM = 2;
+  localparam unsigned N_DMA_CH_PER_OUT_STREAM = 4;
 
 
   localparam unsigned N_STREAM_OUT_PEA = N_OUT_STREAM * N_PEA_DOUT_PER_OUT_STREAM;

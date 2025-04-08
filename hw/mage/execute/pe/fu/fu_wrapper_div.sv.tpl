@@ -7,7 +7,7 @@
 // Date: 26/02/2025
 // Description: wrapper for functional unit
 
-module fu_wrapper
+module fu_wrapper_div
   import pea_pkg::*;
 (
     input  logic                   clk_i,
@@ -23,6 +23,7 @@ module fu_wrapper
     output logic                   acc_loopback_o,
     output logic                   valid_o,
     output logic                   ready_o,
+    output logic      [N_BITS-1:0] rem_q_o,
 %endif
 %if enable_decoupling == str(1):
     input  logic      [       1:0] vec_mode_i,
@@ -40,6 +41,12 @@ module fu_wrapper
   ////////////////////////////////////////////////////////////////
   //                    Ready-Valid Handling                    //
   ////////////////////////////////////////////////////////////////
+  // division ready-valid
+  logic       out_div_valid;
+  logic       div_ready;
+  logic       div_busy;
+  logic       div_input_valid;
+  logic       div_used_once;
   // acuumulation ready-valid
   logic [15:0] acc_cnt;
   logic       acc_ready;
@@ -71,11 +78,66 @@ module fu_wrapper
 
   assign acc_ready = 1'b1;
   assign acc_valid = (acc_cnt == reg_acc_value_i && acc_cnt != '0);
+  assign div_input_valid = (ops_valid_i) & ((instr_i == DIV) || (instr_i == DIVU) || (instr_i == REM) || (instr_i == ABSDIV && valid_mo_instr));
+
+  always_ff @(posedge clk_i, negedge rst_n_i) begin
+    if (!rst_n_i) begin
+      div_busy <= 1'b0;
+    end else begin
+      if (out_div_valid) begin
+        div_busy <= 1'b0;
+      end else begin
+        if (div_input_valid) begin
+          div_busy <= 1'b1;
+        end
+      end
+    end
+  end
+
+  always_ff @(posedge clk_i, negedge rst_n_i) begin
+    if (!rst_n_i) begin
+      div_used_once <= 1'b0;
+    end else begin
+      if (div_busy) begin
+        div_used_once <= 1'b1;
+      end
+    end
+  end
+
+  always_comb begin
+    if (div_busy) begin
+      div_ready = 1'b0;
+      if (out_div_valid) begin
+        div_ready = 1'b1;
+      end
+    end else begin
+      div_ready = 1'b1;
+      if (div_input_valid) begin
+        div_ready = 1'b0;
+      end
+    end
+  end
 
   always_comb begin
     valid = ops_valid_i;
     ready = 1'b1;
     case (instr_i)
+      DIV: begin
+        valid = out_div_valid && div_used_once;
+        ready = div_ready;
+      end
+      DIVU: begin
+        valid = out_div_valid && div_used_once;
+        ready = div_ready;
+      end
+      REM: begin
+        valid = out_div_valid && div_used_once;
+        ready = div_ready;
+      end
+      ABSDIV: begin
+        valid = out_div_valid && div_used_once;
+        ready = div_ready;
+      end
       ACC: begin
         valid = acc_valid;
         ready = acc_ready;
@@ -97,6 +159,20 @@ module fu_wrapper
 
   assign valid_o = valid;
   assign ready_o = ready;
+
+  logic [N_BITS-1:0] quotient_div;
+  logic [N_BITS-1:0] remainder_div;
+
+  div_wrapper div_wrapper_i (
+      .clk_i(clk_i),
+      .rst_n_i(rst_n_i),
+      .a_i(div_op1),
+      .b_i(div_op2),
+      .in_valid_i(div_input_valid),
+      .q_o(quotient_div),
+      .r_o(remainder_div),
+      .valid_o(out_div_valid)
+  );
   %endif
 
   %if enable_streaming_interface == str(1) and enable_decoupling == str(0):
@@ -107,6 +183,9 @@ module fu_wrapper
 
   logic [N_BITS-1:0] mul_op1;
   logic [N_BITS-1:0] mul_op2;
+
+  logic [N_BITS-1:0] div_op1;
+  logic [N_BITS-1:0] div_op2;
 
   logic [N_BITS-1:0] lsh_op1_rev;
   logic [2*N_BITS-1:0] shift_op1;
@@ -155,6 +234,9 @@ module fu_wrapper
       end else if (instr_i == ADDMUL) begin
         temp_res <= add_res[N_BITS:1];
         valid_mo_instr <= ops_valid_i;
+      end else if (instr_i == ABSDIV) begin
+        temp_res <= add_res[N_BITS:1];
+        valid_mo_instr <= ops_valid_i;
       end
     end
   end
@@ -165,6 +247,8 @@ module fu_wrapper
     add_op2 = {b_signed, 1'b0};
     mul_op1 = a_signed;
     mul_op2 = b_signed;
+    div_op1 = a_signed;
+    div_op2 = b_signed;
     shift_op1 = a_signed;
     shift_op2 = b_signed;
 
@@ -174,6 +258,8 @@ module fu_wrapper
         add_op2   = '0;
         mul_op1   = '0;
         mul_op2   = '0;
+        div_op1   = '0;
+        div_op2   = '0;
         shift_op1 = '0;
         shift_op2 = '0;
       end
@@ -231,6 +317,12 @@ module fu_wrapper
         add_op2 = {op2_neg, 1'b1};
       end
 
+      ABSDIV: begin
+        add_op1 = {a_signed, 1'b0};
+        add_op2 = sign_op1 ? {32'd1, 1'b0} : {32'd0, 1'b0};
+        div_op1 = temp_res;
+      end
+
     endcase
   end
   
@@ -247,14 +339,20 @@ module fu_wrapper
       LRSH: res_o = shift_res;
       MAX: res_o = (add_res[N_BITS-1]) ? b_i : a_i;
       MIN: res_o = (add_res[N_BITS-1]) ? a_i : b_i;
+      DIV: res_o = quotient_div;
+      DIVU: res_o = quotient_div;
       ABS: res_o = add_res[N_BITS:1];
       SGNMUL: res_o = add_res[N_BITS:1];
+      REM: res_o = remainder_div;
       ADDPOW: res_o = mul_res;
+      ABSDIV: res_o = quotient_div;
       ADDMUL: res_o = mul_res;
       SGNSUB: res_o = sign_op1 ? add_res[N_BITS:1] : b_signed;
       default: res_o = 0;
     endcase
   end
+
+  assign rem_q_o = (instr_i == DIVU || instr_i == DIV || instr_i == ABSDIV) ? remainder_div : ((instr_i == REM) ? quotient_div : 0);
 
   %elif enable_streaming_interface == str(0) and enable_decoupling == str(1):
   fu_partitioned fu_partitioned_i (

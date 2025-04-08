@@ -34,7 +34,6 @@ filesets:
     - hw/mage/xbars/banks_pea/xbar_banks_pea_pipelined.sv
     - hw/mage/execute/pe/fu/fu_partitioned.sv
     - hw/mage/execute/pe/acc_pe.sv
-    - hw/mage/execute/pe/pe.sv
     - hw/mage/execute/pea.sv
     - hw/mage/mage_top.sv
     file_type: systemVerilogSource

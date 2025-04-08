@@ -18,26 +18,28 @@ N_AGE_TOT = 8
 N_AGE_PER_STREAM = 2
 
 # Streaming Interface
-IN_STREAM_XBAR = 1
-OUT_STREAM_XBAR = 1
+IN_STREAM_XBAR = 0
+OUT_STREAM_XBAR = 0
 ENABLE_STREAMING_INTERFACE = 1
 ENABLE_DECOUPLED = 0
 
 N_DMA_CH = 4
-N_IN_STREAM = 2
-N_DMA_CH_PER_IN_STREAM = 2
-N_PEA_DIN_PER_IN_STREAM = 2
-N_OUT_STREAM = 2
-N_PEA_DOUT_PER_OUT_STREAM = 2
-N_DMA_CH_PER_OUT_STREAM = 2
+N_IN_STREAM = 1
+N_DMA_CH_PER_IN_STREAM = 4
+N_PEA_DIN_PER_IN_STREAM = 4
+N_OUT_STREAM = 1
+N_PEA_DOUT_PER_OUT_STREAM = 4
+N_DMA_CH_PER_OUT_STREAM = 4
 
 # PEA
 N_PEA_ROWS = 4
 N_PEA_COLS = 4
 N_PE_IN_MEM = 4
-N_PE_IN_STREAM = 1
+N_PE_IN_STREAM = 4
 N_NEIGH_PE = 4
 #N_PEA_NOC_TYPE = 0
+
+ROW_DIV = 3
 
 re-vendor:
 	./util/vendor.py ./vendor/lowrisc_opentitan.vendor.hjson -v --update; \
@@ -66,7 +68,10 @@ mage-gen:
 	--n_dma_ch_per_out_stream $(N_DMA_CH_PER_OUT_STREAM) \
 	--in_stream_xbar $(IN_STREAM_XBAR) \
 	--out_stream_xbar $(OUT_STREAM_XBAR)
-	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe --tpl-sv hw/mage/execute/pe/pe.sv.tpl \
+	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe --tpl-sv hw/mage/execute/pe/s_pe.sv.tpl \
+	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
+	--enable_decoupling $(ENABLE_DECOUPLED)
+	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe --tpl-sv hw/mage/execute/pe/s_div_pe.sv.tpl \
 	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
 	--enable_decoupling $(ENABLE_DECOUPLED)
 	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe --tpl-sv hw/mage/execute/pe/acc_pe.sv.tpl \
@@ -75,9 +80,13 @@ mage-gen:
 	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe/fu --tpl-sv hw/mage/execute/pe/fu/fu_wrapper.sv.tpl \
 	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
 	--enable_decoupling $(ENABLE_DECOUPLED)
+	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe/fu --tpl-sv hw/mage/execute/pe/fu/fu_wrapper_div.sv.tpl \
+	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
+	--enable_decoupling $(ENABLE_DECOUPLED)
 	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute --tpl-sv hw/mage/execute/pea.sv.tpl \
 	--n_pea_rows $(N_PEA_ROWS) \
 	--n_pea_cols $(N_PEA_COLS) \
+	--row_div $(ROW_DIV) \
 	--n_pe_in_mem $(N_PE_IN_MEM) \
 	--n_pe_in_stream $(N_PE_IN_STREAM) \
 	--n_neigh_pe $(N_NEIGH_PE) \
@@ -173,6 +182,8 @@ mage-gen:
 	--n_age_tot $(N_AGE_TOT) \
 	--n_age_per_stream $(N_AGE_PER_STREAM) \
 	--enable_decoupling $(ENABLE_DECOUPLED) \
+	--in_stream_xbar $(IN_STREAM_XBAR) \
+	--out_stream_xbar $(OUT_STREAM_XBAR) \
 	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE)
 	util/format-verible;
 	$(PYTHON) util/mage-gen.py  --outdir sw/ --tpl-sv sw/mage_x_heep.h.tpl \
@@ -182,6 +193,8 @@ mage-gen:
 	--n_age_tot $(N_AGE_TOT) \
 	--n_age_per_stream $(N_AGE_PER_STREAM) \
 	--enable_decoupling $(ENABLE_DECOUPLED) \
+	--in_stream_xbar $(IN_STREAM_XBAR) \
+	--out_stream_xbar $(OUT_STREAM_XBAR) \
 	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE)
 	$(PYTHON) $(REGTOOL_SCRIPT) -r -t $(REGTOOL_DEST_DIR) $(REGTOOL_SRC_FILE)
 	$(PYTHON) $(REGTOOL_SCRIPT) -D $(REGTOOL_SRC_FILE) > $(REGTOOL_SW_DEST_DIR)/mage_regs.h

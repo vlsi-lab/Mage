@@ -250,52 +250,6 @@
       },
       ],
     },
-    { name: "STREAM_IN_XBAR_SEL",
-      desc: "Selection signals for input stream crossbars",
-      swaccess: "rw",
-      hwaccess: "hro",
-      fields: [
-      { bits: "1:0",
-        name: "SEL_IN_XBAR_0",
-        desc: "Selection signals for output stream crossbar"
-      },
-      { bits: "3:2",
-        name: "SEL_IN_XBAR_1",
-        desc: "Selection signals for output stream crossbar"
-      },
-      { bits: "5:4",
-        name: "SEL_IN_XBAR_2",
-        desc: "Selection signals for output stream crossbar"
-      },
-      { bits: "7:6",
-        name: "SEL_IN_XBAR_3",
-        desc: "Selection signals for output stream crossbar"
-      },
-      ],
-    },
-    { name: "STREAM_OUT_XBAR_SEL",
-      desc: "Selection signals for output stream crossbars",
-      swaccess: "rw",
-      hwaccess: "hro",
-      fields: [
-      { bits: "1:0",
-        name: "SEL_OUT_XBAR_0",
-        desc: "Selection signals for output stream crossbar"
-      },
-      { bits: "3:2",
-        name: "SEL_OUT_XBAR_1",
-        desc: "Selection signals for output stream crossbar"
-      },
-      { bits: "5:4",
-        name: "SEL_OUT_XBAR_2",
-        desc: "Selection signals for output stream crossbar"
-      },
-      { bits: "7:6",
-        name: "SEL_OUT_XBAR_3",
-        desc: "Selection signals for output stream crossbar"
-      },
-      ],
-    },
     { multireg:
       { name: "SEL_OUT_COL_PEA",
       desc: "Selection signals for output of MAGE-CGRA PEA",
@@ -326,26 +280,14 @@
     { multireg:
       { name: "ACC_VALUE",
       desc: "Accumulation Value for PEs",
-      count : "4",
+      count : "16",
       cname: "ACC_VALUE_PE",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
-      { bits: "7:0",
-        name: "PE_0",
-        desc: "Selector for column 0"
-      },
-      { bits: "15:8",
-        name: "PE_1",
-        desc: "Selector for column 1"
-      },
-      { bits: "23:16",
-        name: "PE_2",
-        desc: "Selector for column 2"
-      },
-      { bits: "31:24",
-        name: "PE_3",
-        desc: "Selector for column 3"
+      { bits: "31:0",
+        name: "ACC",
+        desc: "Accumulation value"
       },
       ],
       }

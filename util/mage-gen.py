@@ -45,14 +45,14 @@ def write_template(tpl_path, outdir, outfile, **kwargs):
 def main():
 
     # has to be [N_IN_STREAM[N_DMA_CH_PER_IN_STREAM]]
-    in_stream_dma_ch_placement = [[0, 1], [2, 3]];
+    in_stream_dma_ch_placement = [[0, 1, 2, 3]];
     # has to be [N_IN_STREAM[N_PEA_DIN_PER_IN_STREAM]]
-    in_stream_pea_din_placement = [[0, 1], [2, 3]];
+    in_stream_pea_din_placement = [[0, 1, 2, 3]];
     # the entry at poition i,j indicates to which pea col the j-th ch of output stream is connected
     # has to be [N_OUT_STREAM[N_PEA_DOUT_PER_OUT_STREAM]]
-    out_stream_pea_dout_placement = [[0, 1], [2, 3]];
+    out_stream_pea_dout_placement = [[0, 1, 2, 3]];
     # has to be [N_OUT_STREAM[N_DMA_CH_PER_OUT_STREAM]]
-    out_stream_dma_ch_placement = [[0, 1], [2, 3]];
+    out_stream_dma_ch_placement = [[0, 1, 2, 3]];
 
     # has to be [N_PEA_COL][N_IN_MEM]?
     pea_in_mem_placement = [[0, 1, 4, 5], [0, 1, 4, 5], [2, 3, 6, 7], [2, 3, 6, 7]];
@@ -255,6 +255,12 @@ def main():
                         default="4",
                         help="")
     
+    parser.add_argument("--row_div",
+                        metavar="",
+                        nargs='?',
+                        default="4",
+                        help="")
+    
     
 
     args = parser.parse_args()
@@ -348,6 +354,9 @@ def main():
     if args.kernel_len != None and args.kernel_len != '':
         kernel_len = int(args.kernel_len)
 
+    if args.row_div != None and args.row_div != '':
+        row_div = int(args.row_div)
+
 
     kwargs = {
         "num_words"                        : num_words,
@@ -376,7 +385,8 @@ def main():
         "out_stream_pea_dout_placement"    : out_stream_pea_dout_placement,
         "n_age_tot"                        : n_age_tot,
         "n_age_per_stream"                 : n_age_per_stream,
-        "kernel_len"                       : kernel_len
+        "kernel_len"                       : kernel_len,
+        "row_div"                          : row_div
     }
 
     ###########

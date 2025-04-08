@@ -69,10 +69,14 @@ extern "C"
 #define MAGE_COL_RES_SEL_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_SEL_OUT_COL_PEA_REG_OFFSET)
 // Accumulation values
 #define MAGE_ACC_VALUES_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_ACC_VALUE_0_REG_OFFSET)
+%if out_stream_xbar == str(1):
 // Output xbar
 #define MAGE_OUT_XBAR_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_STREAM_OUT_XBAR_SEL_REG_OFFSET)
+%endif
+%if in_stream_xbar == str(1):
 // Output xbar
 #define MAGE_IN_XBAR_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_STREAM_IN_XBAR_SEL_REG_OFFSET)
+%endif
 %endif
 
 #ifdef __cplusplus

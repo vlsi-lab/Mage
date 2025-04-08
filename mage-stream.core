@@ -24,16 +24,14 @@ filesets:
     - hw/mage/configuration/mage_reg_pkg.sv
     - hw/mage/configuration/mage_reg_top.sv
     - hw/mage/configuration/peripheral_regs.sv
-    - hw/mage/execute/pe/fu/div/mage_cv32e40p_ff_one.sv
-    - hw/mage/execute/pe/fu/div/mage_cv32e40p_alu_div.sv
-    - hw/mage/execute/pe/fu/shifter/p_shifter.sv
     - hw/mage/execute/pe/fu/div/r_div_cell.sv
     - hw/mage/execute/pe/fu/div/r_div_stage.sv
     - hw/mage/execute/pe/fu/div/r_div.sv
     - hw/mage/execute/pe/fu/div/div_wrapper.sv
-    - hw/mage/execute/pe/fu/fu.sv
+    - hw/mage/execute/pe/fu/fu_wrapper_div.sv
     - hw/mage/execute/pe/fu/fu_wrapper.sv
-    - hw/mage/execute/pe/pe.sv
+    - hw/mage/execute/pe/s_pe.sv
+    - hw/mage/execute/pe/s_div_pe.sv
     - hw/mage/execute/pea.sv
     - hw/mage/mage_top.sv
     file_type: systemVerilogSource

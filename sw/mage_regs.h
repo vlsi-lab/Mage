@@ -206,47 +206,9 @@ extern "C" {
 #define MAGE_SEPARATE_COLS_SEP_COLS_FIELD \
   ((bitfield_field32_t) { .mask = MAGE_SEPARATE_COLS_SEP_COLS_MASK, .index = MAGE_SEPARATE_COLS_SEP_COLS_OFFSET })
 
-// Selection signals for input stream crossbars
-#define MAGE_STREAM_IN_XBAR_SEL_REG_OFFSET 0x88
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_0_MASK 0x3
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_0_OFFSET 0
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_0_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_0_MASK, .index = MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_0_OFFSET })
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_1_MASK 0x3
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_1_OFFSET 2
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_1_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_1_MASK, .index = MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_1_OFFSET })
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_2_MASK 0x3
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_2_OFFSET 4
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_2_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_2_MASK, .index = MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_2_OFFSET })
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_3_MASK 0x3
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_3_OFFSET 6
-#define MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_3_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_3_MASK, .index = MAGE_STREAM_IN_XBAR_SEL_SEL_IN_XBAR_3_OFFSET })
-
-// Selection signals for output stream crossbars
-#define MAGE_STREAM_OUT_XBAR_SEL_REG_OFFSET 0x8c
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_0_MASK 0x3
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_0_OFFSET 0
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_0_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_0_MASK, .index = MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_0_OFFSET })
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_1_MASK 0x3
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_1_OFFSET 2
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_1_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_1_MASK, .index = MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_1_OFFSET })
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_2_MASK 0x3
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_2_OFFSET 4
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_2_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_2_MASK, .index = MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_2_OFFSET })
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_3_MASK 0x3
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_3_OFFSET 6
-#define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_3_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_3_MASK, .index = MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_3_OFFSET })
-
 // Selection signals for output of MAGE-CGRA PEA (common parameters)
 // Selection signals for output of MAGE-CGRA PEA
-#define MAGE_SEL_OUT_COL_PEA_REG_OFFSET 0x90
+#define MAGE_SEL_OUT_COL_PEA_REG_OFFSET 0x88
 #define MAGE_SEL_OUT_COL_PEA_SEL_COL_0_0_MASK 0xff
 #define MAGE_SEL_OUT_COL_PEA_SEL_COL_0_0_OFFSET 0
 #define MAGE_SEL_OUT_COL_PEA_SEL_COL_0_0_FIELD \
@@ -265,81 +227,57 @@ extern "C" {
   ((bitfield_field32_t) { .mask = MAGE_SEL_OUT_COL_PEA_SEL_COL_3_0_MASK, .index = MAGE_SEL_OUT_COL_PEA_SEL_COL_3_0_OFFSET })
 
 // Accumulation Value for PEs (common parameters)
-// Accumulation Value for PEs
-#define MAGE_ACC_VALUE_0_REG_OFFSET 0x94
-#define MAGE_ACC_VALUE_0_PE_0_0_MASK 0xff
-#define MAGE_ACC_VALUE_0_PE_0_0_OFFSET 0
-#define MAGE_ACC_VALUE_0_PE_0_0_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_0_PE_0_0_MASK, .index = MAGE_ACC_VALUE_0_PE_0_0_OFFSET })
-#define MAGE_ACC_VALUE_0_PE_1_0_MASK 0xff
-#define MAGE_ACC_VALUE_0_PE_1_0_OFFSET 8
-#define MAGE_ACC_VALUE_0_PE_1_0_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_0_PE_1_0_MASK, .index = MAGE_ACC_VALUE_0_PE_1_0_OFFSET })
-#define MAGE_ACC_VALUE_0_PE_2_0_MASK 0xff
-#define MAGE_ACC_VALUE_0_PE_2_0_OFFSET 16
-#define MAGE_ACC_VALUE_0_PE_2_0_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_0_PE_2_0_MASK, .index = MAGE_ACC_VALUE_0_PE_2_0_OFFSET })
-#define MAGE_ACC_VALUE_0_PE_3_0_MASK 0xff
-#define MAGE_ACC_VALUE_0_PE_3_0_OFFSET 24
-#define MAGE_ACC_VALUE_0_PE_3_0_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_0_PE_3_0_MASK, .index = MAGE_ACC_VALUE_0_PE_3_0_OFFSET })
+#define MAGE_ACC_VALUE_ACC_FIELD_WIDTH 32
+#define MAGE_ACC_VALUE_ACC_FIELDS_PER_REG 1
+#define MAGE_ACC_VALUE_MULTIREG_COUNT 16
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_1_REG_OFFSET 0x98
-#define MAGE_ACC_VALUE_1_PE_0_1_MASK 0xff
-#define MAGE_ACC_VALUE_1_PE_0_1_OFFSET 0
-#define MAGE_ACC_VALUE_1_PE_0_1_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_1_PE_0_1_MASK, .index = MAGE_ACC_VALUE_1_PE_0_1_OFFSET })
-#define MAGE_ACC_VALUE_1_PE_1_1_MASK 0xff
-#define MAGE_ACC_VALUE_1_PE_1_1_OFFSET 8
-#define MAGE_ACC_VALUE_1_PE_1_1_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_1_PE_1_1_MASK, .index = MAGE_ACC_VALUE_1_PE_1_1_OFFSET })
-#define MAGE_ACC_VALUE_1_PE_2_1_MASK 0xff
-#define MAGE_ACC_VALUE_1_PE_2_1_OFFSET 16
-#define MAGE_ACC_VALUE_1_PE_2_1_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_1_PE_2_1_MASK, .index = MAGE_ACC_VALUE_1_PE_2_1_OFFSET })
-#define MAGE_ACC_VALUE_1_PE_3_1_MASK 0xff
-#define MAGE_ACC_VALUE_1_PE_3_1_OFFSET 24
-#define MAGE_ACC_VALUE_1_PE_3_1_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_1_PE_3_1_MASK, .index = MAGE_ACC_VALUE_1_PE_3_1_OFFSET })
+#define MAGE_ACC_VALUE_0_REG_OFFSET 0x8c
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_2_REG_OFFSET 0x9c
-#define MAGE_ACC_VALUE_2_PE_0_2_MASK 0xff
-#define MAGE_ACC_VALUE_2_PE_0_2_OFFSET 0
-#define MAGE_ACC_VALUE_2_PE_0_2_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_2_PE_0_2_MASK, .index = MAGE_ACC_VALUE_2_PE_0_2_OFFSET })
-#define MAGE_ACC_VALUE_2_PE_1_2_MASK 0xff
-#define MAGE_ACC_VALUE_2_PE_1_2_OFFSET 8
-#define MAGE_ACC_VALUE_2_PE_1_2_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_2_PE_1_2_MASK, .index = MAGE_ACC_VALUE_2_PE_1_2_OFFSET })
-#define MAGE_ACC_VALUE_2_PE_2_2_MASK 0xff
-#define MAGE_ACC_VALUE_2_PE_2_2_OFFSET 16
-#define MAGE_ACC_VALUE_2_PE_2_2_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_2_PE_2_2_MASK, .index = MAGE_ACC_VALUE_2_PE_2_2_OFFSET })
-#define MAGE_ACC_VALUE_2_PE_3_2_MASK 0xff
-#define MAGE_ACC_VALUE_2_PE_3_2_OFFSET 24
-#define MAGE_ACC_VALUE_2_PE_3_2_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_2_PE_3_2_MASK, .index = MAGE_ACC_VALUE_2_PE_3_2_OFFSET })
+#define MAGE_ACC_VALUE_1_REG_OFFSET 0x90
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_3_REG_OFFSET 0xa0
-#define MAGE_ACC_VALUE_3_PE_0_3_MASK 0xff
-#define MAGE_ACC_VALUE_3_PE_0_3_OFFSET 0
-#define MAGE_ACC_VALUE_3_PE_0_3_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_3_PE_0_3_MASK, .index = MAGE_ACC_VALUE_3_PE_0_3_OFFSET })
-#define MAGE_ACC_VALUE_3_PE_1_3_MASK 0xff
-#define MAGE_ACC_VALUE_3_PE_1_3_OFFSET 8
-#define MAGE_ACC_VALUE_3_PE_1_3_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_3_PE_1_3_MASK, .index = MAGE_ACC_VALUE_3_PE_1_3_OFFSET })
-#define MAGE_ACC_VALUE_3_PE_2_3_MASK 0xff
-#define MAGE_ACC_VALUE_3_PE_2_3_OFFSET 16
-#define MAGE_ACC_VALUE_3_PE_2_3_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_3_PE_2_3_MASK, .index = MAGE_ACC_VALUE_3_PE_2_3_OFFSET })
-#define MAGE_ACC_VALUE_3_PE_3_3_MASK 0xff
-#define MAGE_ACC_VALUE_3_PE_3_3_OFFSET 24
-#define MAGE_ACC_VALUE_3_PE_3_3_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_ACC_VALUE_3_PE_3_3_MASK, .index = MAGE_ACC_VALUE_3_PE_3_3_OFFSET })
+#define MAGE_ACC_VALUE_2_REG_OFFSET 0x94
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_3_REG_OFFSET 0x98
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_4_REG_OFFSET 0x9c
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_5_REG_OFFSET 0xa0
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_6_REG_OFFSET 0xa4
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_7_REG_OFFSET 0xa8
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_8_REG_OFFSET 0xac
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_9_REG_OFFSET 0xb0
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_10_REG_OFFSET 0xb4
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_11_REG_OFFSET 0xb8
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_12_REG_OFFSET 0xbc
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_13_REG_OFFSET 0xc0
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_14_REG_OFFSET 0xc4
+
+// Accumulation Value for PEs
+#define MAGE_ACC_VALUE_15_REG_OFFSET 0xc8
 
 #ifdef __cplusplus
 }  // extern "C"

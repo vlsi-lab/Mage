@@ -397,26 +397,14 @@
     { multireg:
       { name: "ACC_VALUE",
       desc: "Accumulation Value for PEs",
-      count : "${m.ceil((n_pea_cols*n_pea_rows*8)/32)}",
+      count : "${n_pea_cols*n_pea_rows}",
       cname: "ACC_VALUE_PE",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
-      { bits: "7:0", 
-        name: "PE_0",
-        desc: "Selector for column 0" 
-      },
-      { bits: "15:8", 
-        name: "PE_1",
-        desc: "Selector for column 1"
-      },
-      { bits: "23:16", 
-        name: "PE_2",
-        desc: "Selector for column 2"
-      },
-      { bits: "31:24", 
-        name: "PE_3",
-        desc: "Selector for column 3"
+      { bits: "31:0", 
+        name: "ACC",
+        desc: "Accumulation value" 
       },
       ],
       }

@@ -21,8 +21,6 @@ module streaming_interface
     // PEA Interface
     input logic [M-1:0] pea_ready_i,
     input logic reg_separate_cols_i,
-    input logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_i,
-    input logic [N_IN_STREAM-1:0][N_DMA_CH_PER_IN_STREAM-1:0][LOG_N_DMA_CH_PER_IN_STREAM-1:0] reg_in_stream_sel_i,
     input logic [M-1:0][N_BITS-1:0] dout_pea_i,
     input logic [M-1:0] valid_pea_out_i,
     output logic [N_STREAM_IN_PEA-1:0] valid_pea_in_o,
@@ -134,32 +132,28 @@ module streaming_interface
   assign stream_in_dma_ch_valid[0][0] = hw_r_fifo_pop[0] && pea_ready_i[0];
   assign stream_in_dma_ch_data[0][1] = hw_r_fifo_dout[1];
   assign stream_in_dma_ch_valid[0][1] = hw_r_fifo_pop[1] && pea_ready_i[1];
-  assign stream_in_dma_ch_data[1][0] = hw_r_fifo_dout[2];
-  assign stream_in_dma_ch_valid[1][0] = hw_r_fifo_pop[2] && pea_ready_i[2];
-  assign stream_in_dma_ch_data[1][1] = hw_r_fifo_dout[3];
-  assign stream_in_dma_ch_valid[1][1] = hw_r_fifo_pop[3] && pea_ready_i[3];
+  assign stream_in_dma_ch_data[0][2] = hw_r_fifo_dout[2];
+  assign stream_in_dma_ch_valid[0][2] = hw_r_fifo_pop[2] && pea_ready_i[2];
+  assign stream_in_dma_ch_data[0][3] = hw_r_fifo_dout[3];
+  assign stream_in_dma_ch_valid[0][3] = hw_r_fifo_pop[3] && pea_ready_i[3];
 
   assign stream_out_pea_data[0][0] = dout_pea_i[0];
   assign stream_out_pea_valid[0][0] = valid_pea_out_i[0];
   assign stream_out_pea_data[0][1] = dout_pea_i[1];
   assign stream_out_pea_valid[0][1] = valid_pea_out_i[1];
-  assign stream_out_pea_data[1][0] = dout_pea_i[2];
-  assign stream_out_pea_valid[1][0] = valid_pea_out_i[2];
-  assign stream_out_pea_data[1][1] = dout_pea_i[3];
-  assign stream_out_pea_valid[1][1] = valid_pea_out_i[3];
+  assign stream_out_pea_data[0][2] = dout_pea_i[2];
+  assign stream_out_pea_valid[0][2] = valid_pea_out_i[2];
+  assign stream_out_pea_data[0][3] = dout_pea_i[3];
+  assign stream_out_pea_valid[0][3] = valid_pea_out_i[3];
 
-  genvar k;
-  generate
-    for (k = 0; k < N_IN_STREAM; k++) begin : gen_xbar_dma_pea
-      dma_pea_xbar dma_pea_xbar_inst (
-          .dma_ch_valid_i(stream_in_dma_ch_valid[k]),
-          .dma_ch_din_i(stream_in_dma_ch_data[k]),
-          .sel_i(reg_in_stream_sel_i[k]),
-          .din_pea_o(stream_in_pea_data[k]),
-          .valid_pea_o(stream_in_pea_valid[k])
-      );
-    end
-  endgenerate
+  assign stream_in_pea_data[0][0] = stream_in_dma_ch_data[0][0];
+  assign stream_in_pea_valid[0][0] = stream_in_dma_ch_valid[0][0];
+  assign stream_in_pea_data[0][1] = stream_in_dma_ch_data[0][1];
+  assign stream_in_pea_valid[0][1] = stream_in_dma_ch_valid[0][1];
+  assign stream_in_pea_data[0][2] = stream_in_dma_ch_data[0][2];
+  assign stream_in_pea_valid[0][2] = stream_in_dma_ch_valid[0][2];
+  assign stream_in_pea_data[0][3] = stream_in_dma_ch_data[0][3];
+  assign stream_in_pea_valid[0][3] = stream_in_dma_ch_valid[0][3];
 
   always_comb begin
     for (int i = 0; i < N_IN_STREAM; i = i + 1) begin
@@ -170,18 +164,14 @@ module streaming_interface
     end
   end
 
-  genvar l;
-  generate
-    for (l = 0; l < N_OUT_STREAM; l++) begin : gen_xbar_pea_dma
-      pea_dma_xbar pea_dma_xbar_inst (
-          .dout_pea_i(stream_out_pea_data[l]),
-          .valid_pea_i(stream_out_pea_valid[l]),
-          .sel_i(reg_out_stream_sel_i[l]),
-          .dma_ch_dout_o(stream_out_dma_ch_data[l]),
-          .dma_ch_valid_o(stream_out_dma_ch_valid[l])
-      );
-    end
-  endgenerate
+  assign stream_out_dma_ch_data[0][0]  = stream_out_pea_data[0][0];
+  assign stream_out_dma_ch_valid[0][0] = stream_out_pea_valid[0][0];
+  assign stream_out_dma_ch_data[0][1]  = stream_out_pea_data[0][1];
+  assign stream_out_dma_ch_valid[0][1] = stream_out_pea_valid[0][1];
+  assign stream_out_dma_ch_data[0][2]  = stream_out_pea_data[0][2];
+  assign stream_out_dma_ch_valid[0][2] = stream_out_pea_valid[0][2];
+  assign stream_out_dma_ch_data[0][3]  = stream_out_pea_data[0][3];
+  assign stream_out_dma_ch_valid[0][3] = stream_out_pea_valid[0][3];
 
   always_comb begin
     for (int i = 0; i < N_OUT_STREAM; i = i + 1) begin

@@ -14,9 +14,9 @@ module pea
     input  logic                                                      clk_i,
     input  logic                                                      rst_n_i,
     // Streaming Interface
-    input  logic                                                      reg_separate_cols_i,
+    input  logic [                1:0]                                reg_separate_cols_i,
     input  logic [              M-1:0][   LOG_N:0]                    reg_stream_sel_out_pea_i,
-    input  logic [              N-1:0][     M-1:0][              7:0] reg_acc_value_i,
+    input  logic [              N-1:0][     M-1:0][             31:0] reg_acc_value_i,
     input  logic [N_STREAM_IN_PEA-1:0]                                stream_valid_i,
     input  logic [N_STREAM_IN_PEA-1:0][N_BITS-1:0]                    stream_data_i,
     output logic [              M-1:0]                                pea_ready_o,
@@ -27,181 +27,181 @@ module pea
     input  logic [              N-1:0][     M-1:0][             31:0] reg_constant_op_i
 );
 
-  logic [         N_BITS-1:0]                  out_data_pe00;
-  logic [         N_BITS-1:0]                  out_data_pe01;
-  logic [         N_BITS-1:0]                  out_data_pe02;
-  logic [         N_BITS-1:0]                  out_data_pe03;
-  logic [         N_BITS-1:0]                  out_data_pe10;
-  logic [         N_BITS-1:0]                  out_data_pe11;
-  logic [         N_BITS-1:0]                  out_data_pe12;
-  logic [         N_BITS-1:0]                  out_data_pe13;
-  logic [         N_BITS-1:0]                  out_data_pe20;
-  logic [         N_BITS-1:0]                  out_data_pe21;
-  logic [         N_BITS-1:0]                  out_data_pe22;
-  logic [         N_BITS-1:0]                  out_data_pe23;
-  logic [         N_BITS-1:0]                  out_data_pe30;
-  logic [         N_BITS-1:0]                  out_data_pe31;
-  logic [         N_BITS-1:0]                  out_data_pe32;
-  logic [         N_BITS-1:0]                  out_data_pe33;
+  logic [         N_BITS-1:0]                   out_data_pe00;
+  logic [         N_BITS-1:0]                   out_data_pe01;
+  logic [         N_BITS-1:0]                   out_data_pe02;
+  logic [         N_BITS-1:0]                   out_data_pe03;
+  logic [         N_BITS-1:0]                   out_data_pe10;
+  logic [         N_BITS-1:0]                   out_data_pe11;
+  logic [         N_BITS-1:0]                   out_data_pe12;
+  logic [         N_BITS-1:0]                   out_data_pe13;
+  logic [         N_BITS-1:0]                   out_data_pe20;
+  logic [         N_BITS-1:0]                   out_data_pe21;
+  logic [         N_BITS-1:0]                   out_data_pe22;
+  logic [         N_BITS-1:0]                   out_data_pe23;
+  logic [         N_BITS-1:0]                   out_data_pe30;
+  logic [         N_BITS-1:0]                   out_data_pe31;
+  logic [         N_BITS-1:0]                   out_data_pe32;
+  logic [         N_BITS-1:0]                   out_data_pe33;
 
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe00;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe01;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe02;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe03;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe10;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe11;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe12;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe13;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe20;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe21;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe22;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe23;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe30;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe31;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe32;
-  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]      in_data_pe33;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe00;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe01;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe02;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe03;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe10;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe11;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe12;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe13;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe20;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe21;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe22;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe23;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe30;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe31;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe32;
+  logic [    N_INPUTS_PE-3:0][N_BITS-1:0]       in_data_pe33;
 
 
   ////////////////////////////////////////////////////////////////
   //              Signals for Streaming MAGE PEA                //
   ////////////////////////////////////////////////////////////////
-  logic [N_STREAM_IN_PEA-1:0][N_BITS-1:0]      stream_data_in_reg;
-  logic [N_STREAM_IN_PEA-1:0]                  stream_valid_in_reg;
-  logic [              M-1:0][     N-1:0][7:0] reg_acc_value_pe;
+  logic [N_STREAM_IN_PEA-1:0][N_BITS-1:0]       stream_data_in_reg;
+  logic [N_STREAM_IN_PEA-1:0]                   stream_valid_in_reg;
+  logic [              M-1:0][     N-1:0][31:0] reg_acc_value_pe;
 
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in00;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in01;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in02;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in03;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in10;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in11;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in12;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in13;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in20;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in21;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in22;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in23;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in30;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in31;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in32;
-  logic [    N_INPUTS_PE-3:0]                  stream_valid_pe_in33;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in00;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in01;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in02;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in03;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in10;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in11;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in12;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in13;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in20;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in21;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in22;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in23;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in30;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in31;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in32;
+  logic [    N_INPUTS_PE-3:0]                   stream_valid_pe_in33;
 
-  logic                                        stream_valid_pe_out00;
-  logic                                        stream_valid_pe_out01;
-  logic                                        stream_valid_pe_out02;
-  logic                                        stream_valid_pe_out03;
-  logic                                        stream_valid_pe_out10;
-  logic                                        stream_valid_pe_out11;
-  logic                                        stream_valid_pe_out12;
-  logic                                        stream_valid_pe_out13;
-  logic                                        stream_valid_pe_out20;
-  logic                                        stream_valid_pe_out21;
-  logic                                        stream_valid_pe_out22;
-  logic                                        stream_valid_pe_out23;
-  logic                                        stream_valid_pe_out30;
-  logic                                        stream_valid_pe_out31;
-  logic                                        stream_valid_pe_out32;
-  logic                                        stream_valid_pe_out33;
+  logic                                         stream_valid_pe_out00;
+  logic                                         stream_valid_pe_out01;
+  logic                                         stream_valid_pe_out02;
+  logic                                         stream_valid_pe_out03;
+  logic                                         stream_valid_pe_out10;
+  logic                                         stream_valid_pe_out11;
+  logic                                         stream_valid_pe_out12;
+  logic                                         stream_valid_pe_out13;
+  logic                                         stream_valid_pe_out20;
+  logic                                         stream_valid_pe_out21;
+  logic                                         stream_valid_pe_out22;
+  logic                                         stream_valid_pe_out23;
+  logic                                         stream_valid_pe_out30;
+  logic                                         stream_valid_pe_out31;
+  logic                                         stream_valid_pe_out32;
+  logic                                         stream_valid_pe_out33;
 
-  logic                                        stream_ready_pe_out00;
-  logic                                        stream_ready_pe_out01;
-  logic                                        stream_ready_pe_out02;
-  logic                                        stream_ready_pe_out03;
-  logic                                        stream_ready_pe_out10;
-  logic                                        stream_ready_pe_out11;
-  logic                                        stream_ready_pe_out12;
-  logic                                        stream_ready_pe_out13;
-  logic                                        stream_ready_pe_out20;
-  logic                                        stream_ready_pe_out21;
-  logic                                        stream_ready_pe_out22;
-  logic                                        stream_ready_pe_out23;
-  logic                                        stream_ready_pe_out30;
-  logic                                        stream_ready_pe_out31;
-  logic                                        stream_ready_pe_out32;
-  logic                                        stream_ready_pe_out33;
+  logic                                         stream_ready_pe_out00;
+  logic                                         stream_ready_pe_out01;
+  logic                                         stream_ready_pe_out02;
+  logic                                         stream_ready_pe_out03;
+  logic                                         stream_ready_pe_out10;
+  logic                                         stream_ready_pe_out11;
+  logic                                         stream_ready_pe_out12;
+  logic                                         stream_ready_pe_out13;
+  logic                                         stream_ready_pe_out20;
+  logic                                         stream_ready_pe_out21;
+  logic                                         stream_ready_pe_out22;
+  logic                                         stream_ready_pe_out23;
+  logic                                         stream_ready_pe_out30;
+  logic                                         stream_ready_pe_out31;
+  logic                                         stream_ready_pe_out32;
+  logic                                         stream_ready_pe_out33;
 
-  logic [              M-1:0]                  ready_in_pe;
+  logic [              M-1:0]                   ready_in_pe;
 
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op00;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op01;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op02;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op03;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op10;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op11;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op12;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op13;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op20;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op21;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op22;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op23;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op30;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op31;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op32;
-  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]      in_delay_op33;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op00;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op01;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op02;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op03;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op10;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op11;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op12;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op13;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op20;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op21;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op22;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op23;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op30;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op31;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op32;
+  logic [     N_NEIGH_PE-1:0][N_BITS-1:0]       in_delay_op33;
 
-  logic [         N_BITS-1:0]                  out_delay_op00;
-  logic [         N_BITS-1:0]                  out_delay_op01;
-  logic [         N_BITS-1:0]                  out_delay_op02;
-  logic [         N_BITS-1:0]                  out_delay_op03;
-  logic [         N_BITS-1:0]                  out_delay_op10;
-  logic [         N_BITS-1:0]                  out_delay_op11;
-  logic [         N_BITS-1:0]                  out_delay_op12;
-  logic [         N_BITS-1:0]                  out_delay_op13;
-  logic [         N_BITS-1:0]                  out_delay_op20;
-  logic [         N_BITS-1:0]                  out_delay_op21;
-  logic [         N_BITS-1:0]                  out_delay_op22;
-  logic [         N_BITS-1:0]                  out_delay_op23;
-  logic [         N_BITS-1:0]                  out_delay_op30;
-  logic [         N_BITS-1:0]                  out_delay_op31;
-  logic [         N_BITS-1:0]                  out_delay_op32;
-  logic [         N_BITS-1:0]                  out_delay_op33;
+  logic [         N_BITS-1:0]                   out_delay_op00;
+  logic [         N_BITS-1:0]                   out_delay_op01;
+  logic [         N_BITS-1:0]                   out_delay_op02;
+  logic [         N_BITS-1:0]                   out_delay_op03;
+  logic [         N_BITS-1:0]                   out_delay_op10;
+  logic [         N_BITS-1:0]                   out_delay_op11;
+  logic [         N_BITS-1:0]                   out_delay_op12;
+  logic [         N_BITS-1:0]                   out_delay_op13;
+  logic [         N_BITS-1:0]                   out_delay_op20;
+  logic [         N_BITS-1:0]                   out_delay_op21;
+  logic [         N_BITS-1:0]                   out_delay_op22;
+  logic [         N_BITS-1:0]                   out_delay_op23;
+  logic [         N_BITS-1:0]                   out_delay_op30;
+  logic [         N_BITS-1:0]                   out_delay_op31;
+  logic [         N_BITS-1:0]                   out_delay_op32;
+  logic [         N_BITS-1:0]                   out_delay_op33;
 
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid00;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid01;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid02;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid03;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid10;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid11;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid12;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid13;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid20;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid21;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid22;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid23;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid30;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid31;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid32;
-  logic [     N_NEIGH_PE-1:0]                  in_delay_op_valid33;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid00;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid01;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid02;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid03;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid10;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid11;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid12;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid13;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid20;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid21;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid22;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid23;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid30;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid31;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid32;
+  logic [     N_NEIGH_PE-1:0]                   in_delay_op_valid33;
 
-  logic                                        out_delay_op_valid00;
-  logic                                        out_delay_op_valid01;
-  logic                                        out_delay_op_valid02;
-  logic                                        out_delay_op_valid03;
-  logic                                        out_delay_op_valid10;
-  logic                                        out_delay_op_valid11;
-  logic                                        out_delay_op_valid12;
-  logic                                        out_delay_op_valid13;
-  logic                                        out_delay_op_valid20;
-  logic                                        out_delay_op_valid21;
-  logic                                        out_delay_op_valid22;
-  logic                                        out_delay_op_valid23;
-  logic                                        out_delay_op_valid30;
-  logic                                        out_delay_op_valid31;
-  logic                                        out_delay_op_valid32;
-  logic                                        out_delay_op_valid33;
+  logic                                         out_delay_op_valid00;
+  logic                                         out_delay_op_valid01;
+  logic                                         out_delay_op_valid02;
+  logic                                         out_delay_op_valid03;
+  logic                                         out_delay_op_valid10;
+  logic                                         out_delay_op_valid11;
+  logic                                         out_delay_op_valid12;
+  logic                                         out_delay_op_valid13;
+  logic                                         out_delay_op_valid20;
+  logic                                         out_delay_op_valid21;
+  logic                                         out_delay_op_valid22;
+  logic                                         out_delay_op_valid23;
+  logic                                         out_delay_op_valid30;
+  logic                                         out_delay_op_valid31;
+  logic                                         out_delay_op_valid32;
+  logic                                         out_delay_op_valid33;
 
-  logic                                        pea_ready_all_cols;
-  logic [              M-1:0]                  pea_ready_single_cols;
-  logic [            M/2-1:0]                  pea_ready_twin_cols;
+  logic                                         pea_ready_all_cols;
+  logic [              M-1:0]                   pea_ready_single_cols;
+  logic [            M/2-1:0]                   pea_ready_twin_cols;
 
-  logic [                N:0][N_BITS-1:0]      out_data_col0;
-  logic [                N:0][N_BITS-1:0]      out_data_col1;
-  logic [                N:0][N_BITS-1:0]      out_data_col2;
-  logic [                N:0][N_BITS-1:0]      out_data_col3;
-  logic [                N:0]                  out_valid_col0;
-  logic [                N:0]                  out_valid_col1;
-  logic [                N:0]                  out_valid_col2;
-  logic [                N:0]                  out_valid_col3;
+  logic [                N:0][N_BITS-1:0]       out_data_col0;
+  logic [                N:0][N_BITS-1:0]       out_data_col1;
+  logic [                N:0][N_BITS-1:0]       out_data_col2;
+  logic [                N:0][N_BITS-1:0]       out_data_col3;
+  logic [                N:0]                   out_valid_col0;
+  logic [                N:0]                   out_valid_col1;
+  logic [                N:0]                   out_valid_col2;
+  logic [                N:0]                   out_valid_col3;
 
   //Input Registers
   always_ff @(posedge clk_i, negedge rst_n_i) begin
@@ -695,7 +695,7 @@ module pea
     end
   end
 
-  pe pe_inst_00 (
+  s_pe pe_inst_00 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe00),
@@ -711,7 +711,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[0][0]),
       .pe_res_o(out_data_pe00)
   );
-  pe pe_inst_01 (
+  s_pe pe_inst_01 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe01),
@@ -727,7 +727,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[0][1]),
       .pe_res_o(out_data_pe01)
   );
-  pe pe_inst_02 (
+  s_pe pe_inst_02 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe02),
@@ -743,7 +743,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[0][2]),
       .pe_res_o(out_data_pe02)
   );
-  pe pe_inst_03 (
+  s_pe pe_inst_03 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe03),
@@ -759,7 +759,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[0][3]),
       .pe_res_o(out_data_pe03)
   );
-  pe pe_inst_10 (
+  s_pe pe_inst_10 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe10),
@@ -775,7 +775,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[1][0]),
       .pe_res_o(out_data_pe10)
   );
-  pe pe_inst_11 (
+  s_pe pe_inst_11 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe11),
@@ -791,7 +791,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[1][1]),
       .pe_res_o(out_data_pe11)
   );
-  pe pe_inst_12 (
+  s_pe pe_inst_12 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe12),
@@ -807,7 +807,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[1][2]),
       .pe_res_o(out_data_pe12)
   );
-  pe pe_inst_13 (
+  s_pe pe_inst_13 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe13),
@@ -823,7 +823,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[1][3]),
       .pe_res_o(out_data_pe13)
   );
-  pe pe_inst_20 (
+  s_pe pe_inst_20 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe20),
@@ -839,7 +839,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[2][0]),
       .pe_res_o(out_data_pe20)
   );
-  pe pe_inst_21 (
+  s_pe pe_inst_21 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe21),
@@ -855,7 +855,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[2][1]),
       .pe_res_o(out_data_pe21)
   );
-  pe pe_inst_22 (
+  s_pe pe_inst_22 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe22),
@@ -871,7 +871,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[2][2]),
       .pe_res_o(out_data_pe22)
   );
-  pe pe_inst_23 (
+  s_pe pe_inst_23 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe23),
@@ -887,7 +887,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[2][3]),
       .pe_res_o(out_data_pe23)
   );
-  pe pe_inst_30 (
+  s_div_pe pe_inst_30 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe30),
@@ -903,7 +903,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[3][0]),
       .pe_res_o(out_data_pe30)
   );
-  pe pe_inst_31 (
+  s_div_pe pe_inst_31 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe31),
@@ -919,7 +919,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[3][1]),
       .pe_res_o(out_data_pe31)
   );
-  pe pe_inst_32 (
+  s_div_pe pe_inst_32 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe32),
@@ -935,7 +935,7 @@ module pea
       .ctrl_pe_i(ctrl_pea_i[3][2]),
       .pe_res_o(out_data_pe32)
   );
-  pe pe_inst_33 (
+  s_div_pe pe_inst_33 (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe33),

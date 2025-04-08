@@ -30,31 +30,34 @@ package pea_pkg;
   localparam unsigned N_RADIX = 16;
   localparam unsigned N_DIV_STAGE = 8;
 
-  localparam unsigned N_OPERATIONS = 16;
   localparam unsigned N_NEIGH_PE = 4;
-  localparam unsigned N_INPUTS_PE = 9;
-  localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
+  localparam unsigned N_INPUTS_PE = 12;
   localparam unsigned LOG_N_INPUTS_PE = (N_INPUTS_PE == 1) ? 1 : $clog2(N_INPUTS_PE);
   ////////////////////////////////////////////////////////////////
   //         PE Instructions and Interconnections Types         //
   ////////////////////////////////////////////////////////////////
-  typedef enum logic [3:0] {
-    NOP = 4'b0000,
-    MUL = 4'b0001,
-    SUB = 4'b0010,
-    LSH = 4'b0011,
-    LRSH = 4'b0100,
-    ARSH = 4'b0101,
-    MAX = 4'b0110,
-    MIN = 4'b0111,
-    ABS = 4'b1000,
-    SGNMUL = 4'b1001,
-    ADD = 4'b1010,
-    DIV = 4'b1011,
-    DIVU = 4'b1100,
-    ACC = 4'b1101,
-    REM = 4'b1110,
-    ADDPOW = 4'b1111
+  localparam unsigned N_OPERATIONS = 32;
+  localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
+  typedef enum logic [4:0] {
+    NOP = 5'b00000,
+    MUL = 5'b00001,
+    SUB = 5'b00010,
+    LSH = 5'b00011,
+    LRSH = 5'b00100,
+    ARSH = 5'b00101,
+    MAX = 5'b00110,
+    MIN = 5'b00111,
+    ABS = 5'b01000,
+    SGNMUL = 5'b01001,
+    ADD = 5'b01010,
+    DIV = 5'b01011,
+    DIVU = 5'b01100,
+    ACC = 5'b01101,
+    REM = 5'b01110,
+    ADDPOW = 5'b01111,
+    ADDMUL = 5'b10000,
+    ABSDIV = 5'b10001,
+    SGNSUB = 5'b10010
   } fu_instr_t;
 
   typedef enum logic [LOG_N_INPUTS_PE-1:0] {

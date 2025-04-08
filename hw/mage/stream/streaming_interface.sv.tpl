@@ -184,8 +184,8 @@ module streaming_interface
     % for i in range(len(in_stream_pea_din_placement)):
       % for j in range(len(in_stream_pea_din_placement[i])):
         % if i == nis and j == npd:
-  assign stream_in_pea_data[${nis}][${npd}] = stream_in_dma_ch_data[${in_stream_pea_din_placement[i][j]}];
-  assign stream_in_pea_valid[${nis}][${npd}] = stream_in_dma_ch_valid[${in_stream_pea_din_placement[i][j]}];
+  assign stream_in_pea_data[${nis}][${npd}] = stream_in_dma_ch_data[${i}][${in_stream_pea_din_placement[i][j]}];
+  assign stream_in_pea_valid[${nis}][${npd}] = stream_in_dma_ch_valid[${i}][${in_stream_pea_din_placement[i][j]}];
           % endif       
         % endfor
       % endfor
@@ -221,8 +221,8 @@ module streaming_interface
     % for i in range(len(out_stream_dma_ch_placement)):
       % for j in range(len(out_stream_dma_ch_placement[i])):
         % if i == nos and j == ndc:
-  assign stream_out_dma_ch_data[${nos}][${ndc}] = stream_out_pea_data[${out_stream_dma_ch_placement[i][j]}];
-  assign stream_out_dma_ch_valid[${nos}][${ndc}] = stream_out_pea_valid[${out_stream_dma_ch_placement[i][j]}];
+  assign stream_out_dma_ch_data[${nos}][${ndc}] = stream_out_pea_data[${i}][${out_stream_dma_ch_placement[i][j]}];
+  assign stream_out_dma_ch_valid[${nos}][${ndc}] = stream_out_pea_valid[${i}][${out_stream_dma_ch_placement[i][j]}];
           % endif       
         % endfor
       % endfor

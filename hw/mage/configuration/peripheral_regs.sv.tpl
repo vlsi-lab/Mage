@@ -61,7 +61,7 @@ module peripheral_regs
     output logic [1:0] reg_separate_cols_o,
     output logic [N_DMA_CH-1:0] reg_dma_ch_cfg_o,
     output logic [M-1:0][LOG_N:0] reg_sel_out_col_pea_o,
-    output logic [N-1:0][M-1:0][7:0] reg_acc_value_pe_o,
+    output logic [N-1:0][M-1:0][31:0] reg_acc_value_pe_o,
   %if out_stream_xbar == str(1):
     output logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_o,
   %endif
@@ -196,7 +196,7 @@ module peripheral_regs
   %endfor
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-    reg_acc_value_pe_o[${r}][${c}] = reg2hw.acc_value[${r}].pe_${c}.q;
+    reg_acc_value_pe_o[${r}][${c}] = reg2hw.acc_value[${r*n_pea_cols+c}].q;
     %endfor 
   %endfor
   %if out_stream_xbar == str(1):

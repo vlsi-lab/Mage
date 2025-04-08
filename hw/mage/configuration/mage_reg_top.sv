@@ -169,30 +169,6 @@ module mage_reg_top #(
   logic [1:0] separate_cols_qs;
   logic [1:0] separate_cols_wd;
   logic separate_cols_we;
-  logic [1:0] stream_in_xbar_sel_sel_in_xbar_0_qs;
-  logic [1:0] stream_in_xbar_sel_sel_in_xbar_0_wd;
-  logic stream_in_xbar_sel_sel_in_xbar_0_we;
-  logic [1:0] stream_in_xbar_sel_sel_in_xbar_1_qs;
-  logic [1:0] stream_in_xbar_sel_sel_in_xbar_1_wd;
-  logic stream_in_xbar_sel_sel_in_xbar_1_we;
-  logic [1:0] stream_in_xbar_sel_sel_in_xbar_2_qs;
-  logic [1:0] stream_in_xbar_sel_sel_in_xbar_2_wd;
-  logic stream_in_xbar_sel_sel_in_xbar_2_we;
-  logic [1:0] stream_in_xbar_sel_sel_in_xbar_3_qs;
-  logic [1:0] stream_in_xbar_sel_sel_in_xbar_3_wd;
-  logic stream_in_xbar_sel_sel_in_xbar_3_we;
-  logic [1:0] stream_out_xbar_sel_sel_out_xbar_0_qs;
-  logic [1:0] stream_out_xbar_sel_sel_out_xbar_0_wd;
-  logic stream_out_xbar_sel_sel_out_xbar_0_we;
-  logic [1:0] stream_out_xbar_sel_sel_out_xbar_1_qs;
-  logic [1:0] stream_out_xbar_sel_sel_out_xbar_1_wd;
-  logic stream_out_xbar_sel_sel_out_xbar_1_we;
-  logic [1:0] stream_out_xbar_sel_sel_out_xbar_2_qs;
-  logic [1:0] stream_out_xbar_sel_sel_out_xbar_2_wd;
-  logic stream_out_xbar_sel_sel_out_xbar_2_we;
-  logic [1:0] stream_out_xbar_sel_sel_out_xbar_3_qs;
-  logic [1:0] stream_out_xbar_sel_sel_out_xbar_3_wd;
-  logic stream_out_xbar_sel_sel_out_xbar_3_we;
   logic [7:0] sel_out_col_pea_sel_col_0_0_qs;
   logic [7:0] sel_out_col_pea_sel_col_0_0_wd;
   logic sel_out_col_pea_sel_col_0_0_we;
@@ -205,54 +181,54 @@ module mage_reg_top #(
   logic [7:0] sel_out_col_pea_sel_col_3_0_qs;
   logic [7:0] sel_out_col_pea_sel_col_3_0_wd;
   logic sel_out_col_pea_sel_col_3_0_we;
-  logic [7:0] acc_value_0_pe_0_0_qs;
-  logic [7:0] acc_value_0_pe_0_0_wd;
-  logic acc_value_0_pe_0_0_we;
-  logic [7:0] acc_value_0_pe_1_0_qs;
-  logic [7:0] acc_value_0_pe_1_0_wd;
-  logic acc_value_0_pe_1_0_we;
-  logic [7:0] acc_value_0_pe_2_0_qs;
-  logic [7:0] acc_value_0_pe_2_0_wd;
-  logic acc_value_0_pe_2_0_we;
-  logic [7:0] acc_value_0_pe_3_0_qs;
-  logic [7:0] acc_value_0_pe_3_0_wd;
-  logic acc_value_0_pe_3_0_we;
-  logic [7:0] acc_value_1_pe_0_1_qs;
-  logic [7:0] acc_value_1_pe_0_1_wd;
-  logic acc_value_1_pe_0_1_we;
-  logic [7:0] acc_value_1_pe_1_1_qs;
-  logic [7:0] acc_value_1_pe_1_1_wd;
-  logic acc_value_1_pe_1_1_we;
-  logic [7:0] acc_value_1_pe_2_1_qs;
-  logic [7:0] acc_value_1_pe_2_1_wd;
-  logic acc_value_1_pe_2_1_we;
-  logic [7:0] acc_value_1_pe_3_1_qs;
-  logic [7:0] acc_value_1_pe_3_1_wd;
-  logic acc_value_1_pe_3_1_we;
-  logic [7:0] acc_value_2_pe_0_2_qs;
-  logic [7:0] acc_value_2_pe_0_2_wd;
-  logic acc_value_2_pe_0_2_we;
-  logic [7:0] acc_value_2_pe_1_2_qs;
-  logic [7:0] acc_value_2_pe_1_2_wd;
-  logic acc_value_2_pe_1_2_we;
-  logic [7:0] acc_value_2_pe_2_2_qs;
-  logic [7:0] acc_value_2_pe_2_2_wd;
-  logic acc_value_2_pe_2_2_we;
-  logic [7:0] acc_value_2_pe_3_2_qs;
-  logic [7:0] acc_value_2_pe_3_2_wd;
-  logic acc_value_2_pe_3_2_we;
-  logic [7:0] acc_value_3_pe_0_3_qs;
-  logic [7:0] acc_value_3_pe_0_3_wd;
-  logic acc_value_3_pe_0_3_we;
-  logic [7:0] acc_value_3_pe_1_3_qs;
-  logic [7:0] acc_value_3_pe_1_3_wd;
-  logic acc_value_3_pe_1_3_we;
-  logic [7:0] acc_value_3_pe_2_3_qs;
-  logic [7:0] acc_value_3_pe_2_3_wd;
-  logic acc_value_3_pe_2_3_we;
-  logic [7:0] acc_value_3_pe_3_3_qs;
-  logic [7:0] acc_value_3_pe_3_3_wd;
-  logic acc_value_3_pe_3_3_we;
+  logic [31:0] acc_value_0_qs;
+  logic [31:0] acc_value_0_wd;
+  logic acc_value_0_we;
+  logic [31:0] acc_value_1_qs;
+  logic [31:0] acc_value_1_wd;
+  logic acc_value_1_we;
+  logic [31:0] acc_value_2_qs;
+  logic [31:0] acc_value_2_wd;
+  logic acc_value_2_we;
+  logic [31:0] acc_value_3_qs;
+  logic [31:0] acc_value_3_wd;
+  logic acc_value_3_we;
+  logic [31:0] acc_value_4_qs;
+  logic [31:0] acc_value_4_wd;
+  logic acc_value_4_we;
+  logic [31:0] acc_value_5_qs;
+  logic [31:0] acc_value_5_wd;
+  logic acc_value_5_we;
+  logic [31:0] acc_value_6_qs;
+  logic [31:0] acc_value_6_wd;
+  logic acc_value_6_we;
+  logic [31:0] acc_value_7_qs;
+  logic [31:0] acc_value_7_wd;
+  logic acc_value_7_we;
+  logic [31:0] acc_value_8_qs;
+  logic [31:0] acc_value_8_wd;
+  logic acc_value_8_we;
+  logic [31:0] acc_value_9_qs;
+  logic [31:0] acc_value_9_wd;
+  logic acc_value_9_we;
+  logic [31:0] acc_value_10_qs;
+  logic [31:0] acc_value_10_wd;
+  logic acc_value_10_we;
+  logic [31:0] acc_value_11_qs;
+  logic [31:0] acc_value_11_wd;
+  logic acc_value_11_we;
+  logic [31:0] acc_value_12_qs;
+  logic [31:0] acc_value_12_wd;
+  logic acc_value_12_we;
+  logic [31:0] acc_value_13_qs;
+  logic [31:0] acc_value_13_wd;
+  logic acc_value_13_we;
+  logic [31:0] acc_value_14_qs;
+  logic [31:0] acc_value_14_wd;
+  logic acc_value_14_we;
+  logic [31:0] acc_value_15_qs;
+  logic [31:0] acc_value_15_wd;
+  logic acc_value_15_we;
 
   // Register instances
 
@@ -1207,218 +1183,6 @@ module mage_reg_top #(
   );
 
 
-  // R[stream_in_xbar_sel]: V(False)
-
-  //   F[sel_in_xbar_0]: 1:0
-  prim_subreg #(
-      .DW      (2),
-      .SWACCESS("RW"),
-      .RESVAL  (2'h0)
-  ) u_stream_in_xbar_sel_sel_in_xbar_0 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(stream_in_xbar_sel_sel_in_xbar_0_we),
-      .wd(stream_in_xbar_sel_sel_in_xbar_0_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.stream_in_xbar_sel.sel_in_xbar_0.q),
-
-      // to register interface (read)
-      .qs(stream_in_xbar_sel_sel_in_xbar_0_qs)
-  );
-
-
-  //   F[sel_in_xbar_1]: 3:2
-  prim_subreg #(
-      .DW      (2),
-      .SWACCESS("RW"),
-      .RESVAL  (2'h0)
-  ) u_stream_in_xbar_sel_sel_in_xbar_1 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(stream_in_xbar_sel_sel_in_xbar_1_we),
-      .wd(stream_in_xbar_sel_sel_in_xbar_1_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.stream_in_xbar_sel.sel_in_xbar_1.q),
-
-      // to register interface (read)
-      .qs(stream_in_xbar_sel_sel_in_xbar_1_qs)
-  );
-
-
-  //   F[sel_in_xbar_2]: 5:4
-  prim_subreg #(
-      .DW      (2),
-      .SWACCESS("RW"),
-      .RESVAL  (2'h0)
-  ) u_stream_in_xbar_sel_sel_in_xbar_2 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(stream_in_xbar_sel_sel_in_xbar_2_we),
-      .wd(stream_in_xbar_sel_sel_in_xbar_2_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.stream_in_xbar_sel.sel_in_xbar_2.q),
-
-      // to register interface (read)
-      .qs(stream_in_xbar_sel_sel_in_xbar_2_qs)
-  );
-
-
-  //   F[sel_in_xbar_3]: 7:6
-  prim_subreg #(
-      .DW      (2),
-      .SWACCESS("RW"),
-      .RESVAL  (2'h0)
-  ) u_stream_in_xbar_sel_sel_in_xbar_3 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(stream_in_xbar_sel_sel_in_xbar_3_we),
-      .wd(stream_in_xbar_sel_sel_in_xbar_3_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.stream_in_xbar_sel.sel_in_xbar_3.q),
-
-      // to register interface (read)
-      .qs(stream_in_xbar_sel_sel_in_xbar_3_qs)
-  );
-
-
-  // R[stream_out_xbar_sel]: V(False)
-
-  //   F[sel_out_xbar_0]: 1:0
-  prim_subreg #(
-      .DW      (2),
-      .SWACCESS("RW"),
-      .RESVAL  (2'h0)
-  ) u_stream_out_xbar_sel_sel_out_xbar_0 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(stream_out_xbar_sel_sel_out_xbar_0_we),
-      .wd(stream_out_xbar_sel_sel_out_xbar_0_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.stream_out_xbar_sel.sel_out_xbar_0.q),
-
-      // to register interface (read)
-      .qs(stream_out_xbar_sel_sel_out_xbar_0_qs)
-  );
-
-
-  //   F[sel_out_xbar_1]: 3:2
-  prim_subreg #(
-      .DW      (2),
-      .SWACCESS("RW"),
-      .RESVAL  (2'h0)
-  ) u_stream_out_xbar_sel_sel_out_xbar_1 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(stream_out_xbar_sel_sel_out_xbar_1_we),
-      .wd(stream_out_xbar_sel_sel_out_xbar_1_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.stream_out_xbar_sel.sel_out_xbar_1.q),
-
-      // to register interface (read)
-      .qs(stream_out_xbar_sel_sel_out_xbar_1_qs)
-  );
-
-
-  //   F[sel_out_xbar_2]: 5:4
-  prim_subreg #(
-      .DW      (2),
-      .SWACCESS("RW"),
-      .RESVAL  (2'h0)
-  ) u_stream_out_xbar_sel_sel_out_xbar_2 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(stream_out_xbar_sel_sel_out_xbar_2_we),
-      .wd(stream_out_xbar_sel_sel_out_xbar_2_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.stream_out_xbar_sel.sel_out_xbar_2.q),
-
-      // to register interface (read)
-      .qs(stream_out_xbar_sel_sel_out_xbar_2_qs)
-  );
-
-
-  //   F[sel_out_xbar_3]: 7:6
-  prim_subreg #(
-      .DW      (2),
-      .SWACCESS("RW"),
-      .RESVAL  (2'h0)
-  ) u_stream_out_xbar_sel_sel_out_xbar_3 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(stream_out_xbar_sel_sel_out_xbar_3_we),
-      .wd(stream_out_xbar_sel_sel_out_xbar_3_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.stream_out_xbar_sel.sel_out_xbar_3.q),
-
-      // to register interface (read)
-      .qs(stream_out_xbar_sel_sel_out_xbar_3_qs)
-  );
-
-
 
   // Subregister 0 of Multireg sel_out_col_pea
   // R[sel_out_col_pea]: V(False)
@@ -1532,18 +1296,17 @@ module mage_reg_top #(
   // Subregister 0 of Multireg acc_value
   // R[acc_value_0]: V(False)
 
-  // F[pe_0_0]: 7:0
   prim_subreg #(
-      .DW      (8),
+      .DW      (32),
       .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_0_pe_0_0 (
+      .RESVAL  (32'h0)
+  ) u_acc_value_0 (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
 
       // from register interface
-      .we(acc_value_0_pe_0_0_we),
-      .wd(acc_value_0_pe_0_0_wd),
+      .we(acc_value_0_we),
+      .wd(acc_value_0_wd),
 
       // from internal hardware
       .de(1'b0),
@@ -1551,106 +1314,26 @@ module mage_reg_top #(
 
       // to internal hardware
       .qe(),
-      .q (reg2hw.acc_value[0].pe_0.q),
+      .q (reg2hw.acc_value[0].q),
 
       // to register interface (read)
-      .qs(acc_value_0_pe_0_0_qs)
+      .qs(acc_value_0_qs)
   );
-
-
-  // F[pe_1_0]: 15:8
-  prim_subreg #(
-      .DW      (8),
-      .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_0_pe_1_0 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(acc_value_0_pe_1_0_we),
-      .wd(acc_value_0_pe_1_0_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.acc_value[0].pe_1.q),
-
-      // to register interface (read)
-      .qs(acc_value_0_pe_1_0_qs)
-  );
-
-
-  // F[pe_2_0]: 23:16
-  prim_subreg #(
-      .DW      (8),
-      .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_0_pe_2_0 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(acc_value_0_pe_2_0_we),
-      .wd(acc_value_0_pe_2_0_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.acc_value[0].pe_2.q),
-
-      // to register interface (read)
-      .qs(acc_value_0_pe_2_0_qs)
-  );
-
-
-  // F[pe_3_0]: 31:24
-  prim_subreg #(
-      .DW      (8),
-      .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_0_pe_3_0 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(acc_value_0_pe_3_0_we),
-      .wd(acc_value_0_pe_3_0_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.acc_value[0].pe_3.q),
-
-      // to register interface (read)
-      .qs(acc_value_0_pe_3_0_qs)
-  );
-
 
   // Subregister 1 of Multireg acc_value
   // R[acc_value_1]: V(False)
 
-  // F[pe_0_1]: 7:0
   prim_subreg #(
-      .DW      (8),
+      .DW      (32),
       .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_1_pe_0_1 (
+      .RESVAL  (32'h0)
+  ) u_acc_value_1 (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
 
       // from register interface
-      .we(acc_value_1_pe_0_1_we),
-      .wd(acc_value_1_pe_0_1_wd),
+      .we(acc_value_1_we),
+      .wd(acc_value_1_wd),
 
       // from internal hardware
       .de(1'b0),
@@ -1658,106 +1341,26 @@ module mage_reg_top #(
 
       // to internal hardware
       .qe(),
-      .q (reg2hw.acc_value[1].pe_0.q),
+      .q (reg2hw.acc_value[1].q),
 
       // to register interface (read)
-      .qs(acc_value_1_pe_0_1_qs)
+      .qs(acc_value_1_qs)
   );
-
-
-  // F[pe_1_1]: 15:8
-  prim_subreg #(
-      .DW      (8),
-      .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_1_pe_1_1 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(acc_value_1_pe_1_1_we),
-      .wd(acc_value_1_pe_1_1_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.acc_value[1].pe_1.q),
-
-      // to register interface (read)
-      .qs(acc_value_1_pe_1_1_qs)
-  );
-
-
-  // F[pe_2_1]: 23:16
-  prim_subreg #(
-      .DW      (8),
-      .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_1_pe_2_1 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(acc_value_1_pe_2_1_we),
-      .wd(acc_value_1_pe_2_1_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.acc_value[1].pe_2.q),
-
-      // to register interface (read)
-      .qs(acc_value_1_pe_2_1_qs)
-  );
-
-
-  // F[pe_3_1]: 31:24
-  prim_subreg #(
-      .DW      (8),
-      .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_1_pe_3_1 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(acc_value_1_pe_3_1_we),
-      .wd(acc_value_1_pe_3_1_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.acc_value[1].pe_3.q),
-
-      // to register interface (read)
-      .qs(acc_value_1_pe_3_1_qs)
-  );
-
 
   // Subregister 2 of Multireg acc_value
   // R[acc_value_2]: V(False)
 
-  // F[pe_0_2]: 7:0
   prim_subreg #(
-      .DW      (8),
+      .DW      (32),
       .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_2_pe_0_2 (
+      .RESVAL  (32'h0)
+  ) u_acc_value_2 (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
 
       // from register interface
-      .we(acc_value_2_pe_0_2_we),
-      .wd(acc_value_2_pe_0_2_wd),
+      .we(acc_value_2_we),
+      .wd(acc_value_2_wd),
 
       // from internal hardware
       .de(1'b0),
@@ -1765,106 +1368,26 @@ module mage_reg_top #(
 
       // to internal hardware
       .qe(),
-      .q (reg2hw.acc_value[2].pe_0.q),
+      .q (reg2hw.acc_value[2].q),
 
       // to register interface (read)
-      .qs(acc_value_2_pe_0_2_qs)
+      .qs(acc_value_2_qs)
   );
-
-
-  // F[pe_1_2]: 15:8
-  prim_subreg #(
-      .DW      (8),
-      .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_2_pe_1_2 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(acc_value_2_pe_1_2_we),
-      .wd(acc_value_2_pe_1_2_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.acc_value[2].pe_1.q),
-
-      // to register interface (read)
-      .qs(acc_value_2_pe_1_2_qs)
-  );
-
-
-  // F[pe_2_2]: 23:16
-  prim_subreg #(
-      .DW      (8),
-      .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_2_pe_2_2 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(acc_value_2_pe_2_2_we),
-      .wd(acc_value_2_pe_2_2_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.acc_value[2].pe_2.q),
-
-      // to register interface (read)
-      .qs(acc_value_2_pe_2_2_qs)
-  );
-
-
-  // F[pe_3_2]: 31:24
-  prim_subreg #(
-      .DW      (8),
-      .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_2_pe_3_2 (
-      .clk_i (clk_i),
-      .rst_ni(rst_ni),
-
-      // from register interface
-      .we(acc_value_2_pe_3_2_we),
-      .wd(acc_value_2_pe_3_2_wd),
-
-      // from internal hardware
-      .de(1'b0),
-      .d ('0),
-
-      // to internal hardware
-      .qe(),
-      .q (reg2hw.acc_value[2].pe_3.q),
-
-      // to register interface (read)
-      .qs(acc_value_2_pe_3_2_qs)
-  );
-
 
   // Subregister 3 of Multireg acc_value
   // R[acc_value_3]: V(False)
 
-  // F[pe_0_3]: 7:0
   prim_subreg #(
-      .DW      (8),
+      .DW      (32),
       .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_3_pe_0_3 (
+      .RESVAL  (32'h0)
+  ) u_acc_value_3 (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
 
       // from register interface
-      .we(acc_value_3_pe_0_3_we),
-      .wd(acc_value_3_pe_0_3_wd),
+      .we(acc_value_3_we),
+      .wd(acc_value_3_wd),
 
       // from internal hardware
       .de(1'b0),
@@ -1872,25 +1395,26 @@ module mage_reg_top #(
 
       // to internal hardware
       .qe(),
-      .q (reg2hw.acc_value[3].pe_0.q),
+      .q (reg2hw.acc_value[3].q),
 
       // to register interface (read)
-      .qs(acc_value_3_pe_0_3_qs)
+      .qs(acc_value_3_qs)
   );
 
+  // Subregister 4 of Multireg acc_value
+  // R[acc_value_4]: V(False)
 
-  // F[pe_1_3]: 15:8
   prim_subreg #(
-      .DW      (8),
+      .DW      (32),
       .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_3_pe_1_3 (
+      .RESVAL  (32'h0)
+  ) u_acc_value_4 (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
 
       // from register interface
-      .we(acc_value_3_pe_1_3_we),
-      .wd(acc_value_3_pe_1_3_wd),
+      .we(acc_value_4_we),
+      .wd(acc_value_4_wd),
 
       // from internal hardware
       .de(1'b0),
@@ -1898,25 +1422,26 @@ module mage_reg_top #(
 
       // to internal hardware
       .qe(),
-      .q (reg2hw.acc_value[3].pe_1.q),
+      .q (reg2hw.acc_value[4].q),
 
       // to register interface (read)
-      .qs(acc_value_3_pe_1_3_qs)
+      .qs(acc_value_4_qs)
   );
 
+  // Subregister 5 of Multireg acc_value
+  // R[acc_value_5]: V(False)
 
-  // F[pe_2_3]: 23:16
   prim_subreg #(
-      .DW      (8),
+      .DW      (32),
       .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_3_pe_2_3 (
+      .RESVAL  (32'h0)
+  ) u_acc_value_5 (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
 
       // from register interface
-      .we(acc_value_3_pe_2_3_we),
-      .wd(acc_value_3_pe_2_3_wd),
+      .we(acc_value_5_we),
+      .wd(acc_value_5_wd),
 
       // from internal hardware
       .de(1'b0),
@@ -1924,25 +1449,26 @@ module mage_reg_top #(
 
       // to internal hardware
       .qe(),
-      .q (reg2hw.acc_value[3].pe_2.q),
+      .q (reg2hw.acc_value[5].q),
 
       // to register interface (read)
-      .qs(acc_value_3_pe_2_3_qs)
+      .qs(acc_value_5_qs)
   );
 
+  // Subregister 6 of Multireg acc_value
+  // R[acc_value_6]: V(False)
 
-  // F[pe_3_3]: 31:24
   prim_subreg #(
-      .DW      (8),
+      .DW      (32),
       .SWACCESS("RW"),
-      .RESVAL  (8'h0)
-  ) u_acc_value_3_pe_3_3 (
+      .RESVAL  (32'h0)
+  ) u_acc_value_6 (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
 
       // from register interface
-      .we(acc_value_3_pe_3_3_we),
-      .wd(acc_value_3_pe_3_3_wd),
+      .we(acc_value_6_we),
+      .wd(acc_value_6_wd),
 
       // from internal hardware
       .de(1'b0),
@@ -1950,17 +1476,259 @@ module mage_reg_top #(
 
       // to internal hardware
       .qe(),
-      .q (reg2hw.acc_value[3].pe_3.q),
+      .q (reg2hw.acc_value[6].q),
 
       // to register interface (read)
-      .qs(acc_value_3_pe_3_3_qs)
+      .qs(acc_value_6_qs)
+  );
+
+  // Subregister 7 of Multireg acc_value
+  // R[acc_value_7]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_acc_value_7 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(acc_value_7_we),
+      .wd(acc_value_7_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.acc_value[7].q),
+
+      // to register interface (read)
+      .qs(acc_value_7_qs)
+  );
+
+  // Subregister 8 of Multireg acc_value
+  // R[acc_value_8]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_acc_value_8 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(acc_value_8_we),
+      .wd(acc_value_8_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.acc_value[8].q),
+
+      // to register interface (read)
+      .qs(acc_value_8_qs)
+  );
+
+  // Subregister 9 of Multireg acc_value
+  // R[acc_value_9]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_acc_value_9 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(acc_value_9_we),
+      .wd(acc_value_9_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.acc_value[9].q),
+
+      // to register interface (read)
+      .qs(acc_value_9_qs)
+  );
+
+  // Subregister 10 of Multireg acc_value
+  // R[acc_value_10]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_acc_value_10 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(acc_value_10_we),
+      .wd(acc_value_10_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.acc_value[10].q),
+
+      // to register interface (read)
+      .qs(acc_value_10_qs)
+  );
+
+  // Subregister 11 of Multireg acc_value
+  // R[acc_value_11]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_acc_value_11 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(acc_value_11_we),
+      .wd(acc_value_11_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.acc_value[11].q),
+
+      // to register interface (read)
+      .qs(acc_value_11_qs)
+  );
+
+  // Subregister 12 of Multireg acc_value
+  // R[acc_value_12]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_acc_value_12 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(acc_value_12_we),
+      .wd(acc_value_12_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.acc_value[12].q),
+
+      // to register interface (read)
+      .qs(acc_value_12_qs)
+  );
+
+  // Subregister 13 of Multireg acc_value
+  // R[acc_value_13]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_acc_value_13 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(acc_value_13_we),
+      .wd(acc_value_13_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.acc_value[13].q),
+
+      // to register interface (read)
+      .qs(acc_value_13_qs)
+  );
+
+  // Subregister 14 of Multireg acc_value
+  // R[acc_value_14]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_acc_value_14 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(acc_value_14_we),
+      .wd(acc_value_14_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.acc_value[14].q),
+
+      // to register interface (read)
+      .qs(acc_value_14_qs)
+  );
+
+  // Subregister 15 of Multireg acc_value
+  // R[acc_value_15]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_acc_value_15 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(acc_value_15_we),
+      .wd(acc_value_15_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.acc_value[15].q),
+
+      // to register interface (read)
+      .qs(acc_value_15_qs)
   );
 
 
 
 
-
-  logic [40:0] addr_hit;
+  logic [50:0] addr_hit;
   always_comb begin
     addr_hit = '0;
     addr_hit[0] = (reg_addr == MAGE_CFG_PE_00_OFFSET);
@@ -1997,13 +1765,23 @@ module mage_reg_top #(
     addr_hit[31] = (reg_addr == MAGE_PEA_CONSTANTS_15_OFFSET);
     addr_hit[32] = (reg_addr == MAGE_STREAM_DMA_CFG_OFFSET);
     addr_hit[33] = (reg_addr == MAGE_SEPARATE_COLS_OFFSET);
-    addr_hit[34] = (reg_addr == MAGE_STREAM_IN_XBAR_SEL_OFFSET);
-    addr_hit[35] = (reg_addr == MAGE_STREAM_OUT_XBAR_SEL_OFFSET);
-    addr_hit[36] = (reg_addr == MAGE_SEL_OUT_COL_PEA_OFFSET);
-    addr_hit[37] = (reg_addr == MAGE_ACC_VALUE_0_OFFSET);
-    addr_hit[38] = (reg_addr == MAGE_ACC_VALUE_1_OFFSET);
-    addr_hit[39] = (reg_addr == MAGE_ACC_VALUE_2_OFFSET);
-    addr_hit[40] = (reg_addr == MAGE_ACC_VALUE_3_OFFSET);
+    addr_hit[34] = (reg_addr == MAGE_SEL_OUT_COL_PEA_OFFSET);
+    addr_hit[35] = (reg_addr == MAGE_ACC_VALUE_0_OFFSET);
+    addr_hit[36] = (reg_addr == MAGE_ACC_VALUE_1_OFFSET);
+    addr_hit[37] = (reg_addr == MAGE_ACC_VALUE_2_OFFSET);
+    addr_hit[38] = (reg_addr == MAGE_ACC_VALUE_3_OFFSET);
+    addr_hit[39] = (reg_addr == MAGE_ACC_VALUE_4_OFFSET);
+    addr_hit[40] = (reg_addr == MAGE_ACC_VALUE_5_OFFSET);
+    addr_hit[41] = (reg_addr == MAGE_ACC_VALUE_6_OFFSET);
+    addr_hit[42] = (reg_addr == MAGE_ACC_VALUE_7_OFFSET);
+    addr_hit[43] = (reg_addr == MAGE_ACC_VALUE_8_OFFSET);
+    addr_hit[44] = (reg_addr == MAGE_ACC_VALUE_9_OFFSET);
+    addr_hit[45] = (reg_addr == MAGE_ACC_VALUE_10_OFFSET);
+    addr_hit[46] = (reg_addr == MAGE_ACC_VALUE_11_OFFSET);
+    addr_hit[47] = (reg_addr == MAGE_ACC_VALUE_12_OFFSET);
+    addr_hit[48] = (reg_addr == MAGE_ACC_VALUE_13_OFFSET);
+    addr_hit[49] = (reg_addr == MAGE_ACC_VALUE_14_OFFSET);
+    addr_hit[50] = (reg_addr == MAGE_ACC_VALUE_15_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0;
@@ -2051,7 +1829,17 @@ module mage_reg_top #(
                (addr_hit[37] & (|(MAGE_PERMIT[37] & ~reg_be))) |
                (addr_hit[38] & (|(MAGE_PERMIT[38] & ~reg_be))) |
                (addr_hit[39] & (|(MAGE_PERMIT[39] & ~reg_be))) |
-               (addr_hit[40] & (|(MAGE_PERMIT[40] & ~reg_be)))));
+               (addr_hit[40] & (|(MAGE_PERMIT[40] & ~reg_be))) |
+               (addr_hit[41] & (|(MAGE_PERMIT[41] & ~reg_be))) |
+               (addr_hit[42] & (|(MAGE_PERMIT[42] & ~reg_be))) |
+               (addr_hit[43] & (|(MAGE_PERMIT[43] & ~reg_be))) |
+               (addr_hit[44] & (|(MAGE_PERMIT[44] & ~reg_be))) |
+               (addr_hit[45] & (|(MAGE_PERMIT[45] & ~reg_be))) |
+               (addr_hit[46] & (|(MAGE_PERMIT[46] & ~reg_be))) |
+               (addr_hit[47] & (|(MAGE_PERMIT[47] & ~reg_be))) |
+               (addr_hit[48] & (|(MAGE_PERMIT[48] & ~reg_be))) |
+               (addr_hit[49] & (|(MAGE_PERMIT[49] & ~reg_be))) |
+               (addr_hit[50] & (|(MAGE_PERMIT[50] & ~reg_be)))));
   end
 
   assign cfg_pe_00_we = addr_hit[0] & reg_we & !reg_error;
@@ -2156,89 +1944,65 @@ module mage_reg_top #(
   assign separate_cols_we = addr_hit[33] & reg_we & !reg_error;
   assign separate_cols_wd = reg_wdata[1:0];
 
-  assign stream_in_xbar_sel_sel_in_xbar_0_we = addr_hit[34] & reg_we & !reg_error;
-  assign stream_in_xbar_sel_sel_in_xbar_0_wd = reg_wdata[1:0];
-
-  assign stream_in_xbar_sel_sel_in_xbar_1_we = addr_hit[34] & reg_we & !reg_error;
-  assign stream_in_xbar_sel_sel_in_xbar_1_wd = reg_wdata[3:2];
-
-  assign stream_in_xbar_sel_sel_in_xbar_2_we = addr_hit[34] & reg_we & !reg_error;
-  assign stream_in_xbar_sel_sel_in_xbar_2_wd = reg_wdata[5:4];
-
-  assign stream_in_xbar_sel_sel_in_xbar_3_we = addr_hit[34] & reg_we & !reg_error;
-  assign stream_in_xbar_sel_sel_in_xbar_3_wd = reg_wdata[7:6];
-
-  assign stream_out_xbar_sel_sel_out_xbar_0_we = addr_hit[35] & reg_we & !reg_error;
-  assign stream_out_xbar_sel_sel_out_xbar_0_wd = reg_wdata[1:0];
-
-  assign stream_out_xbar_sel_sel_out_xbar_1_we = addr_hit[35] & reg_we & !reg_error;
-  assign stream_out_xbar_sel_sel_out_xbar_1_wd = reg_wdata[3:2];
-
-  assign stream_out_xbar_sel_sel_out_xbar_2_we = addr_hit[35] & reg_we & !reg_error;
-  assign stream_out_xbar_sel_sel_out_xbar_2_wd = reg_wdata[5:4];
-
-  assign stream_out_xbar_sel_sel_out_xbar_3_we = addr_hit[35] & reg_we & !reg_error;
-  assign stream_out_xbar_sel_sel_out_xbar_3_wd = reg_wdata[7:6];
-
-  assign sel_out_col_pea_sel_col_0_0_we = addr_hit[36] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_0_0_we = addr_hit[34] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_0_0_wd = reg_wdata[7:0];
 
-  assign sel_out_col_pea_sel_col_1_0_we = addr_hit[36] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_1_0_we = addr_hit[34] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_1_0_wd = reg_wdata[15:8];
 
-  assign sel_out_col_pea_sel_col_2_0_we = addr_hit[36] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_2_0_we = addr_hit[34] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_2_0_wd = reg_wdata[23:16];
 
-  assign sel_out_col_pea_sel_col_3_0_we = addr_hit[36] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_3_0_we = addr_hit[34] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_3_0_wd = reg_wdata[31:24];
 
-  assign acc_value_0_pe_0_0_we = addr_hit[37] & reg_we & !reg_error;
-  assign acc_value_0_pe_0_0_wd = reg_wdata[7:0];
+  assign acc_value_0_we = addr_hit[35] & reg_we & !reg_error;
+  assign acc_value_0_wd = reg_wdata[31:0];
 
-  assign acc_value_0_pe_1_0_we = addr_hit[37] & reg_we & !reg_error;
-  assign acc_value_0_pe_1_0_wd = reg_wdata[15:8];
+  assign acc_value_1_we = addr_hit[36] & reg_we & !reg_error;
+  assign acc_value_1_wd = reg_wdata[31:0];
 
-  assign acc_value_0_pe_2_0_we = addr_hit[37] & reg_we & !reg_error;
-  assign acc_value_0_pe_2_0_wd = reg_wdata[23:16];
+  assign acc_value_2_we = addr_hit[37] & reg_we & !reg_error;
+  assign acc_value_2_wd = reg_wdata[31:0];
 
-  assign acc_value_0_pe_3_0_we = addr_hit[37] & reg_we & !reg_error;
-  assign acc_value_0_pe_3_0_wd = reg_wdata[31:24];
+  assign acc_value_3_we = addr_hit[38] & reg_we & !reg_error;
+  assign acc_value_3_wd = reg_wdata[31:0];
 
-  assign acc_value_1_pe_0_1_we = addr_hit[38] & reg_we & !reg_error;
-  assign acc_value_1_pe_0_1_wd = reg_wdata[7:0];
+  assign acc_value_4_we = addr_hit[39] & reg_we & !reg_error;
+  assign acc_value_4_wd = reg_wdata[31:0];
 
-  assign acc_value_1_pe_1_1_we = addr_hit[38] & reg_we & !reg_error;
-  assign acc_value_1_pe_1_1_wd = reg_wdata[15:8];
+  assign acc_value_5_we = addr_hit[40] & reg_we & !reg_error;
+  assign acc_value_5_wd = reg_wdata[31:0];
 
-  assign acc_value_1_pe_2_1_we = addr_hit[38] & reg_we & !reg_error;
-  assign acc_value_1_pe_2_1_wd = reg_wdata[23:16];
+  assign acc_value_6_we = addr_hit[41] & reg_we & !reg_error;
+  assign acc_value_6_wd = reg_wdata[31:0];
 
-  assign acc_value_1_pe_3_1_we = addr_hit[38] & reg_we & !reg_error;
-  assign acc_value_1_pe_3_1_wd = reg_wdata[31:24];
+  assign acc_value_7_we = addr_hit[42] & reg_we & !reg_error;
+  assign acc_value_7_wd = reg_wdata[31:0];
 
-  assign acc_value_2_pe_0_2_we = addr_hit[39] & reg_we & !reg_error;
-  assign acc_value_2_pe_0_2_wd = reg_wdata[7:0];
+  assign acc_value_8_we = addr_hit[43] & reg_we & !reg_error;
+  assign acc_value_8_wd = reg_wdata[31:0];
 
-  assign acc_value_2_pe_1_2_we = addr_hit[39] & reg_we & !reg_error;
-  assign acc_value_2_pe_1_2_wd = reg_wdata[15:8];
+  assign acc_value_9_we = addr_hit[44] & reg_we & !reg_error;
+  assign acc_value_9_wd = reg_wdata[31:0];
 
-  assign acc_value_2_pe_2_2_we = addr_hit[39] & reg_we & !reg_error;
-  assign acc_value_2_pe_2_2_wd = reg_wdata[23:16];
+  assign acc_value_10_we = addr_hit[45] & reg_we & !reg_error;
+  assign acc_value_10_wd = reg_wdata[31:0];
 
-  assign acc_value_2_pe_3_2_we = addr_hit[39] & reg_we & !reg_error;
-  assign acc_value_2_pe_3_2_wd = reg_wdata[31:24];
+  assign acc_value_11_we = addr_hit[46] & reg_we & !reg_error;
+  assign acc_value_11_wd = reg_wdata[31:0];
 
-  assign acc_value_3_pe_0_3_we = addr_hit[40] & reg_we & !reg_error;
-  assign acc_value_3_pe_0_3_wd = reg_wdata[7:0];
+  assign acc_value_12_we = addr_hit[47] & reg_we & !reg_error;
+  assign acc_value_12_wd = reg_wdata[31:0];
 
-  assign acc_value_3_pe_1_3_we = addr_hit[40] & reg_we & !reg_error;
-  assign acc_value_3_pe_1_3_wd = reg_wdata[15:8];
+  assign acc_value_13_we = addr_hit[48] & reg_we & !reg_error;
+  assign acc_value_13_wd = reg_wdata[31:0];
 
-  assign acc_value_3_pe_2_3_we = addr_hit[40] & reg_we & !reg_error;
-  assign acc_value_3_pe_2_3_wd = reg_wdata[23:16];
+  assign acc_value_14_we = addr_hit[49] & reg_we & !reg_error;
+  assign acc_value_14_wd = reg_wdata[31:0];
 
-  assign acc_value_3_pe_3_3_we = addr_hit[40] & reg_we & !reg_error;
-  assign acc_value_3_pe_3_3_wd = reg_wdata[31:24];
+  assign acc_value_15_we = addr_hit[50] & reg_we & !reg_error;
+  assign acc_value_15_wd = reg_wdata[31:0];
 
   // Read data return
   always_comb begin
@@ -2381,52 +2145,74 @@ module mage_reg_top #(
       end
 
       addr_hit[34]: begin
-        reg_rdata_next[1:0] = stream_in_xbar_sel_sel_in_xbar_0_qs;
-        reg_rdata_next[3:2] = stream_in_xbar_sel_sel_in_xbar_1_qs;
-        reg_rdata_next[5:4] = stream_in_xbar_sel_sel_in_xbar_2_qs;
-        reg_rdata_next[7:6] = stream_in_xbar_sel_sel_in_xbar_3_qs;
-      end
-
-      addr_hit[35]: begin
-        reg_rdata_next[1:0] = stream_out_xbar_sel_sel_out_xbar_0_qs;
-        reg_rdata_next[3:2] = stream_out_xbar_sel_sel_out_xbar_1_qs;
-        reg_rdata_next[5:4] = stream_out_xbar_sel_sel_out_xbar_2_qs;
-        reg_rdata_next[7:6] = stream_out_xbar_sel_sel_out_xbar_3_qs;
-      end
-
-      addr_hit[36]: begin
         reg_rdata_next[7:0]   = sel_out_col_pea_sel_col_0_0_qs;
         reg_rdata_next[15:8]  = sel_out_col_pea_sel_col_1_0_qs;
         reg_rdata_next[23:16] = sel_out_col_pea_sel_col_2_0_qs;
         reg_rdata_next[31:24] = sel_out_col_pea_sel_col_3_0_qs;
       end
 
+      addr_hit[35]: begin
+        reg_rdata_next[31:0] = acc_value_0_qs;
+      end
+
+      addr_hit[36]: begin
+        reg_rdata_next[31:0] = acc_value_1_qs;
+      end
+
       addr_hit[37]: begin
-        reg_rdata_next[7:0]   = acc_value_0_pe_0_0_qs;
-        reg_rdata_next[15:8]  = acc_value_0_pe_1_0_qs;
-        reg_rdata_next[23:16] = acc_value_0_pe_2_0_qs;
-        reg_rdata_next[31:24] = acc_value_0_pe_3_0_qs;
+        reg_rdata_next[31:0] = acc_value_2_qs;
       end
 
       addr_hit[38]: begin
-        reg_rdata_next[7:0]   = acc_value_1_pe_0_1_qs;
-        reg_rdata_next[15:8]  = acc_value_1_pe_1_1_qs;
-        reg_rdata_next[23:16] = acc_value_1_pe_2_1_qs;
-        reg_rdata_next[31:24] = acc_value_1_pe_3_1_qs;
+        reg_rdata_next[31:0] = acc_value_3_qs;
       end
 
       addr_hit[39]: begin
-        reg_rdata_next[7:0]   = acc_value_2_pe_0_2_qs;
-        reg_rdata_next[15:8]  = acc_value_2_pe_1_2_qs;
-        reg_rdata_next[23:16] = acc_value_2_pe_2_2_qs;
-        reg_rdata_next[31:24] = acc_value_2_pe_3_2_qs;
+        reg_rdata_next[31:0] = acc_value_4_qs;
       end
 
       addr_hit[40]: begin
-        reg_rdata_next[7:0]   = acc_value_3_pe_0_3_qs;
-        reg_rdata_next[15:8]  = acc_value_3_pe_1_3_qs;
-        reg_rdata_next[23:16] = acc_value_3_pe_2_3_qs;
-        reg_rdata_next[31:24] = acc_value_3_pe_3_3_qs;
+        reg_rdata_next[31:0] = acc_value_5_qs;
+      end
+
+      addr_hit[41]: begin
+        reg_rdata_next[31:0] = acc_value_6_qs;
+      end
+
+      addr_hit[42]: begin
+        reg_rdata_next[31:0] = acc_value_7_qs;
+      end
+
+      addr_hit[43]: begin
+        reg_rdata_next[31:0] = acc_value_8_qs;
+      end
+
+      addr_hit[44]: begin
+        reg_rdata_next[31:0] = acc_value_9_qs;
+      end
+
+      addr_hit[45]: begin
+        reg_rdata_next[31:0] = acc_value_10_qs;
+      end
+
+      addr_hit[46]: begin
+        reg_rdata_next[31:0] = acc_value_11_qs;
+      end
+
+      addr_hit[47]: begin
+        reg_rdata_next[31:0] = acc_value_12_qs;
+      end
+
+      addr_hit[48]: begin
+        reg_rdata_next[31:0] = acc_value_13_qs;
+      end
+
+      addr_hit[49]: begin
+        reg_rdata_next[31:0] = acc_value_14_qs;
+      end
+
+      addr_hit[50]: begin
+        reg_rdata_next[31:0] = acc_value_15_qs;
       end
 
       default: begin

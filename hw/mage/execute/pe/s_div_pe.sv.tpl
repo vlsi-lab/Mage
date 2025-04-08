@@ -2,13 +2,13 @@
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 //
-// File: pe.sv
+// File: s_pe.sv
 // Author: Alessio Naclerio
 // Date: 26/02/2025
-// Description: This module is the main building block of the Processing Element Array (PEA).
+// Description: This module is the main building block of the Processing Element Array (PEA) for Mage in streaming mode.
 //              It contains the functional unit (FU) and the input operand multiplexers.
 
-module pe
+module s_div_pe
   import pea_pkg::*;
 (
     input  logic                                                  clk_i,
@@ -16,7 +16,7 @@ module pe
     input  logic [N_CFG_BITS_PE-1:0]                              ctrl_pe_i,
 %if enable_streaming_interface == str(1):
     // Streaming Interface
-    input  logic [7:0]                                            reg_acc_value_i,
+    input  logic [31:0]                                           reg_acc_value_i,
     input  logic                                                  pea_ready_i,
     input  logic [  N_INPUTS_PE-4:0][N_BITS-1:0]                  neigh_pe_op_i,
     input  logic [  N_INPUTS_PE-4:0]                              neigh_pe_op_valid_i,
@@ -48,8 +48,12 @@ module pe
   delay_pe_mux_sel_t                          delay_op_sel;
   logic      [N_BITS-1:0]                     delay_op_fu;
   logic      [N_BITS-1:0]                     delay_op_out;
+  logic      [N_BITS-1:0]                     delay_op_out_d1;
+  logic      [N_BITS-1:0]                     delay_op_out_d2;
   logic                                       delay_op_valid;
   logic                                       delay_op_valid_out;
+  logic                                       delay_op_valid_out_d1;
+  logic                                       delay_op_valid_out_d2;
   // actual inputs to muxes
   logic      [  N_INPUTS_PE-1:0][N_BITS-1:0]  operands;
   logic      [  N_INPUTS_PE-1:0]              operands_valid;
@@ -57,6 +61,7 @@ module pe
   logic                                       fu_ops_valid;
   logic                                       fu_valid;
   logic                                       fu_ready;
+  logic                                       multi_op_instr;
   // accumulation signals
   logic                                       valid;
   logic                                       acc_loopback;
@@ -148,13 +153,15 @@ module pe
   ////////////////////////////////////////////////////////////////
   //                         Functional Unit                    //
   ////////////////////////////////////////////////////////////////
-  fu_wrapper fu_wrapper_i (
+  fu_wrapper_div fu_wrapper_div_i (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .a_i(op_a),
       .b_i(op_b),
 %if enable_streaming_interface == str(1):
+      .const_i(operands[CONSTANT]),
       .reg_acc_value_i,
+      .pea_ready_i,
       .ops_valid_i(fu_ops_valid),
       .valid_o(fu_valid),
       .ready_o(fu_ready),
@@ -185,29 +192,36 @@ module pe
                   ));
   end
 
+  assign multi_op_instr = (fu_instr == ADDMUL) || (fu_instr == ADDPOW) || (fu_instr == ABSDIV);
+
   // Delay Operand Reg
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
-      delay_op_o <= '0;
+      delay_op_out_d1 <= '0;
+      delay_op_out_d2 <= '0;
     end else begin
       if(pea_ready_i) begin
-        delay_op_o <= delay_op_out;
-      end else begin
-        delay_op_o <= delay_op_o;
+        delay_op_out_d1 <= delay_op_out;
+        delay_op_out_d2 <= delay_op_out_d1;
       end
     end
   end
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
-      delay_op_valid_o <= 1'b0;
+      delay_op_valid_out_d1 <= 1'b0;
+      delay_op_valid_out_d2 <= 1'b0;
     end else begin
       if(pea_ready_i) begin
-        delay_op_valid_o <= delay_op_valid_out;
-      end else begin
-        delay_op_valid_o <= delay_op_valid_o;
+        delay_op_valid_out_d1 <= delay_op_valid_out;
+        delay_op_valid_out_d2 <= delay_op_valid_out_d1;
       end
     end
+  end
+
+  always_comb begin
+    delay_op_o = multi_op_instr ? delay_op_out_d2 : delay_op_out_d1;
+    delay_op_valid_o = multi_op_instr ? delay_op_valid_out_d2 : delay_op_valid_out_d1;
   end
 %endif
 

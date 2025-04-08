@@ -23,9 +23,7 @@ module peripheral_regs
     output logic [1:0] reg_separate_cols_o,
     output logic [N_DMA_CH-1:0] reg_dma_ch_cfg_o,
     output logic [M-1:0][LOG_N:0] reg_sel_out_col_pea_o,
-    output logic [N-1:0][M-1:0][7:0] reg_acc_value_pe_o,
-    output logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_o,
-    output logic [N_IN_STREAM-1:0][N_DMA_CH_PER_IN_STREAM-1:0][LOG_N_DMA_CH_PER_IN_STREAM-1:0] reg_in_stream_sel_o,
+    output logic [N-1:0][M-1:0][31:0] reg_acc_value_pe_o,
     ////////////////////////////////////////////////////////////////
     //           Processing Element Array Configuration           //
     ////////////////////////////////////////////////////////////////
@@ -56,30 +54,22 @@ module peripheral_regs
     reg_sel_out_col_pea_o[1] = reg2hw.sel_out_col_pea[0].sel_col_1.q;
     reg_sel_out_col_pea_o[2] = reg2hw.sel_out_col_pea[0].sel_col_2.q;
     reg_sel_out_col_pea_o[3] = reg2hw.sel_out_col_pea[0].sel_col_3.q;
-    reg_acc_value_pe_o[0][0] = reg2hw.acc_value[0].pe_0.q;
-    reg_acc_value_pe_o[0][1] = reg2hw.acc_value[0].pe_1.q;
-    reg_acc_value_pe_o[0][2] = reg2hw.acc_value[0].pe_2.q;
-    reg_acc_value_pe_o[0][3] = reg2hw.acc_value[0].pe_3.q;
-    reg_acc_value_pe_o[1][0] = reg2hw.acc_value[1].pe_0.q;
-    reg_acc_value_pe_o[1][1] = reg2hw.acc_value[1].pe_1.q;
-    reg_acc_value_pe_o[1][2] = reg2hw.acc_value[1].pe_2.q;
-    reg_acc_value_pe_o[1][3] = reg2hw.acc_value[1].pe_3.q;
-    reg_acc_value_pe_o[2][0] = reg2hw.acc_value[2].pe_0.q;
-    reg_acc_value_pe_o[2][1] = reg2hw.acc_value[2].pe_1.q;
-    reg_acc_value_pe_o[2][2] = reg2hw.acc_value[2].pe_2.q;
-    reg_acc_value_pe_o[2][3] = reg2hw.acc_value[2].pe_3.q;
-    reg_acc_value_pe_o[3][0] = reg2hw.acc_value[3].pe_0.q;
-    reg_acc_value_pe_o[3][1] = reg2hw.acc_value[3].pe_1.q;
-    reg_acc_value_pe_o[3][2] = reg2hw.acc_value[3].pe_2.q;
-    reg_acc_value_pe_o[3][3] = reg2hw.acc_value[3].pe_3.q;
-    reg_out_stream_sel_o[0][0] = reg2hw.stream_out_xbar_sel.sel_out_xbar_0;
-    reg_out_stream_sel_o[0][1] = reg2hw.stream_out_xbar_sel.sel_out_xbar_1;
-    reg_out_stream_sel_o[1][0] = reg2hw.stream_out_xbar_sel.sel_out_xbar_2;
-    reg_out_stream_sel_o[1][1] = reg2hw.stream_out_xbar_sel.sel_out_xbar_3;
-    reg_in_stream_sel_o[0][0] = reg2hw.stream_in_xbar_sel.sel_in_xbar_0;
-    reg_in_stream_sel_o[0][1] = reg2hw.stream_in_xbar_sel.sel_in_xbar_1;
-    reg_in_stream_sel_o[1][0] = reg2hw.stream_in_xbar_sel.sel_in_xbar_2;
-    reg_in_stream_sel_o[1][1] = reg2hw.stream_in_xbar_sel.sel_in_xbar_3;
+    reg_acc_value_pe_o[0][0] = reg2hw.acc_value[0].q;
+    reg_acc_value_pe_o[0][1] = reg2hw.acc_value[1].q;
+    reg_acc_value_pe_o[0][2] = reg2hw.acc_value[2].q;
+    reg_acc_value_pe_o[0][3] = reg2hw.acc_value[3].q;
+    reg_acc_value_pe_o[1][0] = reg2hw.acc_value[4].q;
+    reg_acc_value_pe_o[1][1] = reg2hw.acc_value[5].q;
+    reg_acc_value_pe_o[1][2] = reg2hw.acc_value[6].q;
+    reg_acc_value_pe_o[1][3] = reg2hw.acc_value[7].q;
+    reg_acc_value_pe_o[2][0] = reg2hw.acc_value[8].q;
+    reg_acc_value_pe_o[2][1] = reg2hw.acc_value[9].q;
+    reg_acc_value_pe_o[2][2] = reg2hw.acc_value[10].q;
+    reg_acc_value_pe_o[2][3] = reg2hw.acc_value[11].q;
+    reg_acc_value_pe_o[3][0] = reg2hw.acc_value[12].q;
+    reg_acc_value_pe_o[3][1] = reg2hw.acc_value[13].q;
+    reg_acc_value_pe_o[3][2] = reg2hw.acc_value[14].q;
+    reg_acc_value_pe_o[3][3] = reg2hw.acc_value[15].q;
     ////////////////////////////////////////////////////////////////
     //                   Mage PEA Configuration                   //
     ////////////////////////////////////////////////////////////////

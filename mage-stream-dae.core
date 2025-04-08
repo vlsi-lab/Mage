@@ -38,7 +38,6 @@ filesets:
     - hw/mage/execute/pe/cv32e40p_alu_div.sv
     - hw/mage/execute/pe/fu_partitioned.sv
     - hw/mage/execute/acc_pe.sv
-    - hw/mage/execute/pe.sv
     - hw/mage/execute/pea.sv
     - hw/mage/mage_top.sv
     file_type: systemVerilogSource

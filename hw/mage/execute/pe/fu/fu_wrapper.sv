@@ -15,12 +15,13 @@ module fu_wrapper
     input  logic      [N_BITS-1:0] a_i,
     input  logic      [N_BITS-1:0] b_i,
     input  fu_instr_t              instr_i,
+    input  logic      [N_BITS-1:0] const_i,
     input  logic                   ops_valid_i,
-    input  logic      [       7:0] reg_acc_value_i,
+    input  logic                   pea_ready_i,
+    input  logic      [      31:0] reg_acc_value_i,
     output logic                   acc_loopback_o,
     output logic                   valid_o,
     output logic                   ready_o,
-    output logic      [N_BITS-1:0] rem_q_o,
     output logic      [N_BITS-1:0] res_o
 );
 
@@ -33,34 +34,28 @@ module fu_wrapper
   ////////////////////////////////////////////////////////////////
   //                    Ready-Valid Handling                    //
   ////////////////////////////////////////////////////////////////
-  // division ready-valid
-  logic       out_div_valid;
-  logic       div_ready;
-  logic       div_busy;
-  logic       div_input_valid;
-  logic       div_used_once;
   // acuumulation ready-valid
-  logic [7:0] acc_cnt;
-  logic       acc_ready;
-  logic       acc_valid;
+  logic [15:0] acc_cnt;
+  logic        acc_ready;
+  logic        acc_valid;
   // ready-valid
-  logic       valid;
-  logic       ready;
+  logic        valid;
+  logic        ready;
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
-      acc_cnt <= 8'd0;
+      acc_cnt <= 16'd0;
       acc_loopback_o <= 1'b0;
     end else begin
       if (instr_i == ACC || instr_i == MAX) begin
         if (acc_cnt == reg_acc_value_i) begin
-          acc_cnt <= 8'd0;
+          acc_cnt <= 16'd0;
           acc_loopback_o <= 1'b0;
-        end else if (ops_valid_i) begin
-          acc_cnt <= acc_cnt + 8'd1;
+        end else if (ops_valid_i && pea_ready_i) begin
+          acc_cnt <= acc_cnt + 16'd1;
           acc_loopback_o <= 1'b1;
         end
       end else begin
-        acc_cnt <= 8'd0;
+        acc_cnt <= 16'd0;
         acc_loopback_o <= 1'b0;
       end
     end
@@ -68,62 +63,11 @@ module fu_wrapper
 
   assign acc_ready = 1'b1;
   assign acc_valid = (acc_cnt == reg_acc_value_i && acc_cnt != '0);
-  assign div_input_valid = (ops_valid_i) & ((instr_i == DIV) || (instr_i == DIVU) || (instr_i ==REM));
-
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
-    if (!rst_n_i) begin
-      div_busy <= 1'b0;
-    end else begin
-      if (out_div_valid) begin
-        div_busy <= 1'b0;
-      end else begin
-        if (div_input_valid) begin
-          div_busy <= 1'b1;
-        end
-      end
-    end
-  end
-
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
-    if (!rst_n_i) begin
-      div_used_once <= 1'b0;
-    end else begin
-      if (div_busy) begin
-        div_used_once <= 1'b1;
-      end
-    end
-  end
-
-  always_comb begin
-    if (div_busy) begin
-      div_ready = 1'b0;
-      if (out_div_valid) begin
-        div_ready = 1'b1;
-      end
-    end else begin
-      div_ready = 1'b1;
-      if (div_input_valid) begin
-        div_ready = 1'b0;
-      end
-    end
-  end
 
   always_comb begin
     valid = ops_valid_i;
     ready = 1'b1;
     case (instr_i)
-      DIV: begin
-        valid = out_div_valid && div_used_once;
-        ready = div_ready;
-      end
-      DIVU: begin
-        valid = out_div_valid && div_used_once;
-        ready = div_ready;
-      end
-      REM: begin
-        valid = out_div_valid && div_used_once;
-        ready = div_ready;
-      end
       ACC: begin
         valid = acc_valid;
         ready = acc_ready;
@@ -136,84 +80,59 @@ module fu_wrapper
         valid = valid_mo_instr;
         ready = 1'b1;
       end
+      ADDMUL: begin
+        valid = valid_mo_instr;
+        ready = 1'b1;
+      end
     endcase
   end
 
   assign valid_o = valid;
   assign ready_o = ready;
 
-  logic [N_BITS-1:0] quotient_div;
-  logic [N_BITS-1:0] remainder_div;
-
-  div_wrapper div_wrapper_i (
-      .clk_i(clk_i),
-      .rst_n_i(rst_n_i),
-      .a_i(a_i),
-      .b_i(b_i),
-      .in_valid_i(div_input_valid),
-      .q_o(quotient_div),
-      .r_o(remainder_div),
-      //.ready_o(out_div_ready),
-      .valid_o(out_div_valid)
-      //.instr_i(instr_i),
-      //.OpBShift_DI(shift_left_result),
-      //.operand_a_rev_i(operand_a_rev),
-      //.operand_a_neg_rev_i(operand_a_neg_rev)
-  );
-
-  logic shift_valid;
-  logic [N_BITS-1:0] shift_res;
-  logic [31:0] shift_left_result;
-  logic [31:0] operand_a_rev;
-  logic [31:0] operand_a_neg_rev;
-
-  p_shifter p_shifter_i (
-      .a_i(a_i),
-      .b_i(b_i),
-      .instr_i(instr_i),
-      .in_valid_i(ops_valid_i),
-      .res_o(shift_res),
-      .shift_left_result_o(shift_left_result),
-      .operand_a_rev_o(operand_a_rev),
-      .operand_a_neg_rev_o(operand_a_neg_rev),
-      .valid_o(shift_valid)
-  );
-
-  logic [N_BITS-1:0] add_res;
+  logic [N_BITS:0] add_res;
   logic [N_BITS-1:0] mul_res;
+  logic [N_BITS-1:0] shift_res;
+  logic [N_BITS-1:0] lsh_res;
+
   logic [N_BITS-1:0] mul_op1;
   logic [N_BITS-1:0] mul_op2;
+
+  logic [N_BITS-1:0] lsh_op1_rev;
+  logic [2*N_BITS-1:0] shift_op1;
+  logic [N_BITS-1:0] shift_op2;
+
+  logic [N_BITS:0] add_op1;
+  logic [N_BITS:0] add_op2;
+
+  logic [N_BITS-1:0] op2_neg;
+
+  logic sign_op1;
+
   logic [N_BITS-1:0] temp_res;
+
   logic valid_mo_instr;
 
-  assign add_res = a_signed + b_signed;
-  assign mul_op1 = (instr_i == ADDPOW) ? temp_res : a_signed;
-  assign mul_op2 = (instr_i == ADDPOW) ? temp_res : b_signed;
-  assign mul_res = mul_op1 * mul_op2;
+  assign op2_neg   = ~b_signed;
 
-  always_comb begin
-    case (instr_i)
-      NOP: res_o = 0;
-      ADD: res_o = add_res;
-      ACC: res_o = add_res;
-      MUL: res_o = mul_res;
-      SUB: res_o = a_signed - b_signed;
-      LSH: res_o = a_signed << b_signed;
-      ARSH: res_o = a_signed >>> b_signed;
-      LRSH: res_o = a_signed >> b_signed;
-      MAX: res_o = (a_signed > b_signed) ? a_i : b_i;
-      MIN: res_o = (a_signed < b_signed) ? a_i : b_i;
-      DIV: res_o = quotient_div;
-      DIVU: res_o = quotient_div;
-      ABS: res_o = (a_i[31]) ? -a_signed : a_signed;
-      SGNMUL: res_o = (a_i[31]) ? -b_signed : b_signed;
-      REM: res_o = remainder_div;
-      ADDPOW: res_o = mul_res;
-      default: res_o = 0;
-    endcase
-  end
+  assign add_res   = add_op1 + add_op2;
+  assign mul_res   = mul_op1 * mul_op2;
+  assign shift_res = shift_op1 >>> shift_op2;
+  generate
+    genvar m;
+    for (m = 0; m < 32; m++) begin
+      assign lsh_res[31-m] = shift_res[m];
+    end
+  endgenerate
 
-  assign rem_q_o = (instr_i == DIVU) ? remainder_div : ((instr_i == REM) ? quotient_div : 0);
+  assign sign_op1 = a_signed[N_BITS-1];
+
+  generate
+    genvar n;
+    for (n = 0; n < 32; n++) begin
+      assign lsh_op1_rev[n] = a_signed[31-n];
+    end
+  endgenerate
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
@@ -221,10 +140,111 @@ module fu_wrapper
       valid_mo_instr <= 1'b0;
     end else begin
       if (instr_i == ADDPOW) begin
-        temp_res <= add_res;
+        temp_res <= add_res[N_BITS:1];
+        valid_mo_instr <= ops_valid_i;
+      end else if (instr_i == ADDMUL) begin
+        temp_res <= add_res[N_BITS:1];
         valid_mo_instr <= ops_valid_i;
       end
     end
   end
+
+  always_comb begin
+
+    add_op1   = {a_signed, 1'b0};
+    add_op2   = {b_signed, 1'b0};
+    mul_op1   = a_signed;
+    mul_op2   = b_signed;
+    shift_op1 = a_signed;
+    shift_op2 = b_signed;
+
+    case (instr_i)
+      NOP: begin
+        add_op1   = '0;
+        add_op2   = '0;
+        mul_op1   = '0;
+        mul_op2   = '0;
+        shift_op1 = '0;
+        shift_op2 = '0;
+      end
+
+      ABS: begin
+        add_op1 = {a_signed, 1'b0};
+        add_op2 = sign_op1 ? {32'd1, 1'b0} : {32'd0, 1'b0};
+      end
+
+      SGNMUL: begin
+        add_op1 = {b_signed, 1'b0};
+        add_op2 = sign_op1 ? {32'd1, 1'b0} : {32'd0, 1'b0};
+      end
+
+      SUB: begin
+        add_op1 = {a_signed, 1'b1};
+        add_op2 = {op2_neg, 1'b1};
+      end
+
+      MIN: begin
+        add_op1 = {a_signed, 1'b1};
+        add_op2 = {op2_neg, 1'b1};
+      end
+
+      MAX: begin
+        add_op1 = {a_signed, 1'b1};
+        add_op2 = {op2_neg, 1'b1};
+      end
+
+      ARSH: begin
+        shift_op1 = {{32{a_signed[N_BITS-1]}}, a_signed};
+        shift_op2 = b_signed;
+      end
+
+      LRSH: begin
+        shift_op1 = {32'd0, a_signed};
+      end
+
+      LSH: begin
+        shift_op1 = {32'd0, lsh_op1_rev};
+      end
+
+      ADDPOW: begin
+        mul_op1 = temp_res;
+        mul_op2 = temp_res;
+      end
+
+      ADDMUL: begin
+        mul_op1 = temp_res;
+        mul_op2 = const_i;
+      end
+
+      SGNSUB: begin
+        add_op1 = {const_i, 1'b1};
+        add_op2 = {op2_neg, 1'b1};
+      end
+
+    endcase
+  end
+
+
+  always_comb begin
+    case (instr_i)
+      NOP: res_o = 0;
+      ADD: res_o = add_res[N_BITS:1];
+      ACC: res_o = add_res[N_BITS:1];
+      MUL: res_o = mul_res;
+      SUB: res_o = add_res[N_BITS:1];
+      LSH: res_o = lsh_res;
+      ARSH: res_o = shift_res;
+      LRSH: res_o = shift_res;
+      MAX: res_o = (add_res[N_BITS-1]) ? b_i : a_i;
+      MIN: res_o = (add_res[N_BITS-1]) ? a_i : b_i;
+      ABS: res_o = add_res[N_BITS:1];
+      SGNMUL: res_o = add_res[N_BITS:1];
+      ADDPOW: res_o = mul_res;
+      ADDMUL: res_o = mul_res;
+      SGNSUB: res_o = sign_op1 ? add_res[N_BITS:1] : b_signed;
+      default: res_o = 0;
+    endcase
+  end
+
 
 endmodule

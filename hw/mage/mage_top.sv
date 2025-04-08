@@ -36,11 +36,7 @@ module mage_top
   logic [N_DMA_CH-1:0] reg_dma_ch_cfg;
   logic [1:0] reg_separate_cols;
   logic [M-1:0][LOG_N:0] reg_stream_sel_out_pea;
-  logic [N-1:0][M-1:0][7:0] reg_acc_value_pe;
-  // xbar in signals
-  logic [N_IN_STREAM-1:0][N_DMA_CH_PER_IN_STREAM-1:0][LOG_N_DMA_CH_PER_IN_STREAM-1:0] reg_in_stream_sel;
-  // xbar out signals
-  logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel;
+  logic [N-1:0][M-1:0][31:0] reg_acc_value_pe;
   ////////////////////////////////////////////////////////////////
   //           Processing Element Array Configuration           //
   ////////////////////////////////////////////////////////////////
@@ -62,8 +58,6 @@ module mage_top
       .reg_dma_ch_cfg_o(reg_dma_ch_cfg),
       .reg_sel_out_col_pea_o(reg_stream_sel_out_pea),
       .reg_acc_value_pe_o(reg_acc_value_pe),
-      .reg_out_stream_sel_o(reg_out_stream_sel),
-      .reg_in_stream_sel_o(reg_in_stream_sel),
       ////////////////////////////////////////////////////////////////
       //           Processing Element Array Configuration           //
       ////////////////////////////////////////////////////////////////
@@ -107,8 +101,6 @@ module mage_top
       .hw_fifo_req_i(hw_fifo_req_i),
       .hw_fifo_resp_o(hw_fifo_resp_o),
       .reg_separate_cols_i(reg_separate_cols),
-      .reg_out_stream_sel_i(reg_out_stream_sel),
-      .reg_in_stream_sel_i(reg_in_stream_sel),
       .dout_pea_i(stream_pea_data_out),
       .valid_pea_out_i(stream_pea_out_valid),
       .valid_pea_in_o(stream_pea_in_valid),

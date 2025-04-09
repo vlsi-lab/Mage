@@ -70,9 +70,9 @@ module mage_top
   ////////////////////////////////////////////////////////////////
   //                  Crossbars Configuration                   //
   ////////////////////////////////////////////////////////////////
-  logic [(N_CFG_REGS_32_SEL_L_STREAM*32)-1:0] reg_cfg_l_stream_sel;
-  logic [(N_CFG_REGS_32_SEL_S_STREAM*32)-1:0] reg_cfg_s_stream_sel;
-  logic [(N_CFG_REGS_32_SEL_OUT_PEA*32)-1:0] reg_cfg_sel_out_pea;
+  logic [(N_CFG_REGS_LOAD_STREAM*32)-1:0] reg_cfg_l_stream_sel;
+  logic [(N_CFG_REGS_STORE_STREAM*32)-1:0] reg_cfg_s_stream_sel;
+  logic [(N_CFG_REGS_SEL_OUT_PEA*32)-1:0] reg_cfg_sel_out_pea;
   ////////////////////////////////////////////////////////////////
   //                     Crossbars Signals                      //
   ////////////////////////////////////////////////////////////////

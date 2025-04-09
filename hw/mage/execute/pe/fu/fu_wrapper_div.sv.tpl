@@ -54,6 +54,7 @@ module fu_wrapper_div
   // ready-valid
   logic       valid;
   logic       ready;
+  logic       valid_mo_instr;
 %endif
 %if enable_streaming_interface == str(1):
   always_ff @(posedge clk_i, negedge rst_n_i) begin
@@ -162,6 +163,8 @@ module fu_wrapper_div
 
   logic [N_BITS-1:0] quotient_div;
   logic [N_BITS-1:0] remainder_div;
+  logic [N_BITS-1:0] div_op1;
+  logic [N_BITS-1:0] div_op2;
 
   div_wrapper div_wrapper_i (
       .clk_i(clk_i),
@@ -184,9 +187,6 @@ module fu_wrapper_div
   logic [N_BITS-1:0] mul_op1;
   logic [N_BITS-1:0] mul_op2;
 
-  logic [N_BITS-1:0] div_op1;
-  logic [N_BITS-1:0] div_op2;
-
   logic [N_BITS-1:0] lsh_op1_rev;
   logic [2*N_BITS-1:0] shift_op1;
   logic [N_BITS-1:0] shift_op2;
@@ -199,8 +199,6 @@ module fu_wrapper_div
   logic sign_op1;
 
   logic [N_BITS-1:0] temp_res;
-
-  logic valid_mo_instr;
 
   assign op2_neg = ~b_signed;
 

@@ -20,8 +20,8 @@ N_AGE_PER_STREAM = 2
 # Streaming Interface
 IN_STREAM_XBAR = 0
 OUT_STREAM_XBAR = 0
-ENABLE_STREAMING_INTERFACE = 1
-ENABLE_DECOUPLED = 0
+ENABLE_STREAMING_INTERFACE = 0
+ENABLE_DECOUPLED = 1
 
 N_DMA_CH = 4
 N_IN_STREAM = 1
@@ -40,6 +40,7 @@ N_NEIGH_PE = 4
 #N_PEA_NOC_TYPE = 0
 
 ROW_DIV = 3
+ROW_ACC = 0
 
 re-vendor:
 	./util/vendor.py ./vendor/lowrisc_opentitan.vendor.hjson -v --update; \
@@ -68,15 +69,6 @@ mage-gen:
 	--n_dma_ch_per_out_stream $(N_DMA_CH_PER_OUT_STREAM) \
 	--in_stream_xbar $(IN_STREAM_XBAR) \
 	--out_stream_xbar $(OUT_STREAM_XBAR)
-	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe --tpl-sv hw/mage/execute/pe/s_pe.sv.tpl \
-	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
-	--enable_decoupling $(ENABLE_DECOUPLED)
-	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe --tpl-sv hw/mage/execute/pe/s_div_pe.sv.tpl \
-	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
-	--enable_decoupling $(ENABLE_DECOUPLED)
-	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe --tpl-sv hw/mage/execute/pe/acc_pe.sv.tpl \
-	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
-	--enable_decoupling $(ENABLE_DECOUPLED)
 	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe/fu --tpl-sv hw/mage/execute/pe/fu/fu_wrapper.sv.tpl \
 	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
 	--enable_decoupling $(ENABLE_DECOUPLED)
@@ -87,6 +79,7 @@ mage-gen:
 	--n_pea_rows $(N_PEA_ROWS) \
 	--n_pea_cols $(N_PEA_COLS) \
 	--row_div $(ROW_DIV) \
+	--row_acc $(ROW_ACC) \
 	--n_pe_in_mem $(N_PE_IN_MEM) \
 	--n_pe_in_stream $(N_PE_IN_STREAM) \
 	--n_neigh_pe $(N_NEIGH_PE) \

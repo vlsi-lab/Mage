@@ -2,20 +2,21 @@
 // Solderpad Hardware License, Version 2.1, see LICENSE.md for details.
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 //
-// File: acc_pe.sv
+// File: dae_acc_pe.sv
 // Author: Alessio Naclerio
 // Date: 26/02/2025
-// Description: This is a standard PE with functionalities to support accumulation, also for vector mode operations (8 and 16 bits)
+// Description: This module is the main building block of the Processing Element Array (PEA) for Mage in Decoupled Access_execute mode.
+//              It contains the partitioned functional unit (FU) and the input operand multiplexers.
+//              The PE also support accumulations on 8, 16 and 32 bits.
 
-module acc_pe
+module dae_acc_pe
   import pea_pkg::*;
 (
     input  logic                                 clk_i,
     input  logic                                 rst_n_i,
     input  logic [  N_INPUTS_PE-1:0][N_BITS-1:0] pe_op_i,
+    input  logic                                 acc_match_i,
     input  logic [N_CFG_BITS_PE-1:0]             ctrl_pe_i,
-    input  logic [  N_INPUTS_PE-1:0]             stream_valid_i,
-    output logic                                 stream_valid_o,
     output logic [       N_BITS-1:0]             pe_res_o
 );
   //output of input muxes
@@ -34,6 +35,7 @@ module acc_pe
   fu_instr_t                       fu_instr;
 
   //Accumulation signals
+  logic                            acc_match;
   logic                            vec_mode_8;
   logic                            vec_mode_16;
   logic                            no_vec_mode;
@@ -47,14 +49,11 @@ module acc_pe
   ////////////////////////////////////////////////////////////////
   //                      PE Control Word                       //
   ////////////////////////////////////////////////////////////////
-  always_comb begin
-    mux_a_sel = pe_mux_sel_t'(ctrl_pe_i[LOG_N_INPUTS_PE-1 : 0]);
-    mux_b_sel = pe_mux_sel_t'(ctrl_pe_i[2*LOG_N_INPUTS_PE-1 : LOG_N_INPUTS_PE]);
-  end
-  assign fu_instr         = fu_instr_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS - 1 : 2 * LOG_N_INPUTS_PE]);
-  assign vec_mode         = ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS];
-  //assign rf_en = ctrl_pe_i[2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+2];
-  assign acc_counter_sel = ctrl_pe_i[2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+3];
+  assign mux_a_sel = pe_mux_sel_t'(ctrl_pe_i[LOG_N_INPUTS_PE-1 : 0]);
+  assign mux_b_sel = pe_mux_sel_t'(ctrl_pe_i[2*LOG_N_INPUTS_PE-1 : LOG_N_INPUTS_PE]);
+  assign fu_instr  = fu_instr_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS - 1 : 2 * LOG_N_INPUTS_PE]);
+  assign vec_mode  = ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS];
+  assign acc_counter_sel = ctrl_pe_i[2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+2];
 
   /* Accumulation match signal to be asserted if
     1. The PE is in accumulation mode

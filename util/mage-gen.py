@@ -261,6 +261,12 @@ def main():
                         default="4",
                         help="")
     
+    parser.add_argument("--row_acc",
+                        metavar="",
+                        nargs='?',
+                        default="4",
+                        help="")
+    
     
 
     args = parser.parse_args()
@@ -357,6 +363,9 @@ def main():
     if args.row_div != None and args.row_div != '':
         row_div = int(args.row_div)
 
+    if args.row_acc != None and args.row_acc != '':
+        row_acc = int(args.row_acc)
+
 
     kwargs = {
         "num_words"                        : num_words,
@@ -386,7 +395,8 @@ def main():
         "n_age_tot"                        : n_age_tot,
         "n_age_per_stream"                 : n_age_per_stream,
         "kernel_len"                       : kernel_len,
-        "row_div"                          : row_div
+        "row_div"                          : row_div,
+        "row_acc"                          : row_acc
     }
 
     ###########

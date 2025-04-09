@@ -47,6 +47,7 @@ module fu_wrapper
   // ready-valid
   logic       valid;
   logic       ready;
+  logic       valid_mo_instr;
 %endif
 %if enable_streaming_interface == str(1):
   always_ff @(posedge clk_i, negedge rst_n_i) begin
@@ -120,8 +121,6 @@ module fu_wrapper
   logic sign_op1;
 
   logic [N_BITS-1:0] temp_res;
-
-  logic valid_mo_instr;
 
   assign op2_neg = ~b_signed;
 

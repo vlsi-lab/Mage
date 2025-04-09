@@ -388,7 +388,9 @@ logic out_delay_op_valid${r}${c};
   end
 %endif
 
-%for r in range(n_pea_rows):
+
+%if enable_streaming_interface == str(1) and enable_decoupling == str(0):
+  %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
       %if row_div == r:
   s_div_pe pe_inst_${r}${c} (
@@ -398,10 +400,6 @@ logic out_delay_op_valid${r}${c};
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe${r}${c}),
-%if enable_decoupling == str(1):
-      .acc_match_i(acc_match_i),
-%endif
-%if enable_streaming_interface == str(1):
       .reg_acc_value_i(reg_acc_value_pe[${r}][${c}]),
       .pea_ready_i(ready_in_pe[${c}]),
       .neigh_pe_op_valid_i(stream_valid_pe_in${r}${c}),
@@ -411,13 +409,33 @@ logic out_delay_op_valid${r}${c};
       .ready_o(stream_ready_pe_out${r}${c}),
       .delay_op_valid_o(out_delay_op_valid${r}${c}),
       .delay_op_o(out_delay_op${r}${c}),
-%endif
       .ctrl_pe_i(ctrl_pea_i[${r}][${c}]),
       .pe_res_o(out_data_pe${r}${c})
   ); 
     %endfor
-%endfor
+  %endfor
+%endif
 
+%if enable_streaming_interface == str(0) and enable_decoupling == str(1):
+  %for r in range(n_pea_rows):
+    %for c in range(n_pea_cols):
+      %if row_acc == r:
+  dae_acc_pe pe_inst_${r}${c} (
+      .acc_match_i(acc_match_i),
+      %else:
+  dae_pe pe_inst_${r}${c} (
+      %endif
+      .clk_i(clk_i),
+      .rst_n_i(rst_n_i),
+      .pe_op_i(in_data_pe${r}${c}),
+      .ctrl_pe_i(ctrl_pea_i[${r}][${c}]),
+      .pe_res_o(out_data_pe${r}${c})
+  ); 
+    %endfor
+  %endfor
+%endif
+
+%if enable_streaming_interface == str(1) and enable_decoupling == str(0):
   assign pea_ready_all_cols = 
 %for r in range(n_pea_rows): 
   %for c in range(n_pea_cols): 
@@ -474,5 +492,6 @@ logic out_delay_op_valid${r}${c};
     pea_ready_o[${c}] = ready_in_pe[${c}];
 %endfor
   end
+%endif
 
 endmodule

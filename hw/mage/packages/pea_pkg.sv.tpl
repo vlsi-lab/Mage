@@ -51,9 +51,9 @@ package pea_pkg;
 
   localparam unsigned N_NEIGH_PE = ${n_neigh_pe};
 %if enable_streaming_interface == str(1) and enable_decoupling == str(1):
-  localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + n_pe_in_mem + 4};
+  localparam unsigned N_INPUTS_PE = ${1 + n_neigh_pe + n_pe_in_mem + 4};
 %elif enable_streaming_interface == str(1) and enable_decoupling == str(0):
-  localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + 4};
+  localparam unsigned N_INPUTS_PE = ${1 + n_neigh_pe + 4};
 %elif enable_streaming_interface == str(0) and enable_decoupling == str(1):
   localparam unsigned N_INPUTS_PE = ${n_neigh_pe + n_pe_in_mem + 4};
 %endif

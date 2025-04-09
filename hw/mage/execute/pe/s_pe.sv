@@ -70,7 +70,7 @@ module s_pe
   logic                                            rf_en;
 
   always_comb begin
-    for (int i = 0; i < N_INPUTS_PE - 2; i++) begin
+    for (int i = 0; i < N_INPUTS_PE - 3; i++) begin
       operands[i] = neigh_pe_op_i[i];
       operands_valid[i] = neigh_pe_op_valid_i[i];
     end

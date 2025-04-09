@@ -20,7 +20,7 @@ module streaming_interface
     output hw_fifo_resp_t [N_DMA_CH-1:0] hw_fifo_resp_o,
     // PEA Interface
     input logic [M-1:0] pea_ready_i,
-    input logic reg_separate_cols_i,
+    input logic [1:0] reg_separate_cols_i,
 %if out_stream_xbar == str(1):
     input logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_i,
 %endif

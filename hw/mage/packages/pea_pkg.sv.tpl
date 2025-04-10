@@ -134,8 +134,8 @@ package pea_pkg;
     SELF       = 4'b1010,
     RF         = 4'b1011
 %elif  enable_streaming_interface == str(1) and enable_decoupling == str(0):
-    STREAM_IN0 = 4'b0000,
-    CONSTANT   = 4'b0001,
+    CONSTANT   = 4'b0000,
+    STREAM_IN0 = 4'b0001,
     UP         = 4'b0010,
     LEFT       = 4'b0011,
     RIGHT      = 4'b0100,

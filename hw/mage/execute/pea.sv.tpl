@@ -48,7 +48,7 @@ module pea
 
   %for r in range(n_pea_rows):
       %for c in range(n_pea_cols):
-  logic [N_INPUTS_PE-3:0][N_BITS-1:0] in_data_pe${r}${c};  
+  logic [N_INPUTS_PE-4:0][N_BITS-1:0] in_data_pe${r}${c};  
       %endfor
   %endfor
   
@@ -73,7 +73,7 @@ module pea
 
 %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-  logic [N_INPUTS_PE-3:0] stream_valid_pe_in${r}${c};   
+  logic [N_INPUTS_PE-4:0] stream_valid_pe_in${r}${c};   
     %endfor
 %endfor
 
@@ -234,8 +234,8 @@ logic out_delay_op_valid${r}${c};
 
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-  assign in_data_pe${r}${c}[0] = stream_data_in_reg[${c}]; 
-  assign in_data_pe${r}${c}[${1}] = reg_constant_op_i[${r}][${c}];<% k = 0 %> 
+  assign in_data_pe${r}${c}[0] = reg_constant_op_i[${r}][${c}];
+  assign in_data_pe${r}${c}[1] = stream_data_in_reg[${c}]; <% k = 0 %> 
       %for r1 in range(r-1,r+2,1):
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
@@ -255,6 +255,7 @@ logic out_delay_op_valid${r}${c};
 
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
+  assign in_data_pe${r}${c}[0] = reg_constant_op_i[${r}][${c}]; <% k = 0 %> 
       %for n in range(n_pe_in_mem):
         %for i in range(len(pea_in_mem_placement)):
           %for j in range(len(pea_in_mem_placement[i])):
@@ -268,8 +269,6 @@ logic out_delay_op_valid${r}${c};
           %endfor
         %endfor
       %endfor       
-  assign in_data_pe${r}${c}[${n_pe_in_mem}] = reg_constant_op_i[${r}][${c}];
-  assign in_data_pe${r}${c}[${1+n_pe_in_mem}] = out_data_pe${r}${c}; <% k = 0 %> 
       %for r1 in range(r-1,r+2,1):
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
@@ -352,17 +351,17 @@ logic out_delay_op_valid${r}${c};
 ////////////////////////////////////////////////////////////////
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-      <% k = 1 %>       
+
+  assign stream_valid_pe_in${r}${c}[0] = 1'b1;
       % for i in range(len(pea_in_stream_placement)):
         % if i == c:
           %if pea_in_stream_placement[i] != None:
-  assign stream_valid_pe_in${r}${c}[0] = stream_valid_in_reg[${pea_in_stream_placement[i]}];
+  assign stream_valid_pe_in${r}${c}[1] = stream_valid_in_reg[${pea_in_stream_placement[i]}]; <% k = 2 %>  
           %else:
-  assign stream_valid_pe_in${r}${c}[0] = 1'b1;
+  assign stream_valid_pe_in${r}${c}[1] = 1'b1; <% k = 2 %>  
           %endif
         %endif
-      %endfor
-  assign stream_valid_pe_in${r}${c}[${k}] = 1'b1; <% k = k + 1 %>
+      %endfor  
       %for r1 in range(r-1,r+2,1):
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc

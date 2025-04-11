@@ -197,31 +197,37 @@ logic out_delay_op_valid${r}${c};
   ////////////////////////////////////////////////////////////////
 
 %if enable_streaming_interface == str(1) and enable_decoupling == str(1):
-
+  <% k = 0 %>
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
+  assign in_data_pe${r}${c}[0] = reg_constant_op_i[${r}][${c}]; <%k = k + 1%>
       %for n in range(n_pe_in_mem):
         %for i in range(len(pea_in_mem_placement)):
           %for j in range(len(pea_in_mem_placement[i])):
             % if i == r and j == n:
               %if pea_in_mem_placement[i][j] != None:
-  assign in_data_pe${r}${c}[${j}] = in_data_pea[${pea_in_mem_placement[i][j]}];
+  assign in_data_pe${r}${c}[${j}] = in_data_pea[${pea_in_mem_placement[i][j]}]; <%k = k + 1%>
               %else:
-  assign in_data_pe${r}${c}[${j}] = '0;
+  assign in_data_pe${r}${c}[${j}] = '0;<%k = k + 1%>
               %endif        
             %endif
           %endfor
         %endfor
       %endfor
-  assign in_data_pe${r}${c}[${n_pe_in_mem}] = stream_data_in_reg[${c}];
-  assign in_data_pe${r}${c}[${n_pe_in_mem+1}] = reg_constant_op_i[${r}][${c}];<% k = 0%> 
+      %for i in range(len(pea_in_stream_placement[c])):
+        %if pea_in_stream_placement[c][i] != None:
+  assign in_data_pe${r}${c}[${k}] = stream_data_in_reg[${pea_in_stream_placement[c][i]}]; <% k = k + 1 %> 
+        %else:
+  assign in_data_pe${r}${c}[${k}] = '0; <% k = k + 1 %> 
+        %endif  
+      %endfor 
       %for r1 in range(r-1,r+2,1):  
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
             %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
-  assign in_data_pe${r}${c}[${n_pe_in_mem+1+1+k}] = '0; <% k = k + 1 %>
+  assign in_data_pe${r}${c}[${k}] = '0; <% k = k + 1 %>
             %else:
-  assign in_data_pe${r}${c}[${n_pe_in_mem+1+1+k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
+  assign in_data_pe${r}${c}[${k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
             %endif
           %endif
         %endfor
@@ -234,15 +240,21 @@ logic out_delay_op_valid${r}${c};
 
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-  assign in_data_pe${r}${c}[0] = reg_constant_op_i[${r}][${c}];
-  assign in_data_pe${r}${c}[1] = stream_data_in_reg[${c}]; <% k = 0 %> 
+  assign in_data_pe${r}${c}[0] = reg_constant_op_i[${r}][${c}]; <% k = 1 %> 
+      %for i in range(len(pea_in_stream_placement[c])):
+        %if pea_in_stream_placement[c][i] != None:
+  assign in_data_pe${r}${c}[${k}] = stream_data_in_reg[${pea_in_stream_placement[c][i]}]; <% k = k + 1 %> 
+        %else:
+  assign in_data_pe${r}${c}[${k}] = '0; <% k = k + 1 %> 
+        %endif  
+      %endfor 
       %for r1 in range(r-1,r+2,1):
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
             %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
-  assign in_data_pe${r}${c}[${1+1+k}] = '0; <% k = k + 1 %>
+  assign in_data_pe${r}${c}[${k}] = '0; <% k = k + 1 %>
             %else:
-  assign in_data_pe${r}${c}[${1+1+k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
+  assign in_data_pe${r}${c}[${k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
             %endif
           %endif
         %endfor
@@ -255,15 +267,15 @@ logic out_delay_op_valid${r}${c};
 
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-  assign in_data_pe${r}${c}[0] = reg_constant_op_i[${r}][${c}]; <% k = 0 %> 
+  assign in_data_pe${r}${c}[0] = reg_constant_op_i[${r}][${c}]; <% k = 1 %> 
       %for n in range(n_pe_in_mem):
         %for i in range(len(pea_in_mem_placement)):
           %for j in range(len(pea_in_mem_placement[i])):
             % if i == r and j == n:
               %if pea_in_mem_placement[i][j] != None:
-  assign in_data_pe${r}${c}[${j}] = in_data_pea[${pea_in_mem_placement[i][j]}];
+  assign in_data_pe${r}${c}[${j}] = in_data_pea[${pea_in_mem_placement[i][j]}]; <% k = k + 1 %>
               %else:
-  assign in_data_pe${r}${c}[${j}] = '0;
+  assign in_data_pe${r}${c}[${j}] = '0; <% k = k + 1 %>
               %endif       
             %endif
           %endfor
@@ -273,9 +285,9 @@ logic out_delay_op_valid${r}${c};
         %for c1 in range(c-1,c+2,1):
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
             %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
-  assign in_data_pe${r}${c}[${n_pe_in_mem+1+k}] = '0; <% k = k + 1 %>
+  assign in_data_pe${r}${c}[${k}] = '0; <% k = k + 1 %>
             %else:
-  assign in_data_pe${r}${c}[${n_pe_in_mem+1+k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
+  assign in_data_pe${r}${c}[${k}] = out_data_pe${r1}${c1}; <% k = k + 1 %>                  
             %endif
           %endif
         %endfor
@@ -294,15 +306,11 @@ logic out_delay_op_valid${r}${c};
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
             %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
               %if r1 == -1 and c1 == c:
-                % for i in range(len(pea_in_stream_placement)):
-                  % if i == c:
-                    %if pea_in_stream_placement[i] != None:
-  assign in_delay_op${r}${c}[${k}] = stream_data_in_reg[${pea_in_stream_placement[i]}]; <% k = k + 1 %>
-                    %else:
+                %if pea_in_stream_placement[c][0] != None:
+  assign in_delay_op${r}${c}[${k}] = stream_data_in_reg[${pea_in_stream_placement[c][0]}]; <% k = k + 1 %>
+                %else:
   assign in_delay_op${r}${c}[${k}] = '0; <% k = k + 1 %>
-                    %endif
-                  %endif
-                %endfor
+                %endif
               %else:
   assign in_delay_op${r}${c}[${k}] = '0; <% k = k + 1 %>
               %endif
@@ -323,15 +331,11 @@ logic out_delay_op_valid${r}${c};
           %if (r1 == r or c1 == c) and (not(r1 == r and c1 == c)): #this defines noc
             %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
               %if r1 == -1 and c1 == c:
-                % for i in range(len(pea_in_stream_placement)):
-                  % if i == c:
-                    %if pea_in_stream_placement[i] != None:
-  assign in_delay_op_valid${r}${c}[${k}] = stream_valid_in_reg[${pea_in_stream_placement[i]}]; <% k = k + 1 %>
-                    %else:
+                %if pea_in_stream_placement[c][0] != None:
+  assign in_delay_op_valid${r}${c}[${k}] = stream_valid_in_reg[${pea_in_stream_placement[c][0]}]; <% k = k + 1 %>
+                %else:
   assign in_delay_op_valid${r}${c}[${k}] = '0; <% k = k + 1 %>
-                    %endif
-                  %endif
-                %endfor
+                %endif
               %else:
   assign in_delay_op_valid${r}${c}[${k}] = '0; <% k = k + 1 %>
               %endif
@@ -352,14 +356,12 @@ logic out_delay_op_valid${r}${c};
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
 
-  assign stream_valid_pe_in${r}${c}[0] = 1'b1;
-      % for i in range(len(pea_in_stream_placement)):
-        % if i == c:
-          %if pea_in_stream_placement[i] != None:
-  assign stream_valid_pe_in${r}${c}[1] = stream_valid_in_reg[${pea_in_stream_placement[i]}]; <% k = 2 %>  
-          %else:
-  assign stream_valid_pe_in${r}${c}[1] = 1'b1; <% k = 2 %>  
-          %endif
+  assign stream_valid_pe_in${r}${c}[0] = 1'b1; <% k = 1 %>  
+      % for i in range(len(pea_in_stream_placement[c])):
+        %if pea_in_stream_placement[c][i] != None:
+  assign stream_valid_pe_in${r}${c}[${k}] = stream_valid_in_reg[${pea_in_stream_placement[c][i]}]; <% k = k + 1 %>  
+        %else:
+  assign stream_valid_pe_in${r}${c}[${k}] = 1'b1;  <% k = k + 1 %>
         %endif
       %endfor  
       %for r1 in range(r-1,r+2,1):

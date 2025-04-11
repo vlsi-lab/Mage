@@ -143,6 +143,7 @@ module mage_top
   ////////////////////////////////////////////////////////////////
   logic [N_DMA_CH-1:0] reg_dma_ch_cfg;
   logic [1:0] reg_separate_cols;
+  logic reg_synch_dma_ch;
   logic [M-1:0][LOG_N:0] reg_stream_sel_out_pea;
   logic [N-1:0][M-1:0][31:0] reg_acc_value_pe;
   %if in_stream_xbar == str(1):
@@ -208,6 +209,7 @@ module mage_top
 %endif
 %if enable_streaming_interface == str(1):
       .reg_separate_cols_o(reg_separate_cols),
+      .reg_synch_dma_ch_o(reg_synch_dma_ch),
       .reg_dma_ch_cfg_o(reg_dma_ch_cfg),
       .reg_sel_out_col_pea_o(reg_stream_sel_out_pea),
       .reg_acc_value_pe_o(reg_acc_value_pe),
@@ -478,6 +480,7 @@ module mage_top
       .hw_fifo_req_i(hw_fifo_req_i),
       .hw_fifo_resp_o(hw_fifo_resp_o),
       .reg_separate_cols_i(reg_separate_cols),
+      .reg_synch_dma_ch_i(reg_synch_dma_ch),
 %if out_stream_xbar == str(1):
       .reg_out_stream_sel_i(reg_out_stream_sel),
 %endif

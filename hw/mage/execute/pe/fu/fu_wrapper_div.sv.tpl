@@ -41,37 +41,73 @@ module fu_wrapper_div
   ////////////////////////////////////////////////////////////////
   //                    Ready-Valid Handling                    //
   ////////////////////////////////////////////////////////////////
+
   // division ready-valid
-  logic       out_div_valid;
-  logic       div_ready;
-  logic       div_busy;
-  logic       div_input_valid;
-  logic       div_used_once;
-  // acuumulation ready-valid
-  logic [15:0] acc_cnt;
-  logic       acc_ready;
-  logic       acc_valid;
+  logic              out_div_valid;
+  logic              div_ready;
+  logic              div_busy;
+  logic              div_input_valid;
+  logic              div_used_once;
+  logic              div_instr;
+  // accumulation ready-valid
+  logic [N_BITS-1:0] acc_cnt;
+  logic              acc_ready;
+  logic              acc_valid;
   // ready-valid
-  logic       valid;
-  logic       ready;
-  logic       valid_mo_instr;
+  logic              valid;
+  logic              ready;
+  logic              valid_mo_instr;
+  logic              mo_instr;
+  // +1 adder
+  logic [N_BITS-1:0] add_one_op1;
+  logic [N_BITS-1:0] add_one_op2;
+  logic [N_BITS-1:0] add_one_res;
 %endif
+
 %if enable_streaming_interface == str(1):
+  /*
+    +1 adder shared between the ACC counter and the ABS operation in ABSMIN
+  */
+  always_comb begin
+    add_one_op1 = '0;
+    add_one_op2[N_BITS-1:1] = '0;
+    if(instr_i == ACC) begin
+      add_one_op1 = acc_cnt;
+      add_one_op2[0] = 1'b1;
+    end else if (instr_i == ABSMIN) begin
+      add_one_op1 = a_signed;
+      add_one_op2[0] = sign_op1 ? 1'b1 : 1'b0;
+    end
+  end
+
+  always_comb begin
+    add_one_res = add_one_op1 + add_one_op2;
+  end
+
+  ////////////////////////////////////////////////////////////////
+  //                        Accumulation                        //
+  ////////////////////////////////////////////////////////////////
+
+  /*
+    ACC counter: counts up to reg_acc_value_i, it is used to know how many elements to accumulate
+    in the ACC instruction. It is also used to know when to stop the max search in the MAX instruction.
+    acc_loopback_o is used to loop back the result of the operation to the input of the PE.
+  */
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
-      acc_cnt <= 16'd0;
+      acc_cnt <= '0;
       acc_loopback_o <= 1'b0;
     end else begin
       if (instr_i == ACC || instr_i == MAX) begin
         if (acc_cnt == reg_acc_value_i) begin
-          acc_cnt <= 16'd0;
+          acc_cnt <= '0;
           acc_loopback_o <= 1'b0;
         end else if (ops_valid_i && pea_ready_i) begin
-          acc_cnt <= acc_cnt + 16'd1;
+          acc_cnt <= add_one_res;
           acc_loopback_o <= 1'b1;
         end
       end else begin
-        acc_cnt <= 16'd0;
+        acc_cnt <= '0;
         acc_loopback_o <= 1'b0;
       end
     end
@@ -79,6 +115,11 @@ module fu_wrapper_div
 
   assign acc_ready = 1'b1;
   assign acc_valid = (acc_cnt == reg_acc_value_i && acc_cnt != '0);
+
+  ////////////////////////////////////////////////////////////////
+  //                           Division                         //
+  ////////////////////////////////////////////////////////////////
+
   assign div_input_valid = (ops_valid_i) & ((instr_i == DIV) || (instr_i == DIVU) || (instr_i == REM) || (instr_i == ABSDIV && valid_mo_instr));
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin
@@ -119,43 +160,34 @@ module fu_wrapper_div
     end
   end
 
+  ////////////////////////////////////////////////////////////////
+  //                   Ready-Valid Assignment                   //
+  ////////////////////////////////////////////////////////////////
+
+  assign mo_instr = (instr_i == ADDPOW || instr_i == ADDCMUL || instr_i == CADDMUL || instr_i == MULCARSH || instr_i == ABSMIN || instr_i == ABSDIV); 
+  assign div_instr = (instr_i == DIV || instr_i == DIVU || instr_i == REM || instr_i == ABSDIV);
+
   always_comb begin
     valid = ops_valid_i;
     ready = 1'b1;
-    case (instr_i)
-      DIV: begin
-        valid = out_div_valid && div_used_once;
-        ready = div_ready;
-      end
-      DIVU: begin
-        valid = out_div_valid && div_used_once;
-        ready = div_ready;
-      end
-      REM: begin
-        valid = out_div_valid && div_used_once;
-        ready = div_ready;
-      end
-      ABSDIV: begin
-        valid = out_div_valid && div_used_once;
-        ready = div_ready;
-      end
-      ACC: begin
-        valid = acc_valid;
-        ready = acc_ready;
-      end
-      MAX: begin
-        valid = (reg_acc_value_i == '0) ? ops_valid_i : acc_valid;
-        ready = 1'b1;
-      end
-      ADDPOW: begin
-        valid = valid_mo_instr;
-        ready = 1'b1;
-      end
-      ADDMUL: begin
-        valid = valid_mo_instr;
-        ready = 1'b1;
-      end
-    endcase
+    if (mo_instr) begin
+      valid = valid_mo_instr;
+      ready = 1'b1;
+    end else if (div_instr) begin
+      valid = out_div_valid && div_used_once;
+      ready = div_ready;
+    end else begin
+      case (instr_i)
+        ACC: begin
+          valid = acc_valid;
+          ready = acc_ready;
+        end
+        MAX: begin
+          valid = (reg_acc_value_i == '0) ? ops_valid_i : acc_valid;
+          ready = 1'b1;
+        end
+      endcase
+    end
   end
 
   assign valid_o = valid;
@@ -179,6 +211,10 @@ module fu_wrapper_div
   %endif
 
   %if enable_streaming_interface == str(1) and enable_decoupling == str(0):
+  ////////////////////////////////////////////////////////////////
+  //                FU Input/Output Assignments                 //
+  ////////////////////////////////////////////////////////////////
+
   logic [N_BITS:0] add_res;
   logic [N_BITS-1:0] mul_res;
   logic [N_BITS-1:0] shift_res;
@@ -226,12 +262,19 @@ module fu_wrapper_div
       temp_res <= '0;
       valid_mo_instr <= 1'b0;
     end else begin
+      if (mo_instr) begin
+        valid_mo_instr <= ops_valid_i;
+      end
       if (instr_i == ADDPOW) begin
         temp_res <= add_res[N_BITS:1];
-        valid_mo_instr <= ops_valid_i;
-      end else if (instr_i == ADDMUL) begin
+      end else if (instr_i == CADDMUL) begin
         temp_res <= add_res[N_BITS:1];
-        valid_mo_instr <= ops_valid_i;
+      end else if (instr_i == ADDCMUL) begin
+        temp_res <= add_res[N_BITS:1];
+      end else if (instr_i == MULCARSH) begin
+        temp_res <= mul_res;
+      end else if (instr_i == ABSMIN) begin
+        temp_res <= add_one_res;
       end else if (instr_i == ABSDIV) begin
         temp_res <= add_res[N_BITS:1];
         valid_mo_instr <= ops_valid_i;
@@ -304,14 +347,24 @@ module fu_wrapper_div
         mul_op1 = temp_res;
         mul_op2 = temp_res;
       end
-      
-      ADDMUL: begin
+
+      ADDCMUL: begin
         mul_op1 = temp_res;
         mul_op2 = const_i;
       end
 
-      SGNSUB: begin
-        add_op1 = {const_i, 1'b1};
+      CADDMUL: begin
+        add_op2 = {const_i, 1'b0};
+        mul_op1 = temp_res;
+      end
+
+      MULCARSH: begin
+        shift_op1 = temp_res;
+        shift_op2 = const_i;
+      end
+
+      ABSMIN: begin
+        add_op1 = {temp_res, 1'b1};
         add_op2 = {op2_neg, 1'b1};
       end
 
@@ -321,6 +374,15 @@ module fu_wrapper_div
         div_op1 = temp_res;
       end
 
+      NEZCSUB: begin
+        add_op1 = {const_i, 1'b1};
+        add_op2 = {op2_neg, 1'b1};
+      end
+
+      NEZCSUBZ: begin
+        add_op1 = {const_i, 1'b1};
+        add_op2 = {op2_neg, 1'b1};
+      end
     endcase
   end
   
@@ -344,8 +406,12 @@ module fu_wrapper_div
       REM: res_o = remainder_div;
       ADDPOW: res_o = mul_res;
       ABSDIV: res_o = quotient_div;
-      ADDMUL: res_o = mul_res;
-      SGNSUB: res_o = sign_op1 ? add_res[N_BITS:1] : b_signed;
+      CADDMUL: res_o = mul_res;
+      ADDCMUL: res_o = mul_res;
+      MULCARSH: res_o = shift_res;
+      ABSMIN: res_o = add_res[N_BITS:1];
+      NEZCSUB: res_o = sign_op1 ? add_res[N_BITS:1] : b_signed;
+      NEZCSUBZ: res_o = sign_op1 ? add_res[N_BITS:1] : '0;
       default: res_o = 0;
     endcase
   end

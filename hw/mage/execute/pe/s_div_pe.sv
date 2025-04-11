@@ -71,7 +71,7 @@ module s_div_pe
   logic                                            rf_en;
 
   always_comb begin
-    for (int i = 0; i < N_INPUTS_PE - 3Error; i++) begin
+    for (int i = 0; i < N_INPUTS_PE - 3; i++) begin
       operands[i] = neigh_pe_op_i[i];
       operands_valid[i] = neigh_pe_op_valid_i[i];
     end
@@ -156,7 +156,7 @@ module s_div_pe
                   ));
   end
 
-  assign multi_op_instr = (fu_instr == ADDMUL) || (fu_instr == ADDPOW) || (fu_instr == ABSDIV);
+  assign multi_op_instr = (fu_instr == ADDPOW || fu_instr == ADDCMUL || fu_instr == CADDMUL || fu_instr == MULCARSH || fu_instr == ABSMIN || fu_instr == ABSDIV);
 
   // Delay Operand Reg
   always_ff @(posedge clk_i, negedge rst_n_i) begin

@@ -21,6 +21,7 @@ module streaming_interface
     // PEA Interface
     input logic [M-1:0] pea_ready_i,
     input logic [1:0] reg_separate_cols_i,
+    input logic reg_synch_dma_ch_i,
 %if out_stream_xbar == str(1):
     input logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_i,
 %endif
@@ -35,6 +36,7 @@ module streaming_interface
 
   // Fifo signals
   logic [N_DMA_CH-1:0] hw_r_fifo_pop;
+  logic [N_DMA_CH-1:0] hw_r_fifo_pop_enable;
   logic [N_DMA_CH-1:0] hw_r_fifo_empty;
   logic [N_DMA_CH-1:0] hw_r_fifo_full;
   logic [N_DMA_CH-1:0][$clog2(4)-1:0] hw_r_usage;
@@ -115,10 +117,32 @@ module streaming_interface
   // Pop from Read FIFO
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
-      hw_r_fifo_pop[i] = 1'b0;
+      hw_r_fifo_pop_enable[i] = 1'b0;
       if (hw_r_fifo_empty[i] == 1'b0 && pea_ready_i[i] == 1'b1) begin
-        hw_r_fifo_pop[i] = 1'b1;
+        hw_r_fifo_pop_enable[i] = 1'b1;
       end
+    end
+  end
+
+  always_comb begin
+    hw_r_fifo_pop = '0;
+    if(reg_synch_dma_ch_i == 1'b0) begin
+      for (int i = 0; i < N_DMA_CH; i = i + 1) begin
+        hw_r_fifo_pop[i] = hw_r_fifo_pop_enable[i];
+      end
+    end else if(reg_synch_dma_ch_i == 1'b1) begin
+%for c in range(n_pea_cols):
+      hw_r_fifo_pop[${c}] =
+  %for i in range(len(pea_in_stream_placement[c])):
+    %if pea_in_stream_placement[c][i] != None:
+      %if i != len(pea_in_stream_placement[c]) - 1:
+        hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}] &
+      %else:
+        hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}];
+      %endif
+    %endif
+  %endfor 
+%endfor
     end
   end
 

@@ -169,6 +169,9 @@ module mage_reg_top #(
   logic [1:0] separate_cols_qs;
   logic [1:0] separate_cols_wd;
   logic separate_cols_we;
+  logic synch_dma_ch_qs;
+  logic synch_dma_ch_wd;
+  logic synch_dma_ch_we;
   logic [7:0] sel_out_col_pea_sel_col_0_0_qs;
   logic [7:0] sel_out_col_pea_sel_col_0_0_wd;
   logic sel_out_col_pea_sel_col_0_0_we;
@@ -1183,6 +1186,33 @@ module mage_reg_top #(
   );
 
 
+  // R[synch_dma_ch]: V(False)
+
+  prim_subreg #(
+      .DW      (1),
+      .SWACCESS("RW"),
+      .RESVAL  (1'h0)
+  ) u_synch_dma_ch (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(synch_dma_ch_we),
+      .wd(synch_dma_ch_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.synch_dma_ch.q),
+
+      // to register interface (read)
+      .qs(synch_dma_ch_qs)
+  );
+
+
 
   // Subregister 0 of Multireg sel_out_col_pea
   // R[sel_out_col_pea]: V(False)
@@ -1728,7 +1758,7 @@ module mage_reg_top #(
 
 
 
-  logic [50:0] addr_hit;
+  logic [51:0] addr_hit;
   always_comb begin
     addr_hit = '0;
     addr_hit[0] = (reg_addr == MAGE_CFG_PE_00_OFFSET);
@@ -1765,23 +1795,24 @@ module mage_reg_top #(
     addr_hit[31] = (reg_addr == MAGE_PEA_CONSTANTS_15_OFFSET);
     addr_hit[32] = (reg_addr == MAGE_STREAM_DMA_CFG_OFFSET);
     addr_hit[33] = (reg_addr == MAGE_SEPARATE_COLS_OFFSET);
-    addr_hit[34] = (reg_addr == MAGE_SEL_OUT_COL_PEA_OFFSET);
-    addr_hit[35] = (reg_addr == MAGE_ACC_VALUE_0_OFFSET);
-    addr_hit[36] = (reg_addr == MAGE_ACC_VALUE_1_OFFSET);
-    addr_hit[37] = (reg_addr == MAGE_ACC_VALUE_2_OFFSET);
-    addr_hit[38] = (reg_addr == MAGE_ACC_VALUE_3_OFFSET);
-    addr_hit[39] = (reg_addr == MAGE_ACC_VALUE_4_OFFSET);
-    addr_hit[40] = (reg_addr == MAGE_ACC_VALUE_5_OFFSET);
-    addr_hit[41] = (reg_addr == MAGE_ACC_VALUE_6_OFFSET);
-    addr_hit[42] = (reg_addr == MAGE_ACC_VALUE_7_OFFSET);
-    addr_hit[43] = (reg_addr == MAGE_ACC_VALUE_8_OFFSET);
-    addr_hit[44] = (reg_addr == MAGE_ACC_VALUE_9_OFFSET);
-    addr_hit[45] = (reg_addr == MAGE_ACC_VALUE_10_OFFSET);
-    addr_hit[46] = (reg_addr == MAGE_ACC_VALUE_11_OFFSET);
-    addr_hit[47] = (reg_addr == MAGE_ACC_VALUE_12_OFFSET);
-    addr_hit[48] = (reg_addr == MAGE_ACC_VALUE_13_OFFSET);
-    addr_hit[49] = (reg_addr == MAGE_ACC_VALUE_14_OFFSET);
-    addr_hit[50] = (reg_addr == MAGE_ACC_VALUE_15_OFFSET);
+    addr_hit[34] = (reg_addr == MAGE_SYNCH_DMA_CH_OFFSET);
+    addr_hit[35] = (reg_addr == MAGE_SEL_OUT_COL_PEA_OFFSET);
+    addr_hit[36] = (reg_addr == MAGE_ACC_VALUE_0_OFFSET);
+    addr_hit[37] = (reg_addr == MAGE_ACC_VALUE_1_OFFSET);
+    addr_hit[38] = (reg_addr == MAGE_ACC_VALUE_2_OFFSET);
+    addr_hit[39] = (reg_addr == MAGE_ACC_VALUE_3_OFFSET);
+    addr_hit[40] = (reg_addr == MAGE_ACC_VALUE_4_OFFSET);
+    addr_hit[41] = (reg_addr == MAGE_ACC_VALUE_5_OFFSET);
+    addr_hit[42] = (reg_addr == MAGE_ACC_VALUE_6_OFFSET);
+    addr_hit[43] = (reg_addr == MAGE_ACC_VALUE_7_OFFSET);
+    addr_hit[44] = (reg_addr == MAGE_ACC_VALUE_8_OFFSET);
+    addr_hit[45] = (reg_addr == MAGE_ACC_VALUE_9_OFFSET);
+    addr_hit[46] = (reg_addr == MAGE_ACC_VALUE_10_OFFSET);
+    addr_hit[47] = (reg_addr == MAGE_ACC_VALUE_11_OFFSET);
+    addr_hit[48] = (reg_addr == MAGE_ACC_VALUE_12_OFFSET);
+    addr_hit[49] = (reg_addr == MAGE_ACC_VALUE_13_OFFSET);
+    addr_hit[50] = (reg_addr == MAGE_ACC_VALUE_14_OFFSET);
+    addr_hit[51] = (reg_addr == MAGE_ACC_VALUE_15_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0;
@@ -1839,7 +1870,8 @@ module mage_reg_top #(
                (addr_hit[47] & (|(MAGE_PERMIT[47] & ~reg_be))) |
                (addr_hit[48] & (|(MAGE_PERMIT[48] & ~reg_be))) |
                (addr_hit[49] & (|(MAGE_PERMIT[49] & ~reg_be))) |
-               (addr_hit[50] & (|(MAGE_PERMIT[50] & ~reg_be)))));
+               (addr_hit[50] & (|(MAGE_PERMIT[50] & ~reg_be))) |
+               (addr_hit[51] & (|(MAGE_PERMIT[51] & ~reg_be)))));
   end
 
   assign cfg_pe_00_we = addr_hit[0] & reg_we & !reg_error;
@@ -1944,64 +1976,67 @@ module mage_reg_top #(
   assign separate_cols_we = addr_hit[33] & reg_we & !reg_error;
   assign separate_cols_wd = reg_wdata[1:0];
 
-  assign sel_out_col_pea_sel_col_0_0_we = addr_hit[34] & reg_we & !reg_error;
+  assign synch_dma_ch_we = addr_hit[34] & reg_we & !reg_error;
+  assign synch_dma_ch_wd = reg_wdata[0];
+
+  assign sel_out_col_pea_sel_col_0_0_we = addr_hit[35] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_0_0_wd = reg_wdata[7:0];
 
-  assign sel_out_col_pea_sel_col_1_0_we = addr_hit[34] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_1_0_we = addr_hit[35] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_1_0_wd = reg_wdata[15:8];
 
-  assign sel_out_col_pea_sel_col_2_0_we = addr_hit[34] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_2_0_we = addr_hit[35] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_2_0_wd = reg_wdata[23:16];
 
-  assign sel_out_col_pea_sel_col_3_0_we = addr_hit[34] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_3_0_we = addr_hit[35] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_3_0_wd = reg_wdata[31:24];
 
-  assign acc_value_0_we = addr_hit[35] & reg_we & !reg_error;
+  assign acc_value_0_we = addr_hit[36] & reg_we & !reg_error;
   assign acc_value_0_wd = reg_wdata[31:0];
 
-  assign acc_value_1_we = addr_hit[36] & reg_we & !reg_error;
+  assign acc_value_1_we = addr_hit[37] & reg_we & !reg_error;
   assign acc_value_1_wd = reg_wdata[31:0];
 
-  assign acc_value_2_we = addr_hit[37] & reg_we & !reg_error;
+  assign acc_value_2_we = addr_hit[38] & reg_we & !reg_error;
   assign acc_value_2_wd = reg_wdata[31:0];
 
-  assign acc_value_3_we = addr_hit[38] & reg_we & !reg_error;
+  assign acc_value_3_we = addr_hit[39] & reg_we & !reg_error;
   assign acc_value_3_wd = reg_wdata[31:0];
 
-  assign acc_value_4_we = addr_hit[39] & reg_we & !reg_error;
+  assign acc_value_4_we = addr_hit[40] & reg_we & !reg_error;
   assign acc_value_4_wd = reg_wdata[31:0];
 
-  assign acc_value_5_we = addr_hit[40] & reg_we & !reg_error;
+  assign acc_value_5_we = addr_hit[41] & reg_we & !reg_error;
   assign acc_value_5_wd = reg_wdata[31:0];
 
-  assign acc_value_6_we = addr_hit[41] & reg_we & !reg_error;
+  assign acc_value_6_we = addr_hit[42] & reg_we & !reg_error;
   assign acc_value_6_wd = reg_wdata[31:0];
 
-  assign acc_value_7_we = addr_hit[42] & reg_we & !reg_error;
+  assign acc_value_7_we = addr_hit[43] & reg_we & !reg_error;
   assign acc_value_7_wd = reg_wdata[31:0];
 
-  assign acc_value_8_we = addr_hit[43] & reg_we & !reg_error;
+  assign acc_value_8_we = addr_hit[44] & reg_we & !reg_error;
   assign acc_value_8_wd = reg_wdata[31:0];
 
-  assign acc_value_9_we = addr_hit[44] & reg_we & !reg_error;
+  assign acc_value_9_we = addr_hit[45] & reg_we & !reg_error;
   assign acc_value_9_wd = reg_wdata[31:0];
 
-  assign acc_value_10_we = addr_hit[45] & reg_we & !reg_error;
+  assign acc_value_10_we = addr_hit[46] & reg_we & !reg_error;
   assign acc_value_10_wd = reg_wdata[31:0];
 
-  assign acc_value_11_we = addr_hit[46] & reg_we & !reg_error;
+  assign acc_value_11_we = addr_hit[47] & reg_we & !reg_error;
   assign acc_value_11_wd = reg_wdata[31:0];
 
-  assign acc_value_12_we = addr_hit[47] & reg_we & !reg_error;
+  assign acc_value_12_we = addr_hit[48] & reg_we & !reg_error;
   assign acc_value_12_wd = reg_wdata[31:0];
 
-  assign acc_value_13_we = addr_hit[48] & reg_we & !reg_error;
+  assign acc_value_13_we = addr_hit[49] & reg_we & !reg_error;
   assign acc_value_13_wd = reg_wdata[31:0];
 
-  assign acc_value_14_we = addr_hit[49] & reg_we & !reg_error;
+  assign acc_value_14_we = addr_hit[50] & reg_we & !reg_error;
   assign acc_value_14_wd = reg_wdata[31:0];
 
-  assign acc_value_15_we = addr_hit[50] & reg_we & !reg_error;
+  assign acc_value_15_we = addr_hit[51] & reg_we & !reg_error;
   assign acc_value_15_wd = reg_wdata[31:0];
 
   // Read data return
@@ -2145,73 +2180,77 @@ module mage_reg_top #(
       end
 
       addr_hit[34]: begin
+        reg_rdata_next[0] = synch_dma_ch_qs;
+      end
+
+      addr_hit[35]: begin
         reg_rdata_next[7:0]   = sel_out_col_pea_sel_col_0_0_qs;
         reg_rdata_next[15:8]  = sel_out_col_pea_sel_col_1_0_qs;
         reg_rdata_next[23:16] = sel_out_col_pea_sel_col_2_0_qs;
         reg_rdata_next[31:24] = sel_out_col_pea_sel_col_3_0_qs;
       end
 
-      addr_hit[35]: begin
+      addr_hit[36]: begin
         reg_rdata_next[31:0] = acc_value_0_qs;
       end
 
-      addr_hit[36]: begin
+      addr_hit[37]: begin
         reg_rdata_next[31:0] = acc_value_1_qs;
       end
 
-      addr_hit[37]: begin
+      addr_hit[38]: begin
         reg_rdata_next[31:0] = acc_value_2_qs;
       end
 
-      addr_hit[38]: begin
+      addr_hit[39]: begin
         reg_rdata_next[31:0] = acc_value_3_qs;
       end
 
-      addr_hit[39]: begin
+      addr_hit[40]: begin
         reg_rdata_next[31:0] = acc_value_4_qs;
       end
 
-      addr_hit[40]: begin
+      addr_hit[41]: begin
         reg_rdata_next[31:0] = acc_value_5_qs;
       end
 
-      addr_hit[41]: begin
+      addr_hit[42]: begin
         reg_rdata_next[31:0] = acc_value_6_qs;
       end
 
-      addr_hit[42]: begin
+      addr_hit[43]: begin
         reg_rdata_next[31:0] = acc_value_7_qs;
       end
 
-      addr_hit[43]: begin
+      addr_hit[44]: begin
         reg_rdata_next[31:0] = acc_value_8_qs;
       end
 
-      addr_hit[44]: begin
+      addr_hit[45]: begin
         reg_rdata_next[31:0] = acc_value_9_qs;
       end
 
-      addr_hit[45]: begin
+      addr_hit[46]: begin
         reg_rdata_next[31:0] = acc_value_10_qs;
       end
 
-      addr_hit[46]: begin
+      addr_hit[47]: begin
         reg_rdata_next[31:0] = acc_value_11_qs;
       end
 
-      addr_hit[47]: begin
+      addr_hit[48]: begin
         reg_rdata_next[31:0] = acc_value_12_qs;
       end
 
-      addr_hit[48]: begin
+      addr_hit[49]: begin
         reg_rdata_next[31:0] = acc_value_13_qs;
       end
 
-      addr_hit[49]: begin
+      addr_hit[50]: begin
         reg_rdata_next[31:0] = acc_value_14_qs;
       end
 
-      addr_hit[50]: begin
+      addr_hit[51]: begin
         reg_rdata_next[31:0] = acc_value_15_qs;
       end
 

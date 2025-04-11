@@ -51,9 +51,9 @@ package pea_pkg;
 
   localparam unsigned N_NEIGH_PE = ${n_neigh_pe};
 %if enable_streaming_interface == str(1) and enable_decoupling == str(1):
-  localparam unsigned N_INPUTS_PE = ${1 + n_neigh_pe + n_pe_in_mem + 4};
+  localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + n_pe_in_mem + 4};
 %elif enable_streaming_interface == str(1) and enable_decoupling == str(0):
-  localparam unsigned N_INPUTS_PE = ${1 + n_neigh_pe + 4};
+  localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + 4};
 %elif enable_streaming_interface == str(0) and enable_decoupling == str(1):
   localparam unsigned N_INPUTS_PE = ${n_neigh_pe + n_pe_in_mem + 4};
 %endif
@@ -79,25 +79,29 @@ package pea_pkg;
   localparam unsigned N_OPERATIONS = 32;
   localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
   typedef enum logic[4:0]{
-    NOP = 5'b00000,
-    MUL = 5'b00001,
-    SUB = 5'b00010,
-    LSH = 5'b00011,
-    LRSH = 5'b00100,
-    ARSH = 5'b00101,
-    MAX = 5'b00110,
-    MIN = 5'b00111,
-    ABS = 5'b01000,
-    SGNMUL = 5'b01001,
-    ADD = 5'b01010,
-    DIV = 5'b01011,
-    DIVU = 5'b01100,
-    ACC = 5'b01101,
-    REM = 5'b01110,
-    ADDPOW = 5'b01111,
-    ADDMUL = 5'b10000,
-    ABSDIV = 5'b10001,
-    SGNSUB = 5'b10010
+    NOP        = 5'b00000,
+    MUL        = 5'b00001,
+    SUB        = 5'b00010,
+    LSH        = 5'b00011,
+    LRSH       = 5'b00100,
+    ARSH       = 5'b00101,
+    MAX        = 5'b00110,
+    MIN        = 5'b00111,
+    ABS        = 5'b01000,
+    SGNMUL     = 5'b01001,
+    ADD        = 5'b01010,
+    DIV        = 5'b01011,
+    DIVU       = 5'b01100,
+    ACC        = 5'b01101,
+    REM        = 5'b01110,
+    ADDCMUL    = 5'b01111,
+    CADDMUL    = 5'b10000,
+    ADDPOW     = 5'b10001,
+    MULCARSH   = 5'b10010,
+    NEZCSUBZ   = 5'b10011,
+    NEZCSUB    = 5'b10100,
+    ABSDIV     = 5'b10101,
+    ABSMIN     = 5'b10110
   } fu_instr_t;
 %elif enable_streaming_interface == str(0) and enable_decoupling == str(1):
   localparam unsigned N_OPERATIONS = 16;
@@ -121,40 +125,44 @@ package pea_pkg;
 
   typedef enum logic [LOG_N_INPUTS_PE-1:0]{
 %if enable_streaming_interface == str(1) and enable_decoupling == str(1):
-    STREAM_IN0 = 4'b0000,
-    MEMLEFT0   = 4'b0001,
-    MEMLEFT1   = 4'b0010,
-    MEMRIGHT0  = 4'b0011,
-    MEMRIGHT1  = 4'b0100,
-    CONSTANT   = 4'b0101,
-    UP         = 4'b0110,
-    LEFT       = 4'b0111,
-    RIGHT      = 4'b1000,
-    DOWN       = 4'b1001,
-    SELF       = 4'b1010,
-    RF         = 4'b1011
+%for i in range(n_pe_in_stream):
+  STREAM_IN${i} = 4'b${'{:04b}'.format(i+1)},
+%endfor
+  MEMLEFT0   = 4'b0001,
+  MEMLEFT1   = 4'b0010,
+  MEMRIGHT0  = 4'b0011,
+  MEMRIGHT1  = 4'b0100,
+  CONSTANT   = 4'b0101,
+  UP         = 4'b0110,
+  LEFT       = 4'b0111,
+  RIGHT      = 4'b1000,
+  DOWN       = 4'b1001,
+  SELF       = 4'b1010,
+  RF         = 4'b1011
 %elif  enable_streaming_interface == str(1) and enable_decoupling == str(0):
-    CONSTANT   = 4'b0000,
-    STREAM_IN0 = 4'b0001,
-    UP         = 4'b0010,
-    LEFT       = 4'b0011,
-    RIGHT      = 4'b0100,
-    DOWN       = 4'b0101,
-    SELF       = 4'b0110,
-    RF         = 4'b0111,
-    DELAY_OP   = 4'b1000
+  CONSTANT   = 4'b0000,
+  %for i in range(n_pe_in_stream):
+    STREAM_IN${i} = 4'b${'{:04b}'.format(i+1)},
+  %endfor
+  UP         = 4'b${'{:04b}'.format(n_pe_in_stream+1)},
+  LEFT       = 4'b${'{:04b}'.format(n_pe_in_stream+2)},
+  RIGHT      = 4'b${'{:04b}'.format(n_pe_in_stream+3)},
+  DOWN       = 4'b${'{:04b}'.format(n_pe_in_stream+4)},
+  SELF       = 4'b${'{:04b}'.format(n_pe_in_stream+5)},
+  RF         = 4'b${'{:04b}'.format(n_pe_in_stream+6)},
+  DELAY_OP   = 4'b${'{:04b}'.format(n_pe_in_stream+7)}
 %elif  enable_streaming_interface == str(0) and enable_decoupling == str(1):
-    CONSTANT   = 4'b0000,
-    MEMLEFT0   = 4'b0001,
-    MEMLEFT1   = 4'b0010,
-    MEMRIGHT0  = 4'b0011,
-    MEMRIGHT1  = 4'b0100,
-    UP         = 4'b0101,
-    LEFT       = 4'b0110,
-    RIGHT      = 4'b0111,
-    DOWN       = 4'b1000,
-    SELF       = 4'b1001,
-    RF         = 4'b1010
+  CONSTANT   = 4'b0000,
+  MEMLEFT0   = 4'b0001,
+  MEMLEFT1   = 4'b0010,
+  MEMRIGHT0  = 4'b0011,
+  MEMRIGHT1  = 4'b0100,
+  UP         = 4'b0101,
+  LEFT       = 4'b0110,
+  RIGHT      = 4'b0111,
+  DOWN       = 4'b1000,
+  SELF       = 4'b1001,
+  RF         = 4'b1010
 %endif
   }pe_mux_sel_t;
 

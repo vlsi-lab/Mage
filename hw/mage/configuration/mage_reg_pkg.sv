@@ -51,6 +51,8 @@ package mage_reg_pkg;
 
   typedef struct packed {logic [1:0] q;} mage_reg2hw_separate_cols_reg_t;
 
+  typedef struct packed {logic q;} mage_reg2hw_synch_dma_ch_reg_t;
+
   typedef struct packed {
     struct packed {logic [7:0] q;} sel_col_0;
     struct packed {logic [7:0] q;} sel_col_1;
@@ -62,25 +64,26 @@ package mage_reg_pkg;
 
   // Register -> HW type
   typedef struct packed {
-    mage_reg2hw_cfg_pe_00_mreg_t [0:0] cfg_pe_00;  // [1573:1542]
-    mage_reg2hw_cfg_pe_01_mreg_t [0:0] cfg_pe_01;  // [1541:1510]
-    mage_reg2hw_cfg_pe_02_mreg_t [0:0] cfg_pe_02;  // [1509:1478]
-    mage_reg2hw_cfg_pe_03_mreg_t [0:0] cfg_pe_03;  // [1477:1446]
-    mage_reg2hw_cfg_pe_10_mreg_t [0:0] cfg_pe_10;  // [1445:1414]
-    mage_reg2hw_cfg_pe_11_mreg_t [0:0] cfg_pe_11;  // [1413:1382]
-    mage_reg2hw_cfg_pe_12_mreg_t [0:0] cfg_pe_12;  // [1381:1350]
-    mage_reg2hw_cfg_pe_13_mreg_t [0:0] cfg_pe_13;  // [1349:1318]
-    mage_reg2hw_cfg_pe_20_mreg_t [0:0] cfg_pe_20;  // [1317:1286]
-    mage_reg2hw_cfg_pe_21_mreg_t [0:0] cfg_pe_21;  // [1285:1254]
-    mage_reg2hw_cfg_pe_22_mreg_t [0:0] cfg_pe_22;  // [1253:1222]
-    mage_reg2hw_cfg_pe_23_mreg_t [0:0] cfg_pe_23;  // [1221:1190]
-    mage_reg2hw_cfg_pe_30_mreg_t [0:0] cfg_pe_30;  // [1189:1158]
-    mage_reg2hw_cfg_pe_31_mreg_t [0:0] cfg_pe_31;  // [1157:1126]
-    mage_reg2hw_cfg_pe_32_mreg_t [0:0] cfg_pe_32;  // [1125:1094]
-    mage_reg2hw_cfg_pe_33_mreg_t [0:0] cfg_pe_33;  // [1093:1062]
-    mage_reg2hw_pea_constants_mreg_t [15:0] pea_constants;  // [1061:550]
-    mage_reg2hw_stream_dma_cfg_reg_t stream_dma_cfg;  // [549:546]
-    mage_reg2hw_separate_cols_reg_t separate_cols;  // [545:544]
+    mage_reg2hw_cfg_pe_00_mreg_t [0:0] cfg_pe_00;  // [1574:1543]
+    mage_reg2hw_cfg_pe_01_mreg_t [0:0] cfg_pe_01;  // [1542:1511]
+    mage_reg2hw_cfg_pe_02_mreg_t [0:0] cfg_pe_02;  // [1510:1479]
+    mage_reg2hw_cfg_pe_03_mreg_t [0:0] cfg_pe_03;  // [1478:1447]
+    mage_reg2hw_cfg_pe_10_mreg_t [0:0] cfg_pe_10;  // [1446:1415]
+    mage_reg2hw_cfg_pe_11_mreg_t [0:0] cfg_pe_11;  // [1414:1383]
+    mage_reg2hw_cfg_pe_12_mreg_t [0:0] cfg_pe_12;  // [1382:1351]
+    mage_reg2hw_cfg_pe_13_mreg_t [0:0] cfg_pe_13;  // [1350:1319]
+    mage_reg2hw_cfg_pe_20_mreg_t [0:0] cfg_pe_20;  // [1318:1287]
+    mage_reg2hw_cfg_pe_21_mreg_t [0:0] cfg_pe_21;  // [1286:1255]
+    mage_reg2hw_cfg_pe_22_mreg_t [0:0] cfg_pe_22;  // [1254:1223]
+    mage_reg2hw_cfg_pe_23_mreg_t [0:0] cfg_pe_23;  // [1222:1191]
+    mage_reg2hw_cfg_pe_30_mreg_t [0:0] cfg_pe_30;  // [1190:1159]
+    mage_reg2hw_cfg_pe_31_mreg_t [0:0] cfg_pe_31;  // [1158:1127]
+    mage_reg2hw_cfg_pe_32_mreg_t [0:0] cfg_pe_32;  // [1126:1095]
+    mage_reg2hw_cfg_pe_33_mreg_t [0:0] cfg_pe_33;  // [1094:1063]
+    mage_reg2hw_pea_constants_mreg_t [15:0] pea_constants;  // [1062:551]
+    mage_reg2hw_stream_dma_cfg_reg_t stream_dma_cfg;  // [550:547]
+    mage_reg2hw_separate_cols_reg_t separate_cols;  // [546:545]
+    mage_reg2hw_synch_dma_ch_reg_t synch_dma_ch;  // [544:544]
     mage_reg2hw_sel_out_col_pea_mreg_t [0:0] sel_out_col_pea;  // [543:512]
     mage_reg2hw_acc_value_mreg_t [15:0] acc_value;  // [511:0]
   } mage_reg2hw_t;
@@ -120,23 +123,24 @@ package mage_reg_pkg;
   parameter logic [BlockAw-1:0] MAGE_PEA_CONSTANTS_15_OFFSET = 8'h7c;
   parameter logic [BlockAw-1:0] MAGE_STREAM_DMA_CFG_OFFSET = 8'h80;
   parameter logic [BlockAw-1:0] MAGE_SEPARATE_COLS_OFFSET = 8'h84;
-  parameter logic [BlockAw-1:0] MAGE_SEL_OUT_COL_PEA_OFFSET = 8'h88;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_0_OFFSET = 8'h8c;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_1_OFFSET = 8'h90;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_2_OFFSET = 8'h94;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_3_OFFSET = 8'h98;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_4_OFFSET = 8'h9c;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_5_OFFSET = 8'ha0;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_6_OFFSET = 8'ha4;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_7_OFFSET = 8'ha8;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_8_OFFSET = 8'hac;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_9_OFFSET = 8'hb0;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_10_OFFSET = 8'hb4;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_11_OFFSET = 8'hb8;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_12_OFFSET = 8'hbc;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_13_OFFSET = 8'hc0;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_14_OFFSET = 8'hc4;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_15_OFFSET = 8'hc8;
+  parameter logic [BlockAw-1:0] MAGE_SYNCH_DMA_CH_OFFSET = 8'h88;
+  parameter logic [BlockAw-1:0] MAGE_SEL_OUT_COL_PEA_OFFSET = 8'h8c;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_0_OFFSET = 8'h90;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_1_OFFSET = 8'h94;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_2_OFFSET = 8'h98;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_3_OFFSET = 8'h9c;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_4_OFFSET = 8'ha0;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_5_OFFSET = 8'ha4;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_6_OFFSET = 8'ha8;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_7_OFFSET = 8'hac;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_8_OFFSET = 8'hb0;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_9_OFFSET = 8'hb4;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_10_OFFSET = 8'hb8;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_11_OFFSET = 8'hbc;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_12_OFFSET = 8'hc0;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_13_OFFSET = 8'hc4;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_14_OFFSET = 8'hc8;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_15_OFFSET = 8'hcc;
 
   // Register index
   typedef enum int {
@@ -174,6 +178,7 @@ package mage_reg_pkg;
     MAGE_PEA_CONSTANTS_15,
     MAGE_STREAM_DMA_CFG,
     MAGE_SEPARATE_COLS,
+    MAGE_SYNCH_DMA_CH,
     MAGE_SEL_OUT_COL_PEA,
     MAGE_ACC_VALUE_0,
     MAGE_ACC_VALUE_1,
@@ -194,7 +199,7 @@ package mage_reg_pkg;
   } mage_id_e;
 
   // Register width information to check illegal writes
-  parameter logic [3:0] MAGE_PERMIT[51] = '{
+  parameter logic [3:0] MAGE_PERMIT[52] = '{
       4'b1111,  // index[ 0] MAGE_CFG_PE_00
       4'b1111,  // index[ 1] MAGE_CFG_PE_01
       4'b1111,  // index[ 2] MAGE_CFG_PE_02
@@ -229,23 +234,24 @@ package mage_reg_pkg;
       4'b1111,  // index[31] MAGE_PEA_CONSTANTS_15
       4'b0001,  // index[32] MAGE_STREAM_DMA_CFG
       4'b0001,  // index[33] MAGE_SEPARATE_COLS
-      4'b1111,  // index[34] MAGE_SEL_OUT_COL_PEA
-      4'b1111,  // index[35] MAGE_ACC_VALUE_0
-      4'b1111,  // index[36] MAGE_ACC_VALUE_1
-      4'b1111,  // index[37] MAGE_ACC_VALUE_2
-      4'b1111,  // index[38] MAGE_ACC_VALUE_3
-      4'b1111,  // index[39] MAGE_ACC_VALUE_4
-      4'b1111,  // index[40] MAGE_ACC_VALUE_5
-      4'b1111,  // index[41] MAGE_ACC_VALUE_6
-      4'b1111,  // index[42] MAGE_ACC_VALUE_7
-      4'b1111,  // index[43] MAGE_ACC_VALUE_8
-      4'b1111,  // index[44] MAGE_ACC_VALUE_9
-      4'b1111,  // index[45] MAGE_ACC_VALUE_10
-      4'b1111,  // index[46] MAGE_ACC_VALUE_11
-      4'b1111,  // index[47] MAGE_ACC_VALUE_12
-      4'b1111,  // index[48] MAGE_ACC_VALUE_13
-      4'b1111,  // index[49] MAGE_ACC_VALUE_14
-      4'b1111  // index[50] MAGE_ACC_VALUE_15
+      4'b0001,  // index[34] MAGE_SYNCH_DMA_CH
+      4'b1111,  // index[35] MAGE_SEL_OUT_COL_PEA
+      4'b1111,  // index[36] MAGE_ACC_VALUE_0
+      4'b1111,  // index[37] MAGE_ACC_VALUE_1
+      4'b1111,  // index[38] MAGE_ACC_VALUE_2
+      4'b1111,  // index[39] MAGE_ACC_VALUE_3
+      4'b1111,  // index[40] MAGE_ACC_VALUE_4
+      4'b1111,  // index[41] MAGE_ACC_VALUE_5
+      4'b1111,  // index[42] MAGE_ACC_VALUE_6
+      4'b1111,  // index[43] MAGE_ACC_VALUE_7
+      4'b1111,  // index[44] MAGE_ACC_VALUE_8
+      4'b1111,  // index[45] MAGE_ACC_VALUE_9
+      4'b1111,  // index[46] MAGE_ACC_VALUE_10
+      4'b1111,  // index[47] MAGE_ACC_VALUE_11
+      4'b1111,  // index[48] MAGE_ACC_VALUE_12
+      4'b1111,  // index[49] MAGE_ACC_VALUE_13
+      4'b1111,  // index[50] MAGE_ACC_VALUE_14
+      4'b1111  // index[51] MAGE_ACC_VALUE_15
   };
 
 endpackage

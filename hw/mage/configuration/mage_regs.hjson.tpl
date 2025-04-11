@@ -337,6 +337,17 @@
       },
       ],
     },
+    { name: "SYNCH_DMA_CH",
+      desc: "It makes the DMA channels work in synch or not",  
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+      { bits: "0",
+        name: "SYNCH_DMA_CH",
+        desc: "Configuration for synch DMA channels in streaming"
+      },
+      ],
+    },
   %if in_stream_xbar == str(1):
     { name: "STREAM_IN_XBAR_SEL",
       desc: "Selection signals for input stream crossbars",

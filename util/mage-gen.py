@@ -48,6 +48,8 @@ def main():
     in_stream_dma_ch_placement = [[0, 1, 2, 3]];
     # has to be [N_IN_STREAM[N_PEA_DIN_PER_IN_STREAM]]
     in_stream_pea_din_placement = [[0, 1, 2, 3]];
+    # has to be [N_PEA_COL[N_STREAM_INPUT_PE_PE]]
+    in_stream_pe_din_placement = [[0, 1], [0, 1], [2, 3], [2, 3]];
     # the entry at poition i,j indicates to which pea col the j-th ch of output stream is connected
     # has to be [N_OUT_STREAM[N_PEA_DOUT_PER_OUT_STREAM]]
     out_stream_pea_dout_placement = [[0, 1, 2, 3]];
@@ -57,7 +59,7 @@ def main():
     # has to be [N_PEA_COL][N_IN_MEM]?
     pea_in_mem_placement = [[0, 1, 4, 5], [0, 1, 4, 5], [2, 3, 6, 7], [2, 3, 6, 7]];
     # has to be [N_PEA_COL[N_IN_STREAM]]?
-    pea_in_stream_placement = [0, 1, 2, 3];
+    pea_in_stream_placement = [[0, 1], [0, 1], [2, 3], [2, 3]];
 
     parser = argparse.ArgumentParser(prog="mage-gen")
     
@@ -158,6 +160,12 @@ def main():
                         metavar="",
                         nargs='?',
                         default=in_stream_pea_din_placement,
+                        help="")
+    
+    parser.add_argument("--in_stream_pe_din_placement",
+                        metavar="",
+                        nargs='?',
+                        default=in_stream_pe_din_placement,
                         help="")
     
     parser.add_argument("--out_stream_dma_ch_placement",
@@ -321,6 +329,9 @@ def main():
     if args.in_stream_pea_din_placement != None:
         in_stream_pea_din_placement = args.in_stream_pea_din_placement
 
+    if args.in_stream_pe_din_placement != None:
+        in_stream_pe_din_placement = args.in_stream_pe_din_placement
+
     if args.out_stream_dma_ch_placement != None:
         out_stream_dma_ch_placement = args.out_stream_dma_ch_placement
 
@@ -391,6 +402,7 @@ def main():
         "in_stream_dma_ch_placement"       : in_stream_dma_ch_placement,
         "out_stream_dma_ch_placement"      : out_stream_dma_ch_placement,
         "in_stream_pea_din_placement"      : in_stream_pea_din_placement,
+        "in_stream_pe_din_placement"       : in_stream_pe_din_placement,
         "out_stream_pea_dout_placement"    : out_stream_pea_dout_placement,
         "n_age_tot"                        : n_age_tot,
         "n_age_per_stream"                 : n_age_per_stream,

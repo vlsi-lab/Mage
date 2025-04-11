@@ -154,7 +154,7 @@ module s_pe
                   ));
   end
 
-  assign multi_op_instr = (fu_instr == ADDMUL) || (fu_instr == ADDPOW);
+  assign multi_op_instr = (fu_instr == ADDPOW || fu_instr == ADDCMUL || fu_instr == CADDMUL || fu_instr == MULCARSH || fu_instr == ABSMIN);
 
   // Delay Operand Reg
   always_ff @(posedge clk_i, negedge rst_n_i) begin

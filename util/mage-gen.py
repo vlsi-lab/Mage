@@ -52,14 +52,14 @@ def main():
     in_stream_pe_din_placement = [[0, 1], [0, 1], [2, 3], [2, 3]];
     # the entry at poition i,j indicates to which pea col the j-th ch of output stream is connected
     # has to be [N_OUT_STREAM[N_PEA_DOUT_PER_OUT_STREAM]]
-    out_stream_pea_dout_placement = [[0, 1, 2, 3]];
+    out_stream_pea_dout_placement = [[0, 1], [0, 1], [2, 3], [2, 3]];
     # has to be [N_OUT_STREAM[N_DMA_CH_PER_OUT_STREAM]]
     out_stream_dma_ch_placement = [[0, 1, 2, 3]];
 
     # has to be [N_PEA_COL][N_IN_MEM]?
     pea_in_mem_placement = [[0, 1, 4, 5], [0, 1, 4, 5], [2, 3, 6, 7], [2, 3, 6, 7]];
     # has to be [N_PEA_COL[N_IN_STREAM]]?
-    pea_in_stream_placement = [[0, 1], [0, 1], [2, 3], [2, 3]];
+    pea_in_stream_placement = [[0], [1], [2], [3]];
 
     parser = argparse.ArgumentParser(prog="mage-gen")
     

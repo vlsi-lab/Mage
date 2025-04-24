@@ -26,11 +26,14 @@ module pea
 %endif
 %if enable_streaming_interface == str(1):
     // Streaming Interface
+    input  logic   [        N-1:0][     M-1:0][             31:0] reg_pea_rf_i,
+    output  logic   [        N-1:0][     M-1:0][             31:0] reg_pea_rf_d_o,
+    output  logic   [        N-1:0][     M-1:0]                    reg_pea_rf_de_o,
     input  logic [1:0]                                            reg_separate_cols_i,
     input  logic [M-1:0][ LOG_N:0]                                reg_stream_sel_out_pea_i,
     input  logic [N-1:0][M-1:0][31:0]                             reg_acc_value_i,
-    input  logic [N_STREAM_IN_PEA-1:0]                            stream_valid_i,
-    input  logic [N_STREAM_IN_PEA-1:0][N_BITS-1:0]                stream_data_i,
+    input  logic [M-1:0]                            stream_valid_i,
+    input  logic [M-1:0][N_BITS-1:0]                stream_data_i,
     output logic [M-1:0]                                          pea_ready_o,
     output logic [M-1:0]                                          stream_valid_o,
     output logic [M-1:0][N_BITS-1:0]                              stream_data_o,
@@ -67,8 +70,8 @@ module pea
   ////////////////////////////////////////////////////////////////
   //              Signals for Streaming MAGE PEA                //
   ////////////////////////////////////////////////////////////////
-  logic [N_STREAM_IN_PEA-1:0][N_BITS-1:0]  stream_data_in_reg;
-  logic [N_STREAM_IN_PEA-1:0]              stream_valid_in_reg;
+  logic [M-1:0][N_BITS-1:0]  stream_data_in_reg;
+  logic [M-1:0]              stream_valid_in_reg;
   logic [M-1:0][N-1:0][31:0]                 reg_acc_value_pe;
 
 %for r in range(n_pea_rows):
@@ -401,6 +404,9 @@ logic out_delay_op_valid${r}${c};
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .neigh_pe_op_i(in_data_pe${r}${c}),
+      .reg_const_i(reg_pea_rf_i[${r}][${c}]),
+      .reg_pea_rf_d_o(reg_pea_rf_d_o[${r}][${c}]),
+      .reg_pea_rf_de_o(reg_pea_rf_de_o[${r}][${c}]),
       .reg_acc_value_i(reg_acc_value_pe[${r}][${c}]),
       .pea_ready_i(ready_in_pe[${c}]),
       .neigh_pe_op_valid_i(stream_valid_pe_in${r}${c}),

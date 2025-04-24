@@ -10,7 +10,7 @@
 module mage_reg_top #(
     parameter type reg_req_t = logic,
     parameter type reg_rsp_t = logic,
-    parameter int AW = 8
+    parameter int AW = 9
 ) (
     input logic clk_i,
     input logic rst_ni,
@@ -18,6 +18,7 @@ module mage_reg_top #(
     output reg_rsp_t reg_rsp_o,
     // To HW
     output mage_reg_pkg::mage_reg2hw_t reg2hw,  // Write
+    input mage_reg_pkg::mage_hw2reg_t hw2reg,  // Read
 
 
     // Config
@@ -163,15 +164,75 @@ module mage_reg_top #(
   logic [31:0] pea_constants_15_qs;
   logic [31:0] pea_constants_15_wd;
   logic pea_constants_15_we;
+  logic [31:0] pea_rf_0_qs;
+  logic [31:0] pea_rf_0_wd;
+  logic pea_rf_0_we;
+  logic [31:0] pea_rf_1_qs;
+  logic [31:0] pea_rf_1_wd;
+  logic pea_rf_1_we;
+  logic [31:0] pea_rf_2_qs;
+  logic [31:0] pea_rf_2_wd;
+  logic pea_rf_2_we;
+  logic [31:0] pea_rf_3_qs;
+  logic [31:0] pea_rf_3_wd;
+  logic pea_rf_3_we;
+  logic [31:0] pea_rf_4_qs;
+  logic [31:0] pea_rf_4_wd;
+  logic pea_rf_4_we;
+  logic [31:0] pea_rf_5_qs;
+  logic [31:0] pea_rf_5_wd;
+  logic pea_rf_5_we;
+  logic [31:0] pea_rf_6_qs;
+  logic [31:0] pea_rf_6_wd;
+  logic pea_rf_6_we;
+  logic [31:0] pea_rf_7_qs;
+  logic [31:0] pea_rf_7_wd;
+  logic pea_rf_7_we;
+  logic [31:0] pea_rf_8_qs;
+  logic [31:0] pea_rf_8_wd;
+  logic pea_rf_8_we;
+  logic [31:0] pea_rf_9_qs;
+  logic [31:0] pea_rf_9_wd;
+  logic pea_rf_9_we;
+  logic [31:0] pea_rf_10_qs;
+  logic [31:0] pea_rf_10_wd;
+  logic pea_rf_10_we;
+  logic [31:0] pea_rf_11_qs;
+  logic [31:0] pea_rf_11_wd;
+  logic pea_rf_11_we;
+  logic [31:0] pea_rf_12_qs;
+  logic [31:0] pea_rf_12_wd;
+  logic pea_rf_12_we;
+  logic [31:0] pea_rf_13_qs;
+  logic [31:0] pea_rf_13_wd;
+  logic pea_rf_13_we;
+  logic [31:0] pea_rf_14_qs;
+  logic [31:0] pea_rf_14_wd;
+  logic pea_rf_14_we;
+  logic [31:0] pea_rf_15_qs;
+  logic [31:0] pea_rf_15_wd;
+  logic pea_rf_15_we;
   logic [3:0] stream_dma_cfg_qs;
   logic [3:0] stream_dma_cfg_wd;
   logic stream_dma_cfg_we;
   logic [1:0] separate_cols_qs;
   logic [1:0] separate_cols_wd;
   logic separate_cols_we;
-  logic synch_dma_ch_qs;
-  logic synch_dma_ch_wd;
+  logic [1:0] synch_dma_ch_qs;
+  logic [1:0] synch_dma_ch_wd;
   logic synch_dma_ch_we;
+  logic [1:0] stream_out_xbar_sel_sel_out_xbar_0_qs;
+  logic [1:0] stream_out_xbar_sel_sel_out_xbar_0_wd;
+  logic stream_out_xbar_sel_sel_out_xbar_0_we;
+  logic [1:0] stream_out_xbar_sel_sel_out_xbar_1_qs;
+  logic [1:0] stream_out_xbar_sel_sel_out_xbar_1_wd;
+  logic stream_out_xbar_sel_sel_out_xbar_1_we;
+  logic [1:0] stream_out_xbar_sel_sel_out_xbar_2_qs;
+  logic [1:0] stream_out_xbar_sel_sel_out_xbar_2_wd;
+  logic stream_out_xbar_sel_sel_out_xbar_2_we;
+  logic [1:0] stream_out_xbar_sel_sel_out_xbar_3_qs;
+  logic [1:0] stream_out_xbar_sel_sel_out_xbar_3_wd;
+  logic stream_out_xbar_sel_sel_out_xbar_3_we;
   logic [7:0] sel_out_col_pea_sel_col_0_0_qs;
   logic [7:0] sel_out_col_pea_sel_col_0_0_wd;
   logic sel_out_col_pea_sel_col_0_0_we;
@@ -1132,6 +1193,440 @@ module mage_reg_top #(
   );
 
 
+
+  // Subregister 0 of Multireg pea_rf
+  // R[pea_rf_0]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_0 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_0_we),
+      .wd(pea_rf_0_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[0].de),
+      .d (hw2reg.pea_rf[0].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[0].q),
+
+      // to register interface (read)
+      .qs(pea_rf_0_qs)
+  );
+
+  // Subregister 1 of Multireg pea_rf
+  // R[pea_rf_1]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_1 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_1_we),
+      .wd(pea_rf_1_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[1].de),
+      .d (hw2reg.pea_rf[1].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[1].q),
+
+      // to register interface (read)
+      .qs(pea_rf_1_qs)
+  );
+
+  // Subregister 2 of Multireg pea_rf
+  // R[pea_rf_2]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_2 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_2_we),
+      .wd(pea_rf_2_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[2].de),
+      .d (hw2reg.pea_rf[2].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[2].q),
+
+      // to register interface (read)
+      .qs(pea_rf_2_qs)
+  );
+
+  // Subregister 3 of Multireg pea_rf
+  // R[pea_rf_3]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_3 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_3_we),
+      .wd(pea_rf_3_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[3].de),
+      .d (hw2reg.pea_rf[3].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[3].q),
+
+      // to register interface (read)
+      .qs(pea_rf_3_qs)
+  );
+
+  // Subregister 4 of Multireg pea_rf
+  // R[pea_rf_4]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_4 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_4_we),
+      .wd(pea_rf_4_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[4].de),
+      .d (hw2reg.pea_rf[4].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[4].q),
+
+      // to register interface (read)
+      .qs(pea_rf_4_qs)
+  );
+
+  // Subregister 5 of Multireg pea_rf
+  // R[pea_rf_5]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_5 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_5_we),
+      .wd(pea_rf_5_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[5].de),
+      .d (hw2reg.pea_rf[5].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[5].q),
+
+      // to register interface (read)
+      .qs(pea_rf_5_qs)
+  );
+
+  // Subregister 6 of Multireg pea_rf
+  // R[pea_rf_6]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_6 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_6_we),
+      .wd(pea_rf_6_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[6].de),
+      .d (hw2reg.pea_rf[6].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[6].q),
+
+      // to register interface (read)
+      .qs(pea_rf_6_qs)
+  );
+
+  // Subregister 7 of Multireg pea_rf
+  // R[pea_rf_7]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_7 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_7_we),
+      .wd(pea_rf_7_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[7].de),
+      .d (hw2reg.pea_rf[7].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[7].q),
+
+      // to register interface (read)
+      .qs(pea_rf_7_qs)
+  );
+
+  // Subregister 8 of Multireg pea_rf
+  // R[pea_rf_8]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_8 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_8_we),
+      .wd(pea_rf_8_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[8].de),
+      .d (hw2reg.pea_rf[8].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[8].q),
+
+      // to register interface (read)
+      .qs(pea_rf_8_qs)
+  );
+
+  // Subregister 9 of Multireg pea_rf
+  // R[pea_rf_9]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_9 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_9_we),
+      .wd(pea_rf_9_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[9].de),
+      .d (hw2reg.pea_rf[9].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[9].q),
+
+      // to register interface (read)
+      .qs(pea_rf_9_qs)
+  );
+
+  // Subregister 10 of Multireg pea_rf
+  // R[pea_rf_10]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_10 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_10_we),
+      .wd(pea_rf_10_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[10].de),
+      .d (hw2reg.pea_rf[10].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[10].q),
+
+      // to register interface (read)
+      .qs(pea_rf_10_qs)
+  );
+
+  // Subregister 11 of Multireg pea_rf
+  // R[pea_rf_11]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_11 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_11_we),
+      .wd(pea_rf_11_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[11].de),
+      .d (hw2reg.pea_rf[11].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[11].q),
+
+      // to register interface (read)
+      .qs(pea_rf_11_qs)
+  );
+
+  // Subregister 12 of Multireg pea_rf
+  // R[pea_rf_12]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_12 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_12_we),
+      .wd(pea_rf_12_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[12].de),
+      .d (hw2reg.pea_rf[12].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[12].q),
+
+      // to register interface (read)
+      .qs(pea_rf_12_qs)
+  );
+
+  // Subregister 13 of Multireg pea_rf
+  // R[pea_rf_13]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_13 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_13_we),
+      .wd(pea_rf_13_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[13].de),
+      .d (hw2reg.pea_rf[13].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[13].q),
+
+      // to register interface (read)
+      .qs(pea_rf_13_qs)
+  );
+
+  // Subregister 14 of Multireg pea_rf
+  // R[pea_rf_14]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_14 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_14_we),
+      .wd(pea_rf_14_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[14].de),
+      .d (hw2reg.pea_rf[14].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[14].q),
+
+      // to register interface (read)
+      .qs(pea_rf_14_qs)
+  );
+
+  // Subregister 15 of Multireg pea_rf
+  // R[pea_rf_15]: V(False)
+
+  prim_subreg #(
+      .DW      (32),
+      .SWACCESS("RW"),
+      .RESVAL  (32'h0)
+  ) u_pea_rf_15 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(pea_rf_15_we),
+      .wd(pea_rf_15_wd),
+
+      // from internal hardware
+      .de(hw2reg.pea_rf[15].de),
+      .d (hw2reg.pea_rf[15].d),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.pea_rf[15].q),
+
+      // to register interface (read)
+      .qs(pea_rf_15_qs)
+  );
+
+
   // R[stream_dma_cfg]: V(False)
 
   prim_subreg #(
@@ -1189,9 +1684,9 @@ module mage_reg_top #(
   // R[synch_dma_ch]: V(False)
 
   prim_subreg #(
-      .DW      (1),
+      .DW      (2),
       .SWACCESS("RW"),
-      .RESVAL  (1'h0)
+      .RESVAL  (2'h0)
   ) u_synch_dma_ch (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
@@ -1210,6 +1705,112 @@ module mage_reg_top #(
 
       // to register interface (read)
       .qs(synch_dma_ch_qs)
+  );
+
+
+  // R[stream_out_xbar_sel]: V(False)
+
+  //   F[sel_out_xbar_0]: 1:0
+  prim_subreg #(
+      .DW      (2),
+      .SWACCESS("RW"),
+      .RESVAL  (2'h0)
+  ) u_stream_out_xbar_sel_sel_out_xbar_0 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(stream_out_xbar_sel_sel_out_xbar_0_we),
+      .wd(stream_out_xbar_sel_sel_out_xbar_0_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.stream_out_xbar_sel.sel_out_xbar_0.q),
+
+      // to register interface (read)
+      .qs(stream_out_xbar_sel_sel_out_xbar_0_qs)
+  );
+
+
+  //   F[sel_out_xbar_1]: 3:2
+  prim_subreg #(
+      .DW      (2),
+      .SWACCESS("RW"),
+      .RESVAL  (2'h0)
+  ) u_stream_out_xbar_sel_sel_out_xbar_1 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(stream_out_xbar_sel_sel_out_xbar_1_we),
+      .wd(stream_out_xbar_sel_sel_out_xbar_1_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.stream_out_xbar_sel.sel_out_xbar_1.q),
+
+      // to register interface (read)
+      .qs(stream_out_xbar_sel_sel_out_xbar_1_qs)
+  );
+
+
+  //   F[sel_out_xbar_2]: 5:4
+  prim_subreg #(
+      .DW      (2),
+      .SWACCESS("RW"),
+      .RESVAL  (2'h0)
+  ) u_stream_out_xbar_sel_sel_out_xbar_2 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(stream_out_xbar_sel_sel_out_xbar_2_we),
+      .wd(stream_out_xbar_sel_sel_out_xbar_2_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.stream_out_xbar_sel.sel_out_xbar_2.q),
+
+      // to register interface (read)
+      .qs(stream_out_xbar_sel_sel_out_xbar_2_qs)
+  );
+
+
+  //   F[sel_out_xbar_3]: 7:6
+  prim_subreg #(
+      .DW      (2),
+      .SWACCESS("RW"),
+      .RESVAL  (2'h0)
+  ) u_stream_out_xbar_sel_sel_out_xbar_3 (
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // from register interface
+      .we(stream_out_xbar_sel_sel_out_xbar_3_we),
+      .wd(stream_out_xbar_sel_sel_out_xbar_3_wd),
+
+      // from internal hardware
+      .de(1'b0),
+      .d ('0),
+
+      // to internal hardware
+      .qe(),
+      .q (reg2hw.stream_out_xbar_sel.sel_out_xbar_3.q),
+
+      // to register interface (read)
+      .qs(stream_out_xbar_sel_sel_out_xbar_3_qs)
   );
 
 
@@ -1758,7 +2359,7 @@ module mage_reg_top #(
 
 
 
-  logic [51:0] addr_hit;
+  logic [68:0] addr_hit;
   always_comb begin
     addr_hit = '0;
     addr_hit[0] = (reg_addr == MAGE_CFG_PE_00_OFFSET);
@@ -1793,26 +2394,43 @@ module mage_reg_top #(
     addr_hit[29] = (reg_addr == MAGE_PEA_CONSTANTS_13_OFFSET);
     addr_hit[30] = (reg_addr == MAGE_PEA_CONSTANTS_14_OFFSET);
     addr_hit[31] = (reg_addr == MAGE_PEA_CONSTANTS_15_OFFSET);
-    addr_hit[32] = (reg_addr == MAGE_STREAM_DMA_CFG_OFFSET);
-    addr_hit[33] = (reg_addr == MAGE_SEPARATE_COLS_OFFSET);
-    addr_hit[34] = (reg_addr == MAGE_SYNCH_DMA_CH_OFFSET);
-    addr_hit[35] = (reg_addr == MAGE_SEL_OUT_COL_PEA_OFFSET);
-    addr_hit[36] = (reg_addr == MAGE_ACC_VALUE_0_OFFSET);
-    addr_hit[37] = (reg_addr == MAGE_ACC_VALUE_1_OFFSET);
-    addr_hit[38] = (reg_addr == MAGE_ACC_VALUE_2_OFFSET);
-    addr_hit[39] = (reg_addr == MAGE_ACC_VALUE_3_OFFSET);
-    addr_hit[40] = (reg_addr == MAGE_ACC_VALUE_4_OFFSET);
-    addr_hit[41] = (reg_addr == MAGE_ACC_VALUE_5_OFFSET);
-    addr_hit[42] = (reg_addr == MAGE_ACC_VALUE_6_OFFSET);
-    addr_hit[43] = (reg_addr == MAGE_ACC_VALUE_7_OFFSET);
-    addr_hit[44] = (reg_addr == MAGE_ACC_VALUE_8_OFFSET);
-    addr_hit[45] = (reg_addr == MAGE_ACC_VALUE_9_OFFSET);
-    addr_hit[46] = (reg_addr == MAGE_ACC_VALUE_10_OFFSET);
-    addr_hit[47] = (reg_addr == MAGE_ACC_VALUE_11_OFFSET);
-    addr_hit[48] = (reg_addr == MAGE_ACC_VALUE_12_OFFSET);
-    addr_hit[49] = (reg_addr == MAGE_ACC_VALUE_13_OFFSET);
-    addr_hit[50] = (reg_addr == MAGE_ACC_VALUE_14_OFFSET);
-    addr_hit[51] = (reg_addr == MAGE_ACC_VALUE_15_OFFSET);
+    addr_hit[32] = (reg_addr == MAGE_PEA_RF_0_OFFSET);
+    addr_hit[33] = (reg_addr == MAGE_PEA_RF_1_OFFSET);
+    addr_hit[34] = (reg_addr == MAGE_PEA_RF_2_OFFSET);
+    addr_hit[35] = (reg_addr == MAGE_PEA_RF_3_OFFSET);
+    addr_hit[36] = (reg_addr == MAGE_PEA_RF_4_OFFSET);
+    addr_hit[37] = (reg_addr == MAGE_PEA_RF_5_OFFSET);
+    addr_hit[38] = (reg_addr == MAGE_PEA_RF_6_OFFSET);
+    addr_hit[39] = (reg_addr == MAGE_PEA_RF_7_OFFSET);
+    addr_hit[40] = (reg_addr == MAGE_PEA_RF_8_OFFSET);
+    addr_hit[41] = (reg_addr == MAGE_PEA_RF_9_OFFSET);
+    addr_hit[42] = (reg_addr == MAGE_PEA_RF_10_OFFSET);
+    addr_hit[43] = (reg_addr == MAGE_PEA_RF_11_OFFSET);
+    addr_hit[44] = (reg_addr == MAGE_PEA_RF_12_OFFSET);
+    addr_hit[45] = (reg_addr == MAGE_PEA_RF_13_OFFSET);
+    addr_hit[46] = (reg_addr == MAGE_PEA_RF_14_OFFSET);
+    addr_hit[47] = (reg_addr == MAGE_PEA_RF_15_OFFSET);
+    addr_hit[48] = (reg_addr == MAGE_STREAM_DMA_CFG_OFFSET);
+    addr_hit[49] = (reg_addr == MAGE_SEPARATE_COLS_OFFSET);
+    addr_hit[50] = (reg_addr == MAGE_SYNCH_DMA_CH_OFFSET);
+    addr_hit[51] = (reg_addr == MAGE_STREAM_OUT_XBAR_SEL_OFFSET);
+    addr_hit[52] = (reg_addr == MAGE_SEL_OUT_COL_PEA_OFFSET);
+    addr_hit[53] = (reg_addr == MAGE_ACC_VALUE_0_OFFSET);
+    addr_hit[54] = (reg_addr == MAGE_ACC_VALUE_1_OFFSET);
+    addr_hit[55] = (reg_addr == MAGE_ACC_VALUE_2_OFFSET);
+    addr_hit[56] = (reg_addr == MAGE_ACC_VALUE_3_OFFSET);
+    addr_hit[57] = (reg_addr == MAGE_ACC_VALUE_4_OFFSET);
+    addr_hit[58] = (reg_addr == MAGE_ACC_VALUE_5_OFFSET);
+    addr_hit[59] = (reg_addr == MAGE_ACC_VALUE_6_OFFSET);
+    addr_hit[60] = (reg_addr == MAGE_ACC_VALUE_7_OFFSET);
+    addr_hit[61] = (reg_addr == MAGE_ACC_VALUE_8_OFFSET);
+    addr_hit[62] = (reg_addr == MAGE_ACC_VALUE_9_OFFSET);
+    addr_hit[63] = (reg_addr == MAGE_ACC_VALUE_10_OFFSET);
+    addr_hit[64] = (reg_addr == MAGE_ACC_VALUE_11_OFFSET);
+    addr_hit[65] = (reg_addr == MAGE_ACC_VALUE_12_OFFSET);
+    addr_hit[66] = (reg_addr == MAGE_ACC_VALUE_13_OFFSET);
+    addr_hit[67] = (reg_addr == MAGE_ACC_VALUE_14_OFFSET);
+    addr_hit[68] = (reg_addr == MAGE_ACC_VALUE_15_OFFSET);
   end
 
   assign addrmiss = (reg_re || reg_we) ? ~|addr_hit : 1'b0;
@@ -1871,7 +2489,24 @@ module mage_reg_top #(
                (addr_hit[48] & (|(MAGE_PERMIT[48] & ~reg_be))) |
                (addr_hit[49] & (|(MAGE_PERMIT[49] & ~reg_be))) |
                (addr_hit[50] & (|(MAGE_PERMIT[50] & ~reg_be))) |
-               (addr_hit[51] & (|(MAGE_PERMIT[51] & ~reg_be)))));
+               (addr_hit[51] & (|(MAGE_PERMIT[51] & ~reg_be))) |
+               (addr_hit[52] & (|(MAGE_PERMIT[52] & ~reg_be))) |
+               (addr_hit[53] & (|(MAGE_PERMIT[53] & ~reg_be))) |
+               (addr_hit[54] & (|(MAGE_PERMIT[54] & ~reg_be))) |
+               (addr_hit[55] & (|(MAGE_PERMIT[55] & ~reg_be))) |
+               (addr_hit[56] & (|(MAGE_PERMIT[56] & ~reg_be))) |
+               (addr_hit[57] & (|(MAGE_PERMIT[57] & ~reg_be))) |
+               (addr_hit[58] & (|(MAGE_PERMIT[58] & ~reg_be))) |
+               (addr_hit[59] & (|(MAGE_PERMIT[59] & ~reg_be))) |
+               (addr_hit[60] & (|(MAGE_PERMIT[60] & ~reg_be))) |
+               (addr_hit[61] & (|(MAGE_PERMIT[61] & ~reg_be))) |
+               (addr_hit[62] & (|(MAGE_PERMIT[62] & ~reg_be))) |
+               (addr_hit[63] & (|(MAGE_PERMIT[63] & ~reg_be))) |
+               (addr_hit[64] & (|(MAGE_PERMIT[64] & ~reg_be))) |
+               (addr_hit[65] & (|(MAGE_PERMIT[65] & ~reg_be))) |
+               (addr_hit[66] & (|(MAGE_PERMIT[66] & ~reg_be))) |
+               (addr_hit[67] & (|(MAGE_PERMIT[67] & ~reg_be))) |
+               (addr_hit[68] & (|(MAGE_PERMIT[68] & ~reg_be)))));
   end
 
   assign cfg_pe_00_we = addr_hit[0] & reg_we & !reg_error;
@@ -1970,73 +2605,133 @@ module mage_reg_top #(
   assign pea_constants_15_we = addr_hit[31] & reg_we & !reg_error;
   assign pea_constants_15_wd = reg_wdata[31:0];
 
-  assign stream_dma_cfg_we = addr_hit[32] & reg_we & !reg_error;
+  assign pea_rf_0_we = addr_hit[32] & reg_we & !reg_error;
+  assign pea_rf_0_wd = reg_wdata[31:0];
+
+  assign pea_rf_1_we = addr_hit[33] & reg_we & !reg_error;
+  assign pea_rf_1_wd = reg_wdata[31:0];
+
+  assign pea_rf_2_we = addr_hit[34] & reg_we & !reg_error;
+  assign pea_rf_2_wd = reg_wdata[31:0];
+
+  assign pea_rf_3_we = addr_hit[35] & reg_we & !reg_error;
+  assign pea_rf_3_wd = reg_wdata[31:0];
+
+  assign pea_rf_4_we = addr_hit[36] & reg_we & !reg_error;
+  assign pea_rf_4_wd = reg_wdata[31:0];
+
+  assign pea_rf_5_we = addr_hit[37] & reg_we & !reg_error;
+  assign pea_rf_5_wd = reg_wdata[31:0];
+
+  assign pea_rf_6_we = addr_hit[38] & reg_we & !reg_error;
+  assign pea_rf_6_wd = reg_wdata[31:0];
+
+  assign pea_rf_7_we = addr_hit[39] & reg_we & !reg_error;
+  assign pea_rf_7_wd = reg_wdata[31:0];
+
+  assign pea_rf_8_we = addr_hit[40] & reg_we & !reg_error;
+  assign pea_rf_8_wd = reg_wdata[31:0];
+
+  assign pea_rf_9_we = addr_hit[41] & reg_we & !reg_error;
+  assign pea_rf_9_wd = reg_wdata[31:0];
+
+  assign pea_rf_10_we = addr_hit[42] & reg_we & !reg_error;
+  assign pea_rf_10_wd = reg_wdata[31:0];
+
+  assign pea_rf_11_we = addr_hit[43] & reg_we & !reg_error;
+  assign pea_rf_11_wd = reg_wdata[31:0];
+
+  assign pea_rf_12_we = addr_hit[44] & reg_we & !reg_error;
+  assign pea_rf_12_wd = reg_wdata[31:0];
+
+  assign pea_rf_13_we = addr_hit[45] & reg_we & !reg_error;
+  assign pea_rf_13_wd = reg_wdata[31:0];
+
+  assign pea_rf_14_we = addr_hit[46] & reg_we & !reg_error;
+  assign pea_rf_14_wd = reg_wdata[31:0];
+
+  assign pea_rf_15_we = addr_hit[47] & reg_we & !reg_error;
+  assign pea_rf_15_wd = reg_wdata[31:0];
+
+  assign stream_dma_cfg_we = addr_hit[48] & reg_we & !reg_error;
   assign stream_dma_cfg_wd = reg_wdata[3:0];
 
-  assign separate_cols_we = addr_hit[33] & reg_we & !reg_error;
+  assign separate_cols_we = addr_hit[49] & reg_we & !reg_error;
   assign separate_cols_wd = reg_wdata[1:0];
 
-  assign synch_dma_ch_we = addr_hit[34] & reg_we & !reg_error;
-  assign synch_dma_ch_wd = reg_wdata[0];
+  assign synch_dma_ch_we = addr_hit[50] & reg_we & !reg_error;
+  assign synch_dma_ch_wd = reg_wdata[1:0];
 
-  assign sel_out_col_pea_sel_col_0_0_we = addr_hit[35] & reg_we & !reg_error;
+  assign stream_out_xbar_sel_sel_out_xbar_0_we = addr_hit[51] & reg_we & !reg_error;
+  assign stream_out_xbar_sel_sel_out_xbar_0_wd = reg_wdata[1:0];
+
+  assign stream_out_xbar_sel_sel_out_xbar_1_we = addr_hit[51] & reg_we & !reg_error;
+  assign stream_out_xbar_sel_sel_out_xbar_1_wd = reg_wdata[3:2];
+
+  assign stream_out_xbar_sel_sel_out_xbar_2_we = addr_hit[51] & reg_we & !reg_error;
+  assign stream_out_xbar_sel_sel_out_xbar_2_wd = reg_wdata[5:4];
+
+  assign stream_out_xbar_sel_sel_out_xbar_3_we = addr_hit[51] & reg_we & !reg_error;
+  assign stream_out_xbar_sel_sel_out_xbar_3_wd = reg_wdata[7:6];
+
+  assign sel_out_col_pea_sel_col_0_0_we = addr_hit[52] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_0_0_wd = reg_wdata[7:0];
 
-  assign sel_out_col_pea_sel_col_1_0_we = addr_hit[35] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_1_0_we = addr_hit[52] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_1_0_wd = reg_wdata[15:8];
 
-  assign sel_out_col_pea_sel_col_2_0_we = addr_hit[35] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_2_0_we = addr_hit[52] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_2_0_wd = reg_wdata[23:16];
 
-  assign sel_out_col_pea_sel_col_3_0_we = addr_hit[35] & reg_we & !reg_error;
+  assign sel_out_col_pea_sel_col_3_0_we = addr_hit[52] & reg_we & !reg_error;
   assign sel_out_col_pea_sel_col_3_0_wd = reg_wdata[31:24];
 
-  assign acc_value_0_we = addr_hit[36] & reg_we & !reg_error;
+  assign acc_value_0_we = addr_hit[53] & reg_we & !reg_error;
   assign acc_value_0_wd = reg_wdata[31:0];
 
-  assign acc_value_1_we = addr_hit[37] & reg_we & !reg_error;
+  assign acc_value_1_we = addr_hit[54] & reg_we & !reg_error;
   assign acc_value_1_wd = reg_wdata[31:0];
 
-  assign acc_value_2_we = addr_hit[38] & reg_we & !reg_error;
+  assign acc_value_2_we = addr_hit[55] & reg_we & !reg_error;
   assign acc_value_2_wd = reg_wdata[31:0];
 
-  assign acc_value_3_we = addr_hit[39] & reg_we & !reg_error;
+  assign acc_value_3_we = addr_hit[56] & reg_we & !reg_error;
   assign acc_value_3_wd = reg_wdata[31:0];
 
-  assign acc_value_4_we = addr_hit[40] & reg_we & !reg_error;
+  assign acc_value_4_we = addr_hit[57] & reg_we & !reg_error;
   assign acc_value_4_wd = reg_wdata[31:0];
 
-  assign acc_value_5_we = addr_hit[41] & reg_we & !reg_error;
+  assign acc_value_5_we = addr_hit[58] & reg_we & !reg_error;
   assign acc_value_5_wd = reg_wdata[31:0];
 
-  assign acc_value_6_we = addr_hit[42] & reg_we & !reg_error;
+  assign acc_value_6_we = addr_hit[59] & reg_we & !reg_error;
   assign acc_value_6_wd = reg_wdata[31:0];
 
-  assign acc_value_7_we = addr_hit[43] & reg_we & !reg_error;
+  assign acc_value_7_we = addr_hit[60] & reg_we & !reg_error;
   assign acc_value_7_wd = reg_wdata[31:0];
 
-  assign acc_value_8_we = addr_hit[44] & reg_we & !reg_error;
+  assign acc_value_8_we = addr_hit[61] & reg_we & !reg_error;
   assign acc_value_8_wd = reg_wdata[31:0];
 
-  assign acc_value_9_we = addr_hit[45] & reg_we & !reg_error;
+  assign acc_value_9_we = addr_hit[62] & reg_we & !reg_error;
   assign acc_value_9_wd = reg_wdata[31:0];
 
-  assign acc_value_10_we = addr_hit[46] & reg_we & !reg_error;
+  assign acc_value_10_we = addr_hit[63] & reg_we & !reg_error;
   assign acc_value_10_wd = reg_wdata[31:0];
 
-  assign acc_value_11_we = addr_hit[47] & reg_we & !reg_error;
+  assign acc_value_11_we = addr_hit[64] & reg_we & !reg_error;
   assign acc_value_11_wd = reg_wdata[31:0];
 
-  assign acc_value_12_we = addr_hit[48] & reg_we & !reg_error;
+  assign acc_value_12_we = addr_hit[65] & reg_we & !reg_error;
   assign acc_value_12_wd = reg_wdata[31:0];
 
-  assign acc_value_13_we = addr_hit[49] & reg_we & !reg_error;
+  assign acc_value_13_we = addr_hit[66] & reg_we & !reg_error;
   assign acc_value_13_wd = reg_wdata[31:0];
 
-  assign acc_value_14_we = addr_hit[50] & reg_we & !reg_error;
+  assign acc_value_14_we = addr_hit[67] & reg_we & !reg_error;
   assign acc_value_14_wd = reg_wdata[31:0];
 
-  assign acc_value_15_we = addr_hit[51] & reg_we & !reg_error;
+  assign acc_value_15_we = addr_hit[68] & reg_we & !reg_error;
   assign acc_value_15_wd = reg_wdata[31:0];
 
   // Read data return
@@ -2172,85 +2867,156 @@ module mage_reg_top #(
       end
 
       addr_hit[32]: begin
-        reg_rdata_next[3:0] = stream_dma_cfg_qs;
+        reg_rdata_next[31:0] = pea_rf_0_qs;
       end
 
       addr_hit[33]: begin
-        reg_rdata_next[1:0] = separate_cols_qs;
+        reg_rdata_next[31:0] = pea_rf_1_qs;
       end
 
       addr_hit[34]: begin
-        reg_rdata_next[0] = synch_dma_ch_qs;
+        reg_rdata_next[31:0] = pea_rf_2_qs;
       end
 
       addr_hit[35]: begin
+        reg_rdata_next[31:0] = pea_rf_3_qs;
+      end
+
+      addr_hit[36]: begin
+        reg_rdata_next[31:0] = pea_rf_4_qs;
+      end
+
+      addr_hit[37]: begin
+        reg_rdata_next[31:0] = pea_rf_5_qs;
+      end
+
+      addr_hit[38]: begin
+        reg_rdata_next[31:0] = pea_rf_6_qs;
+      end
+
+      addr_hit[39]: begin
+        reg_rdata_next[31:0] = pea_rf_7_qs;
+      end
+
+      addr_hit[40]: begin
+        reg_rdata_next[31:0] = pea_rf_8_qs;
+      end
+
+      addr_hit[41]: begin
+        reg_rdata_next[31:0] = pea_rf_9_qs;
+      end
+
+      addr_hit[42]: begin
+        reg_rdata_next[31:0] = pea_rf_10_qs;
+      end
+
+      addr_hit[43]: begin
+        reg_rdata_next[31:0] = pea_rf_11_qs;
+      end
+
+      addr_hit[44]: begin
+        reg_rdata_next[31:0] = pea_rf_12_qs;
+      end
+
+      addr_hit[45]: begin
+        reg_rdata_next[31:0] = pea_rf_13_qs;
+      end
+
+      addr_hit[46]: begin
+        reg_rdata_next[31:0] = pea_rf_14_qs;
+      end
+
+      addr_hit[47]: begin
+        reg_rdata_next[31:0] = pea_rf_15_qs;
+      end
+
+      addr_hit[48]: begin
+        reg_rdata_next[3:0] = stream_dma_cfg_qs;
+      end
+
+      addr_hit[49]: begin
+        reg_rdata_next[1:0] = separate_cols_qs;
+      end
+
+      addr_hit[50]: begin
+        reg_rdata_next[1:0] = synch_dma_ch_qs;
+      end
+
+      addr_hit[51]: begin
+        reg_rdata_next[1:0] = stream_out_xbar_sel_sel_out_xbar_0_qs;
+        reg_rdata_next[3:2] = stream_out_xbar_sel_sel_out_xbar_1_qs;
+        reg_rdata_next[5:4] = stream_out_xbar_sel_sel_out_xbar_2_qs;
+        reg_rdata_next[7:6] = stream_out_xbar_sel_sel_out_xbar_3_qs;
+      end
+
+      addr_hit[52]: begin
         reg_rdata_next[7:0]   = sel_out_col_pea_sel_col_0_0_qs;
         reg_rdata_next[15:8]  = sel_out_col_pea_sel_col_1_0_qs;
         reg_rdata_next[23:16] = sel_out_col_pea_sel_col_2_0_qs;
         reg_rdata_next[31:24] = sel_out_col_pea_sel_col_3_0_qs;
       end
 
-      addr_hit[36]: begin
+      addr_hit[53]: begin
         reg_rdata_next[31:0] = acc_value_0_qs;
       end
 
-      addr_hit[37]: begin
+      addr_hit[54]: begin
         reg_rdata_next[31:0] = acc_value_1_qs;
       end
 
-      addr_hit[38]: begin
+      addr_hit[55]: begin
         reg_rdata_next[31:0] = acc_value_2_qs;
       end
 
-      addr_hit[39]: begin
+      addr_hit[56]: begin
         reg_rdata_next[31:0] = acc_value_3_qs;
       end
 
-      addr_hit[40]: begin
+      addr_hit[57]: begin
         reg_rdata_next[31:0] = acc_value_4_qs;
       end
 
-      addr_hit[41]: begin
+      addr_hit[58]: begin
         reg_rdata_next[31:0] = acc_value_5_qs;
       end
 
-      addr_hit[42]: begin
+      addr_hit[59]: begin
         reg_rdata_next[31:0] = acc_value_6_qs;
       end
 
-      addr_hit[43]: begin
+      addr_hit[60]: begin
         reg_rdata_next[31:0] = acc_value_7_qs;
       end
 
-      addr_hit[44]: begin
+      addr_hit[61]: begin
         reg_rdata_next[31:0] = acc_value_8_qs;
       end
 
-      addr_hit[45]: begin
+      addr_hit[62]: begin
         reg_rdata_next[31:0] = acc_value_9_qs;
       end
 
-      addr_hit[46]: begin
+      addr_hit[63]: begin
         reg_rdata_next[31:0] = acc_value_10_qs;
       end
 
-      addr_hit[47]: begin
+      addr_hit[64]: begin
         reg_rdata_next[31:0] = acc_value_11_qs;
       end
 
-      addr_hit[48]: begin
+      addr_hit[65]: begin
         reg_rdata_next[31:0] = acc_value_12_qs;
       end
 
-      addr_hit[49]: begin
+      addr_hit[66]: begin
         reg_rdata_next[31:0] = acc_value_13_qs;
       end
 
-      addr_hit[50]: begin
+      addr_hit[67]: begin
         reg_rdata_next[31:0] = acc_value_14_qs;
       end
 
-      addr_hit[51]: begin
+      addr_hit[68]: begin
         reg_rdata_next[31:0] = acc_value_15_qs;
       end
 
@@ -2275,7 +3041,7 @@ module mage_reg_top #(
 endmodule
 
 module mage_reg_top_intf #(
-    parameter  int AW = 8,
+    parameter  int AW = 9,
     localparam int DW = 32
 ) (
     input logic clk_i,
@@ -2283,6 +3049,7 @@ module mage_reg_top_intf #(
     REG_BUS.in regbus_slave,
     // To HW
     output mage_reg_pkg::mage_reg2hw_t reg2hw,  // Write
+    input mage_reg_pkg::mage_hw2reg_t hw2reg,  // Read
     // Config
     input devmode_i  // If 1, explicit error return for unmapped register access
 );
@@ -2316,6 +3083,7 @@ module mage_reg_top_intf #(
       .reg_req_i(s_reg_req),
       .reg_rsp_o(s_reg_rsp),
       .reg2hw,  // Write
+      .hw2reg,  // Read
       .devmode_i
   );
 

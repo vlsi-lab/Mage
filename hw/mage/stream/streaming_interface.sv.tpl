@@ -21,7 +21,6 @@ module streaming_interface
     // PEA Interface
     input logic [M-1:0] pea_ready_i,
     input logic [1:0] reg_separate_cols_i,
-    input logic reg_synch_dma_ch_i,
 %if out_stream_xbar == str(1):
     input logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_i,
 %endif
@@ -117,32 +116,10 @@ module streaming_interface
   // Pop from Read FIFO
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
-      hw_r_fifo_pop_enable[i] = 1'b0;
+      hw_r_fifo_pop[i] = 1'b0;
       if (hw_r_fifo_empty[i] == 1'b0 && pea_ready_i[i] == 1'b1) begin
-        hw_r_fifo_pop_enable[i] = 1'b1;
+        hw_r_fifo_pop[i] = 1'b1;
       end
-    end
-  end
-
-  always_comb begin
-    hw_r_fifo_pop = '0;
-    if(reg_synch_dma_ch_i == 1'b0) begin
-      for (int i = 0; i < N_DMA_CH; i = i + 1) begin
-        hw_r_fifo_pop[i] = hw_r_fifo_pop_enable[i];
-      end
-    end else if(reg_synch_dma_ch_i == 1'b1) begin
-%for c in range(n_pea_cols):
-      hw_r_fifo_pop[${c}] =
-  %for i in range(len(pea_in_stream_placement[c])):
-    %if pea_in_stream_placement[c][i] != None:
-      %if i != len(pea_in_stream_placement[c]) - 1:
-        hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}] &
-      %else:
-        hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}];
-      %endif
-    %endif
-  %endfor 
-%endfor
     end
   end
 
@@ -163,8 +140,13 @@ module streaming_interface
     % for i in range(len(in_stream_dma_ch_placement)):
       % for j in range(len(in_stream_dma_ch_placement[i])):
         % if i == nis and j == ndc:
+          %if in_stream_dma_ch_placement[i][j] != None:
   assign stream_in_dma_ch_data[${nis}][${ndc}] = hw_r_fifo_dout[${in_stream_dma_ch_placement[i][j]}];
-  assign stream_in_dma_ch_valid[${nis}][${ndc}] = hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}] && pea_ready_i[${in_stream_dma_ch_placement[i][j]}] ;
+  assign stream_in_dma_ch_valid[${nis}][${ndc}] = hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}] && pea_ready_i[${in_stream_dma_ch_placement[i][j]}];
+          %else:
+  assign stream_in_dma_ch_data[${nis}][${ndc}] = '0;
+  assign stream_in_dma_ch_valid[${nis}][${ndc}] = 1'b0;
+          %endif
         % endif       
       % endfor
     % endfor
@@ -203,20 +185,17 @@ module streaming_interface
     end
   endgenerate
 % else:
-  % for nis in range(n_in_stream):
-    % for npd in range(n_pea_din_per_in_stream):
-    % for i in range(len(in_stream_pea_din_placement)):
-      % for j in range(len(in_stream_pea_din_placement[i])):
-        % if i == nis and j == npd:
-  assign stream_in_pea_data[${nis}][${npd}] = stream_in_dma_ch_data[${i}][${in_stream_pea_din_placement[i][j]}];
-  assign stream_in_pea_valid[${nis}][${npd}] = stream_in_dma_ch_valid[${i}][${in_stream_pea_din_placement[i][j]}];
-          % endif       
-        % endfor
-      % endfor
-    % endfor
-  % endfor
+  always_comb begin
+    for (int i = 0; i < N_IN_STREAM; i = i + 1) begin
+      for (int j = 0; j < N_DMA_CH_PER_IN_STREAM; j = j + 1) begin // in this case N_DMA_CH_PER_IN_STREAM = N_PEA_DIN_PER_IN_STREAM
+        stream_in_pea_data[i][j] = stream_in_dma_ch_data[i][j];
+        stream_in_pea_valid[i][j] = stream_in_dma_ch_valid[i][j];
+      end
+    end
+  end
 % endif
 
+  // Outputs to PEA construction
   always_comb begin
     for (int i = 0; i < N_IN_STREAM; i = i + 1) begin
       for (int j = 0; j < N_PEA_DIN_PER_IN_STREAM; j = j + 1) begin
@@ -240,20 +219,17 @@ module streaming_interface
     end
   endgenerate
 % else:
-  % for nos in range(n_out_stream):
-    % for ndc in range(n_pea_dout_per_out_stream):
-    % for i in range(len(out_stream_dma_ch_placement)):
-      % for j in range(len(out_stream_dma_ch_placement[i])):
-        % if i == nos and j == ndc:
-  assign stream_out_dma_ch_data[${nos}][${ndc}] = stream_out_pea_data[${i}][${out_stream_dma_ch_placement[i][j]}];
-  assign stream_out_dma_ch_valid[${nos}][${ndc}] = stream_out_pea_valid[${i}][${out_stream_dma_ch_placement[i][j]}];
-          % endif       
-        % endfor
-      % endfor
-    % endfor
-  % endfor
+  always_comb begin
+    for (int i = 0; i < N_IN_STREAM; i = i + 1) begin
+      for (int j = 0; j < N_DMA_CH_PER_IN_STREAM; j = j + 1) begin // in this case N_DMA_CH_PER_OUT_STREAM = N_PEA_DOUT_PER_OUT_STREAM
+        stream_out_dma_ch_data[i][j] = stream_out_pea_data[i][j];
+        stream_out_dma_ch_valid[i][j] = stream_out_pea_valid[i][j];
+      end
+    end
+  end
 % endif
 
+  // Write fifo input construction
   always_comb begin
     for (int i = 0; i < N_OUT_STREAM; i = i + 1) begin
       for (int j = 0; j < N_DMA_CH_PER_OUT_STREAM; j = j + 1) begin

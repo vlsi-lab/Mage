@@ -17,6 +17,9 @@ module s_div_pe
     // Streaming Interface
     input  logic [             31:0]             reg_acc_value_i,
     input  logic                                 pea_ready_i,
+    input  logic [       N_BITS-1:0]             reg_const_i,
+    output logic                                 reg_pea_rf_de_o,
+    output logic [       N_BITS-1:0]             reg_pea_rf_d_o,
     input  logic [  N_INPUTS_PE-4:0][N_BITS-1:0] neigh_pe_op_i,
     input  logic [  N_INPUTS_PE-4:0]             neigh_pe_op_valid_i,
     input  logic [   N_NEIGH_PE-1:0][N_BITS-1:0] neigh_delay_op_i,
@@ -110,14 +113,10 @@ module s_div_pe
   ////////////////////////////////////////////////////////////////
   //                   1-entry Register File                    //
   ////////////////////////////////////////////////////////////////
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
-    if (!rst_n_i) begin
-      rf <= '0;
-    end else begin
-      if (rf_en && fu_valid) begin
-        rf <= fu_out;
-      end
-    end
+
+  always_comb begin
+    reg_pea_rf_de_o = rf_en && valid_o;
+    reg_pea_rf_d_o  = pe_res_o;
   end
 
   ////////////////////////////////////////////////////////////////
@@ -128,7 +127,7 @@ module s_div_pe
       .rst_n_i(rst_n_i),
       .a_i(op_a),
       .b_i(op_b),
-      .const_i(operands[CONSTANT]),
+      .const_i(reg_const_i),
       .reg_acc_value_i,
       .pea_ready_i,
       .ops_valid_i(fu_ops_valid),
@@ -143,10 +142,23 @@ module s_div_pe
   ////////////////////////////////////////////////////////////////
   //                    Delay Operand Selection                 //
   ////////////////////////////////////////////////////////////////
+
+  // delayed operand selection, it is one among the possible operands of the PE FU 
   assign delay_op_fu    = neigh_delay_op_i[delay_op_sel];
+  // delayed operand valid selection
   assign delay_op_valid = neigh_delay_op_valid_i[delay_op_sel];
+  /* output delay data selection
+    ->  delay_op_out = fu_out      if delay_op_sel == D_PE_RES
+    ->  delay_op_out = rem_q_out  if delay_op_sel == D_PE_RES and fu_instr == REM
+    ->  delay_op_out = op_a        if delay_op_sel == D_PE_OP_A
+    ->  delay_op_out = op_b        if delay_op_sel == D_PE_OP_B
+    ->  delay_op_out = delay_op_fu if delay_op_sel == D_PE_DELAY_OP
+    in the default case, delay_op_out is set fed with delay_op_fu,
+    but it can be decided to forward also the result of the PE FU or one of its operands.
+    In case of DIV and REM, the remainder of the division is forwarded.
+  */
   always_comb begin
-    delay_op_out = (delay_op_sel == D_PE_RES) ? ((fu_instr == DIVU || fu_instr == REM) ? rem_q_out : fu_out) : (
+    delay_op_out = (delay_op_sel == D_PE_RES) ? ((fu_instr == DIV || fu_instr == REM) ? rem_q_out : fu_out) : (
                    (delay_op_sel == D_PE_OP_A) ? op_a : (
                    (delay_op_sel == D_PE_OP_B) ? op_b : delay_op_fu
                   ));
@@ -156,7 +168,8 @@ module s_div_pe
                   ));
   end
 
-  assign multi_op_instr = (fu_instr == ADDPOW || fu_instr == ADDCMUL || fu_instr == CADDMUL || fu_instr == MULCARSH || fu_instr == ABSMIN || fu_instr == ABSDIV);
+  // multi_op_instr is asserted when the instruction is a multi-operand one
+  assign multi_op_instr = (fu_instr == ABSDIV || fu_instr == ABSMIN || fu_instr[4] == 1'b1);
 
   // Delay Operand Reg
   always_ff @(posedge clk_i, negedge rst_n_i) begin
@@ -171,6 +184,7 @@ module s_div_pe
     end
   end
 
+  // Delay Operand Valid Reg
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
       delay_op_valid_out_d1 <= 1'b0;
@@ -183,6 +197,12 @@ module s_div_pe
     end
   end
 
+  /* 
+  Delay Operand Output Mux
+    The output of the delay operand is selected based on the instruction
+    If the instruction is a multi-operand one, the output is selected from the second delay register
+    Otherwise, the output is selected from the first delay register
+  */
   always_comb begin
     delay_op_o = multi_op_instr ? delay_op_out_d2 : delay_op_out_d1;
     delay_op_valid_o = multi_op_instr ? delay_op_valid_out_d2 : delay_op_valid_out_d1;
@@ -191,13 +211,21 @@ module s_div_pe
   ////////////////////////////////////////////////////////////////
   //                      Output Register                       //
   ////////////////////////////////////////////////////////////////
+
+  /*
+    The output register of the PE is set to:
+      -> 0 when the instruction is NOP
+      -> result of the FU when the instruction is not NOP, the output of the FU is valid and the pea is ready
+      -> result of the FU when the instruction is ACC or MAX, the operands are valid and the pea is ready
+      -> to itself otherwise, to preserve the current value
+  */
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
       pe_res_o <= '0;
     end else begin
       if (fu_instr == NOP) begin
         pe_res_o <= '0;
-      end else if((pea_ready_i && fu_valid) || ((fu_instr == ACC || fu_instr == MAX) && fu_ops_valid)) begin
+      end else if((pea_ready_i && fu_valid) || ((fu_instr == ACC || fu_instr == MAX) && fu_ops_valid && pea_ready_i)) begin
         pe_res_o <= fu_out;
       end else begin
         pe_res_o <= pe_res_o;
@@ -208,6 +236,13 @@ module s_div_pe
   ////////////////////////////////////////////////////////////////
   //                       Output Ready/Valid                   //
   ////////////////////////////////////////////////////////////////
+
+  /*
+    The output valid signal is set to:
+      -> 0 when the instruction is NOP
+      -> the FU valid signal when the pea is ready
+      -> to itself otherwise, to preserve the current value
+  */
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
       valid <= '0;

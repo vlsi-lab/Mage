@@ -272,11 +272,26 @@
 %endif
     { multireg:
         { name: "PEA_CONSTANTS",
-        desc: "Configuration for PEs constants",
+        desc: "PEs constants",
         count : "${n_pea_rows*n_pea_cols}",
         cname: "PEA_CONSTANTS",
         swaccess: "rw",
         hwaccess: "hro",
+        fields: [
+        { bits: "31:0", 
+          name: "CONSTANT",
+          desc: "Constant for PE" 
+        },
+        ],
+        }
+    },
+    { multireg:
+        { name: "PEA_RF",
+        desc: "PEs RF",
+        count : "${n_pea_rows*n_pea_cols}",
+        cname: "PEA_CONSTANTS",
+        swaccess: "rw",
+        hwaccess: "hrw",
         fields: [
         { bits: "31:0", 
           name: "CONSTANT",
@@ -334,17 +349,6 @@
       { bits: "1:0",
         name: "SEP_COLS",
         desc: "Configuration for separate Mage columns in streaming"
-      },
-      ],
-    },
-    { name: "SYNCH_DMA_CH",
-      desc: "It makes the DMA channels work in synch or not",  
-      swaccess: "rw",
-      hwaccess: "hro",
-      fields: [
-      { bits: "0",
-        name: "SYNCH_DMA_CH",
-        desc: "Configuration for synch DMA channels in streaming"
       },
       ],
     },

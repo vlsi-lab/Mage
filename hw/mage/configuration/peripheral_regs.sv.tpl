@@ -59,10 +59,12 @@ module peripheral_regs
     //               Mage Streaming Configuration                 //
     ////////////////////////////////////////////////////////////////
     output logic [1:0] reg_separate_cols_o,
-    output logic reg_synch_dma_ch_o,
     output logic [N_DMA_CH-1:0] reg_dma_ch_cfg_o,
     output logic [M-1:0][LOG_N:0] reg_sel_out_col_pea_o,
     output logic [N-1:0][M-1:0][31:0] reg_acc_value_pe_o,
+    input logic [N-1:0][M-1:0] reg_pea_rf_de_i,
+    input logic [N-1:0][M-1:0][31:0] reg_pea_rf_d_i,
+    output logic [N-1:0][M-1:0][31:0] reg_pea_rf_o,
   %if out_stream_xbar == str(1):
     output logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_o,
   %endif
@@ -76,9 +78,7 @@ module peripheral_regs
     output logic [N-1:0][M-1:0][31:0] reg_pea_constants_o,
     output logic [N-1:0][M-1:0][N_CFG_REGS_PE-1:0][32-1:0] reg_cfg_pea_o
 );
-%if enable_decoupling == str(1):
   mage_hw2reg_t hw2reg;
-%endif
   mage_reg2hw_t reg2hw;
 
   mage_reg_top #(
@@ -90,9 +90,7 @@ module peripheral_regs
       .reg_req_i(reg_req_i),
       .reg_rsp_o(reg_rsp_o),
       .reg2hw(reg2hw),
-%if enable_decoupling == str(1):
       .hw2reg(hw2reg),
-%endif
       .devmode_i(1'b1)
   );
 
@@ -191,7 +189,6 @@ module peripheral_regs
     //                Streaming Mage Configuration                //
     ////////////////////////////////////////////////////////////////
     reg_separate_cols_o = reg2hw.separate_cols.q;
-    reg_synch_dma_ch_o = reg2hw.synch_dma_ch.q;
     reg_dma_ch_cfg_o = reg2hw.stream_dma_cfg.q;
   %for c in range(n_pea_cols):
     reg_sel_out_col_pea_o[${c}] = reg2hw.sel_out_col_pea[0].sel_col_${c}.q;
@@ -224,6 +221,15 @@ module peripheral_regs
     reg_pea_constants_o[${r}][${c}] = reg2hw.pea_constants[${r*n_pea_cols+c}].q; 
   %endfor
 %endfor
+%if enable_streaming_interface == str(1):
+  %for r in range(n_pea_rows):
+    %for c in range(n_pea_cols):
+    reg_pea_rf_o[${r}][${c}] = reg2hw.pea_rf[${r*n_pea_cols+c}].q;
+    hw2reg.pea_rf[${r*n_pea_cols+c}].de = reg_pea_rf_de_i[${r}][${c}];
+    hw2reg.pea_rf[${r*n_pea_cols+c}].d = reg_pea_rf_d_i[${r}][${c}]; 
+    %endfor
+  %endfor
+%endif
     for (int i = 0; i < N_CFG_REGS_PE; i++) begin
 %for r in range(n_pea_rows):
   %for c in range(n_pea_cols):

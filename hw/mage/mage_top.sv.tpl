@@ -133,17 +133,16 @@ module mage_top
   ////////////////////////////////////////////////////////////////
   //                      Streaming Interface                   //
   ////////////////////////////////////////////////////////////////
-  logic [N_STREAM_OUT_PEA-1:0]             stream_pea_out_valid;
-  logic [N_STREAM_OUT_PEA-1:0][N_BITS-1:0] stream_pea_data_out;
-  logic [ N_STREAM_IN_PEA-1:0]             stream_pea_in_valid;
-  logic [ N_STREAM_IN_PEA-1:0][N_BITS-1:0] stream_pea_data_in;
+  logic [M-1:0]                            stream_pea_out_valid;
+  logic [M-1:0][N_BITS-1:0]                stream_pea_data_out;
+  logic [M-1:0]                            stream_pea_in_valid;
+  logic [M-1:0][N_BITS-1:0]                stream_pea_data_in;
   logic [M-1:0] pea_ready;
   ////////////////////////////////////////////////////////////////
   //                 Stream Peripheral Registers                //
   ////////////////////////////////////////////////////////////////
   logic [N_DMA_CH-1:0] reg_dma_ch_cfg;
   logic [1:0] reg_separate_cols;
-  logic reg_synch_dma_ch;
   logic [M-1:0][LOG_N:0] reg_stream_sel_out_pea;
   logic [N-1:0][M-1:0][31:0] reg_acc_value_pe;
   %if in_stream_xbar == str(1):
@@ -161,7 +160,11 @@ module mage_top
   logic [N-1:0][M-1:0][N_CFG_REGS_PE-1:0][32-1:0] reg_cfg_pea;
   logic [N-1:0][M-1:0][N_CFG_BITS_PE-1:0] cfg_pea;
   logic [N-1:0][M-1:0][31:0] reg_constant_op_pea;
-
+%if enable_streaming_interface == str(1):
+  logic [N-1:0][M-1:0][31:0] reg_rf_in_pea;
+  logic [N-1:0][M-1:0][31:0] reg_rf_d_pea;
+  logic [N-1:0][M-1:0]       reg_rf_de_pea;
+%endif
 
   ////////////////////////////////////////////////////////////////
   //              CSR and Configuration Registers               //
@@ -209,10 +212,12 @@ module mage_top
 %endif
 %if enable_streaming_interface == str(1):
       .reg_separate_cols_o(reg_separate_cols),
-      .reg_synch_dma_ch_o(reg_synch_dma_ch),
       .reg_dma_ch_cfg_o(reg_dma_ch_cfg),
       .reg_sel_out_col_pea_o(reg_stream_sel_out_pea),
       .reg_acc_value_pe_o(reg_acc_value_pe),
+      .reg_pea_rf_de_i(reg_rf_de_pea),
+      .reg_pea_rf_d_i(reg_rf_d_pea),
+      .reg_pea_rf_o(reg_rf_in_pea),
   %if out_stream_xbar == str(1):
       .reg_out_stream_sel_o(reg_out_stream_sel),
   %endif
@@ -275,6 +280,9 @@ module mage_top
       .rst_n_i(rst_n_i),
       .ctrl_pea_i(cfg_pea),
 %if enable_streaming_interface == str(1):
+      .reg_pea_rf_de_o(reg_rf_de_pea),
+      .reg_pea_rf_d_o(reg_rf_d_pea),
+      .reg_pea_rf_i(reg_rf_in_pea),
       .reg_separate_cols_i(reg_separate_cols),
       .reg_acc_value_i(reg_acc_value_pe),
       .reg_stream_sel_out_pea_i(reg_stream_sel_out_pea),
@@ -480,11 +488,10 @@ module mage_top
       .hw_fifo_req_i(hw_fifo_req_i),
       .hw_fifo_resp_o(hw_fifo_resp_o),
       .reg_separate_cols_i(reg_separate_cols),
-      .reg_synch_dma_ch_i(reg_synch_dma_ch),
 %if out_stream_xbar == str(1):
       .reg_out_stream_sel_i(reg_out_stream_sel),
 %endif
-%if out_stream_xbar == str(1):
+%if in_stream_xbar == str(1):
       .reg_in_stream_sel_i(reg_in_stream_sel),
 %endif
       .dout_pea_i(stream_pea_data_out),

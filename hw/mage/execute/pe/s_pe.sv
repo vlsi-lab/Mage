@@ -200,8 +200,8 @@ module s_pe
     Otherwise, the output is selected from the first delay register
   */
   always_comb begin
-    delay_op_o = multi_op_instr ? delay_op_out_d2 : delay_op_out_d1;
-    delay_op_valid_o = multi_op_instr ? delay_op_valid_out_d2 : delay_op_valid_out_d1;
+    delay_op_o = (!multi_op_instr || delay_op_sel == D_PE_RES) ? delay_op_out_d1 : delay_op_out_d2;
+    delay_op_valid_o = (!multi_op_instr || delay_op_sel == D_PE_RES) ? delay_op_valid_out_d1 : delay_op_valid_out_d2;
   end
 
   ////////////////////////////////////////////////////////////////

@@ -158,7 +158,7 @@ module s_div_pe
     In case of DIV and REM, the remainder of the division is forwarded.
   */
   always_comb begin
-    delay_op_out = (delay_op_sel == D_PE_RES) ? ((fu_instr == DIV || fu_instr == REM) ? rem_q_out : fu_out) : (
+    delay_op_out = (delay_op_sel == D_PE_RES) ? ((fu_instr == DIV || fu_instr == REM || fu_instr == ABSDIV || fu_instr == ABSREM) ? rem_q_out : fu_out) : (
                    (delay_op_sel == D_PE_OP_A) ? op_a : (
                    (delay_op_sel == D_PE_OP_B) ? op_b : delay_op_fu
                   ));
@@ -204,8 +204,8 @@ module s_div_pe
     Otherwise, the output is selected from the first delay register
   */
   always_comb begin
-    delay_op_o = multi_op_instr ? delay_op_out_d2 : delay_op_out_d1;
-    delay_op_valid_o = multi_op_instr ? delay_op_valid_out_d2 : delay_op_valid_out_d1;
+    delay_op_o = (!multi_op_instr || delay_op_sel == D_PE_RES) ? delay_op_out_d1 : delay_op_out_d2;
+    delay_op_valid_o = (!multi_op_instr || delay_op_sel == D_PE_RES) ? delay_op_valid_out_d1 : delay_op_valid_out_d2;
   end
 
   ////////////////////////////////////////////////////////////////

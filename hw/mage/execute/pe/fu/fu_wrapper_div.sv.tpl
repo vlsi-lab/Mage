@@ -74,7 +74,7 @@ module fu_wrapper_div
     if(instr_i == ACC || instr_i == MAX) begin
       add_one_op1 = acc_cnt;
       add_one_op2[0] = 1'b1;
-    end else if (instr_i == ABSMIN) begin
+    end else if (instr_i == ABSMIN || instr_i == ABSDIV || instr_i == ABSREM) begin
       add_one_op1 = sign_op1 ? op1_neg : a_signed;
       add_one_op2[0] = sign_op1 ? 1'b1 : 1'b0;
     end  else if (instr_i == SGNCSUB) begin
@@ -174,12 +174,12 @@ module fu_wrapper_div
   always_comb begin
     valid = ops_valid_i;
     ready = 1'b1;
-    if (mo_instr) begin
-      valid = valid_mo_instr;
-      ready = 1'b1;
-    end else if (div_instr) begin
+    if (div_instr) begin
       valid = out_div_valid && div_used_once;
       ready = div_ready;
+    end else if (mo_instr) begin
+      valid = valid_mo_instr;
+      ready = 1'b1;
     end else begin
       case (instr_i)
         ACC: begin
@@ -307,11 +307,11 @@ module fu_wrapper_div
           end else if (instr_i == ABSMIN) begin
             temp_res <= add_one_res;
           end else if (instr_i == ABSDIV) begin
-            temp_res <= add_res[N_BITS:1];
+            temp_res <= add_one_res;
           end else if (instr_i == CADDDIV) begin
             temp_res <= add_res[N_BITS:1];
           end else if (instr_i == ABSREM) begin
-            temp_res <= add_res[N_BITS:1];
+            temp_res <= add_one_res;
           end else if (instr_i == SGNCSUB) begin
             temp_res <= add_res[N_BITS:1];
           end else if (instr_i == SUBPOW) begin
@@ -323,6 +323,8 @@ module fu_wrapper_div
       end
     end
   end
+  
+  assign temp_res_neg = ~temp_res;
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
@@ -434,24 +436,20 @@ module fu_wrapper_div
       end
 
       ABSDIV: begin
-        add_op1 = {a_signed, 1'b0};
-        add_op2 = sign_op1 ? {32'd1, 1'b0} : {32'd0, 1'b0};
         div_op1 = temp_res;
-        div_op1 = temp_op_reg;
+        div_op2 = temp_op_reg;
       end
 
       CADDDIV: begin
         add_op1 = {a_signed, 1'b0};
         add_op2 = {const_i, 1'b0};
         div_op1 = temp_res;
-        div_op1 = temp_op_reg;
+        div_op2 = temp_op_reg;
       end
 
       ABSREM: begin
-        add_op1 = {a_signed, 1'b0};
-        add_op2 = sign_op1 ? {32'd1, 1'b0} : {32'd0, 1'b0};
         div_op1 = temp_res;
-        div_op1 = temp_op_reg;
+        div_op2 = temp_op_reg;
       end
 
       SGNCSUB: begin

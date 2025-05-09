@@ -59,7 +59,7 @@ def main():
     # has to be [N_PEA_COL][N_IN_MEM]?
     pea_in_mem_placement = [[0, 1, 4, 5], [0, 1, 4, 5], [2, 3, 6, 7], [2, 3, 6, 7]];
     # has to be [N_PEA_COL[N_IN_STREAM]]?
-    pea_in_stream_placement = [[0], [1], [2], [3]];
+    pea_in_stream_placement = [[0, 1], [1, 0], [2, 3], [3, 2]];
 
     parser = argparse.ArgumentParser(prog="mage-gen")
     

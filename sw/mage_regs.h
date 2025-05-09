@@ -243,31 +243,33 @@ extern "C" {
 // PEs RF
 #define MAGE_PEA_RF_15_REG_OFFSET 0xbc
 
-// Selection signals for output of MAGE-CGRA PEA
-#define MAGE_STREAM_DMA_CFG_REG_OFFSET 0xc0
-#define MAGE_STREAM_DMA_CFG_DMA_CH_CFG_MASK 0xf
-#define MAGE_STREAM_DMA_CFG_DMA_CH_CFG_OFFSET 0
-#define MAGE_STREAM_DMA_CFG_DMA_CH_CFG_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_STREAM_DMA_CFG_DMA_CH_CFG_MASK, .index = MAGE_STREAM_DMA_CFG_DMA_CH_CFG_OFFSET })
+// Transaction size for DMA 0
+#define MAGE_TRANS_SIZE_0_REG_OFFSET 0xc0
+
+// Transaction size for DMA 1
+#define MAGE_TRANS_SIZE_1_REG_OFFSET 0xc4
+
+// Transaction size for DMA 2
+#define MAGE_TRANS_SIZE_2_REG_OFFSET 0xc8
+
+// Transaction size for DMA 3
+#define MAGE_TRANS_SIZE_3_REG_OFFSET 0xcc
 
 // If set to 1, each column of Mage works in streaming separately from all
 // the other. If 0, all columns work together. If 2, columns are grouped in 2
 // groups of 2 each
-#define MAGE_SEPARATE_COLS_REG_OFFSET 0xc4
+#define MAGE_SEPARATE_COLS_REG_OFFSET 0xd0
 #define MAGE_SEPARATE_COLS_SEP_COLS_MASK 0x3
 #define MAGE_SEPARATE_COLS_SEP_COLS_OFFSET 0
 #define MAGE_SEPARATE_COLS_SEP_COLS_FIELD \
   ((bitfield_field32_t) { .mask = MAGE_SEPARATE_COLS_SEP_COLS_MASK, .index = MAGE_SEPARATE_COLS_SEP_COLS_OFFSET })
 
 // It makes the DMA channels work in synch or not
-#define MAGE_SYNCH_DMA_CH_REG_OFFSET 0xc8
-#define MAGE_SYNCH_DMA_CH_SYNCH_DMA_CH_MASK 0x3
-#define MAGE_SYNCH_DMA_CH_SYNCH_DMA_CH_OFFSET 0
-#define MAGE_SYNCH_DMA_CH_SYNCH_DMA_CH_FIELD \
-  ((bitfield_field32_t) { .mask = MAGE_SYNCH_DMA_CH_SYNCH_DMA_CH_MASK, .index = MAGE_SYNCH_DMA_CH_SYNCH_DMA_CH_OFFSET })
+#define MAGE_SYNCH_DMA_CH_REG_OFFSET 0xd4
+#define MAGE_SYNCH_DMA_CH_SYNCH_DMA_CH_BIT 0
 
 // Selection signals for output stream crossbars
-#define MAGE_STREAM_OUT_XBAR_SEL_REG_OFFSET 0xcc
+#define MAGE_STREAM_OUT_XBAR_SEL_REG_OFFSET 0xd8
 #define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_0_MASK 0x3
 #define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_0_OFFSET 0
 #define MAGE_STREAM_OUT_XBAR_SEL_SEL_OUT_XBAR_0_FIELD \
@@ -287,7 +289,7 @@ extern "C" {
 
 // Selection signals for output of MAGE-CGRA PEA (common parameters)
 // Selection signals for output of MAGE-CGRA PEA
-#define MAGE_SEL_OUT_COL_PEA_REG_OFFSET 0xd0
+#define MAGE_SEL_OUT_COL_PEA_REG_OFFSET 0xdc
 #define MAGE_SEL_OUT_COL_PEA_SEL_COL_0_0_MASK 0xff
 #define MAGE_SEL_OUT_COL_PEA_SEL_COL_0_0_OFFSET 0
 #define MAGE_SEL_OUT_COL_PEA_SEL_COL_0_0_FIELD \
@@ -311,52 +313,52 @@ extern "C" {
 #define MAGE_ACC_VALUE_MULTIREG_COUNT 16
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_0_REG_OFFSET 0xd4
+#define MAGE_ACC_VALUE_0_REG_OFFSET 0xe0
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_1_REG_OFFSET 0xd8
+#define MAGE_ACC_VALUE_1_REG_OFFSET 0xe4
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_2_REG_OFFSET 0xdc
+#define MAGE_ACC_VALUE_2_REG_OFFSET 0xe8
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_3_REG_OFFSET 0xe0
+#define MAGE_ACC_VALUE_3_REG_OFFSET 0xec
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_4_REG_OFFSET 0xe4
+#define MAGE_ACC_VALUE_4_REG_OFFSET 0xf0
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_5_REG_OFFSET 0xe8
+#define MAGE_ACC_VALUE_5_REG_OFFSET 0xf4
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_6_REG_OFFSET 0xec
+#define MAGE_ACC_VALUE_6_REG_OFFSET 0xf8
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_7_REG_OFFSET 0xf0
+#define MAGE_ACC_VALUE_7_REG_OFFSET 0xfc
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_8_REG_OFFSET 0xf4
+#define MAGE_ACC_VALUE_8_REG_OFFSET 0x100
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_9_REG_OFFSET 0xf8
+#define MAGE_ACC_VALUE_9_REG_OFFSET 0x104
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_10_REG_OFFSET 0xfc
+#define MAGE_ACC_VALUE_10_REG_OFFSET 0x108
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_11_REG_OFFSET 0x100
+#define MAGE_ACC_VALUE_11_REG_OFFSET 0x10c
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_12_REG_OFFSET 0x104
+#define MAGE_ACC_VALUE_12_REG_OFFSET 0x110
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_13_REG_OFFSET 0x108
+#define MAGE_ACC_VALUE_13_REG_OFFSET 0x114
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_14_REG_OFFSET 0x10c
+#define MAGE_ACC_VALUE_14_REG_OFFSET 0x118
 
 // Accumulation Value for PEs
-#define MAGE_ACC_VALUE_15_REG_OFFSET 0x110
+#define MAGE_ACC_VALUE_15_REG_OFFSET 0x11c
 
 #ifdef __cplusplus
 }  // extern "C"

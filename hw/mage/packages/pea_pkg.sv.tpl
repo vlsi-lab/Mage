@@ -171,13 +171,13 @@ package pea_pkg;
 
 %if enable_streaming_interface == str(1):
   typedef enum logic [LOG_N_INPUTS_PE-2:0]{
-    D_UP         = 4'b000,
-    D_LEFT       = 4'b001,
-    D_RIGHT      = 4'b010,
-    D_DOWN       = 4'b011,
-    D_PE_RES     = 4'b100,
-    D_PE_OP_A    = 4'b101,
-    D_PE_OP_B    = 4'b110
+    D_UP         = 3'b000,
+    D_LEFT       = 3'b001,
+    D_RIGHT      = 3'b010,
+    D_DOWN       = 3'b011,
+    D_PE_RES     = 3'b100,
+    D_PE_OP_A    = 3'b101,
+    D_PE_OP_B    = 3'b110
   }delay_pe_mux_sel_t;
 %endif
 %if enable_decoupling == str(1):

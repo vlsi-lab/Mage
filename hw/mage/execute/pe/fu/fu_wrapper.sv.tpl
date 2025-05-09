@@ -389,7 +389,7 @@ module fu_wrapper
       ADDCMUL: res_o = mul_res;
       CMULADD: res_o = add_res[N_BITS:1];
       MULCARSH: res_o = shift_res;
-      ABSMIN: res_o = (add_res[N_BITS-1]) ? temp_res : b_signed;
+      ABSMIN: res_o = (add_res[N_BITS-1]) ? temp_res : temp_op_reg;
       SGNCSUB: res_o = (|temp_op_reg == 1'b0) ? '0: add_one_res;
       default: res_o = 0;
     endcase

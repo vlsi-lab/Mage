@@ -13,7 +13,7 @@ filesets:
     - hw/mage/packages/mage_pkg.sv
     - hw/mage/packages/pea_pkg.sv
     - hw/mage/packages/xbar_pkg.sv  
-    - hw/mage/packages/hw_fifo_pkg.sv
+    - hw/mage/packages/fifo_pkg.sv
     file_type: systemVerilogSource
 
   files_execute:

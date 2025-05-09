@@ -410,15 +410,5 @@ void mage_set_sel_out_xbar(uint8_t sel_out){
   *mage_sel_out_xbar = sel_out;
 }
 %endif
-/**
- * @brief Sets the configuration for Mage DMA channel.
- * 
- * @param n_dma_ch Number of the DMA channel.
- * @param cfg DMA channel configuration.
- */
-void mage_set_dma_cfg(uint8_t n_dma_ch, uint8_t cfg){
-  int32_t *mage_dma_cfg = (int32_t *)(MAGE_DMA_CFG_START_ADDR);
-  write_mage_register(cfg, mage_dma_cfg, 0xFF, n_dma_ch << 3);
-}
 
 %endif

@@ -11,7 +11,7 @@ filesets:
     - hw/mage/packages/reg_pkg.sv
     - hw/mage/packages/stream_intf_pkg.sv
     - hw/mage/packages/pea_pkg.sv
-    - hw/mage/packages/hw_fifo_pkg.sv
+    - hw/mage/packages/fifo_pkg.sv
     file_type: systemVerilogSource
 
   files_execute:

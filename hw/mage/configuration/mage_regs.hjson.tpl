@@ -330,17 +330,17 @@
     },
 %endif
 %if enable_streaming_interface == str(1):
-    { name: "STREAM_DMA_CFG",
-      desc: "Selection signals for output of MAGE-CGRA PEA",
+  %for i in range(n_dma_ch):
+    { name: "TRANS_SIZE_${i}",
+      desc: "Transaction size for DMA ${i}",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
-      { bits: "3:0", 
-        name: "DMA_CH_CFG",
-        desc: "Configuration for DMA channels (r or r/w)" 
-      },
+      { bits: "31:0"
+      }
       ],
     },
+  %endfor
     { name: "SEPARATE_COLS",
       desc: "If set to 1, each column of Mage works in streaming separately from all the other. If 0, all columns work together. If 2, columns are grouped in 2 groups of 2 each",
       swaccess: "rw",
@@ -349,6 +349,17 @@
       { bits: "1:0",
         name: "SEP_COLS",
         desc: "Configuration for separate Mage columns in streaming"
+      },
+      ],
+    },
+    { name: "SYNCH_DMA_CH",
+      desc: "It makes the DMA channels work in synch or not",  
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+      { bits: "0",
+        name: "SYNCH_DMA_CH",
+        desc: "Configuration for synch DMA channels in streaming"
       },
       ],
     },

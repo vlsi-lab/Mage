@@ -13,7 +13,7 @@ module mage_top
   import xbar_pkg::*;
 %endif
 %if enable_streaming_interface == str(1):
-  import hw_fifo_pkg::*;
+  import fifo_pkg::*;
   import stream_intf_pkg::*;
 %endif
   import pea_pkg::*;
@@ -23,12 +23,14 @@ module mage_top
     input  logic                                          rst_n_i,
 %if (enable_streaming_interface == str(1)) and (enable_decoupling == str(0)):
     //HW FIFO Interface
-    input hw_fifo_req_t [N_DMA_CH-1:0] hw_fifo_req_i,
-    output hw_fifo_resp_t [N_DMA_CH-1:0] hw_fifo_resp_o,
+    input fifo_req_t [N_DMA_CH-1:0] fifo_req_i,
+    output fifo_resp_t [N_DMA_CH-1:0] fifo_resp_o,
+    output logic mage_done_o,
 %elif enable_streaming_interface == str(1) and enable_decoupling == str(1):
   //HW FIFO Interface
-    input hw_fifo_req_t [N_DMA_CH-1:0] hw_fifo_req_i,
-    output hw_fifo_resp_t [N_DMA_CH-1:0] hw_fifo_resp_o,
+    input fifo_req_t [N_DMA_CH-1:0] fifo_req_i,
+    output fifo_resp_t [N_DMA_CH-1:0] fifo_resp_o,
+    output logic mage_done_o,
 %endif
 %if enable_decoupling == str(1):
     output state_t                                        state_o,
@@ -141,8 +143,9 @@ module mage_top
   ////////////////////////////////////////////////////////////////
   //                 Stream Peripheral Registers                //
   ////////////////////////////////////////////////////////////////
-  logic [N_DMA_CH-1:0] reg_dma_ch_cfg;
+  logic [N_DMA_CH-1:0][N_BITS-1:0] reg_trans_size;
   logic [1:0] reg_separate_cols;
+  logic reg_synch_dma_ch;
   logic [M-1:0][LOG_N:0] reg_stream_sel_out_pea;
   logic [N-1:0][M-1:0][31:0] reg_acc_value_pe;
   %if in_stream_xbar == str(1):
@@ -212,7 +215,8 @@ module mage_top
 %endif
 %if enable_streaming_interface == str(1):
       .reg_separate_cols_o(reg_separate_cols),
-      .reg_dma_ch_cfg_o(reg_dma_ch_cfg),
+      .reg_synch_dma_ch_o(reg_synch_dma_ch),
+      .reg_trans_size_o(reg_trans_size),
       .reg_sel_out_col_pea_o(reg_stream_sel_out_pea),
       .reg_acc_value_pe_o(reg_acc_value_pe),
       .reg_pea_rf_de_i(reg_rf_de_pea),
@@ -484,10 +488,11 @@ module mage_top
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .pea_ready_i(pea_ready),
-      .reg_dma_ch_type_i(reg_dma_ch_cfg),
-      .hw_fifo_req_i(hw_fifo_req_i),
-      .hw_fifo_resp_o(hw_fifo_resp_o),
+      .reg_trans_size_i(reg_trans_size),
+      .fifo_req_i(fifo_req_i),
+      .fifo_resp_o(fifo_resp_o),
       .reg_separate_cols_i(reg_separate_cols),
+      .reg_synch_dma_ch_i(reg_synch_dma_ch),
 %if out_stream_xbar == str(1):
       .reg_out_stream_sel_i(reg_out_stream_sel),
 %endif
@@ -497,7 +502,8 @@ module mage_top
       .dout_pea_i(stream_pea_data_out),
       .valid_pea_out_i(stream_pea_out_valid),
       .valid_pea_in_o(stream_pea_in_valid),
-      .din_pea_o(stream_pea_data_in)
+      .din_pea_o(stream_pea_data_in),
+      .mage_done_o(mage_done_o)
   );
 %endif
 

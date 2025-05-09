@@ -59,7 +59,8 @@ module peripheral_regs
     //               Mage Streaming Configuration                 //
     ////////////////////////////////////////////////////////////////
     output logic [1:0] reg_separate_cols_o,
-    output logic [N_DMA_CH-1:0] reg_dma_ch_cfg_o,
+    output logic reg_synch_dma_ch_o,
+    output logic [N_DMA_CH-1:0][N_BITS-1:0] reg_trans_size_o,
     output logic [M-1:0][LOG_N:0] reg_sel_out_col_pea_o,
     output logic [N-1:0][M-1:0][31:0] reg_acc_value_pe_o,
     input logic [N-1:0][M-1:0] reg_pea_rf_de_i,
@@ -189,7 +190,10 @@ module peripheral_regs
     //                Streaming Mage Configuration                //
     ////////////////////////////////////////////////////////////////
     reg_separate_cols_o = reg2hw.separate_cols.q;
-    reg_dma_ch_cfg_o = reg2hw.stream_dma_cfg.q;
+    reg_synch_dma_ch_o = reg2hw.synch_dma_ch.q;
+  %for i in range(n_dma_ch):
+    reg_trans_size_o[${i}] = reg2hw.trans_size_${i}.q;
+  %endfor
   %for c in range(n_pea_cols):
     reg_sel_out_col_pea_o[${c}] = reg2hw.sel_out_col_pea[0].sel_col_${c}.q;
   %endfor

@@ -21,13 +21,25 @@ module r_div_stage
   logic [$clog2(N_RADIX)-1:0][N_BITS-1:0] r_out;
   logic [$clog2(N_RADIX)-1:0] q_out;
 
-  assign r_in[0][N_BITS-1:1] = r_i[N_BITS-2:0];
+  /* assign r_in[0][N_BITS-1:1] = r_i[N_BITS-2:0];
   assign r_in[0][0] = n_i[$clog2(N_RADIX)-1];
 
   always_comb begin
     for (int i = 0; i < $clog2(N_RADIX) - 1; i++) begin
       r_in[i+1][N_BITS-1:1] = r_out[i][N_BITS-2:0];
       r_in[i+1][0] = n_i[$clog2(N_RADIX)-1-i-1];
+    end
+  end */
+
+  always_comb begin
+    for (int i = 0; i < $clog2(N_RADIX) - 1; i++) begin
+      if (i == 0) begin
+        r_in[i][N_BITS-1:1] = r_i[N_BITS-2:0];
+        r_in[i][0] = n_i[$clog2(N_RADIX)-1];
+      end else begin
+        r_in[i][N_BITS-1:1] = r_out[i-1][N_BITS-2:0];
+        r_in[i][0] = n_i[$clog2(N_RADIX)-1-i-2];
+      end
     end
   end
 

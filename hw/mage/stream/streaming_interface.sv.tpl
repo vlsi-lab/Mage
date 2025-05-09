@@ -9,31 +9,35 @@
 
 module streaming_interface
   import stream_intf_pkg::*;
-  import hw_fifo_pkg::*;
+  import fifo_pkg::*;
   import pea_pkg::*;
 (
     input logic clk_i,
     input logic rst_n_i,
-    input logic [N_DMA_CH-1:0] reg_dma_ch_type_i,
     // HW FIFO Interface
-    input  hw_fifo_req_t [N_DMA_CH-1:0] hw_fifo_req_i,
-    output hw_fifo_resp_t [N_DMA_CH-1:0] hw_fifo_resp_o,
-    // PEA Interface
+    input  fifo_req_t [N_DMA_CH-1:0] fifo_req_i,
+    output fifo_resp_t [N_DMA_CH-1:0] fifo_resp_o,
+    // Configuration signals
     input logic [M-1:0] pea_ready_i,
     input logic [1:0] reg_separate_cols_i,
+    input logic reg_synch_dma_ch_i,
+    input logic [N_DMA_CH-1:0][N_BITS-1:0] reg_trans_size_i,
 %if out_stream_xbar == str(1):
     input logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_i,
 %endif
 %if in_stream_xbar == str(1):
     input logic [N_IN_STREAM-1:0][N_DMA_CH_PER_IN_STREAM-1:0][LOG_N_DMA_CH_PER_IN_STREAM-1:0] reg_in_stream_sel_i,
 %endif
+    // I/O interface with PEA
     input logic  [M-1:0][N_BITS-1:0] dout_pea_i,
     input logic  [M-1:0] valid_pea_out_i,
     output logic [N_STREAM_IN_PEA-1:0] valid_pea_in_o,
-    output logic [N_STREAM_IN_PEA-1:0][N_BITS-1:0] din_pea_o
+    output logic [N_STREAM_IN_PEA-1:0][N_BITS-1:0] din_pea_o,
+    output logic mage_done_o
 );
 
   // Fifo signals
+  logic [N_DMA_CH-1:0][N_BITS-1:0] trans_counter;
   logic [N_DMA_CH-1:0] hw_r_fifo_pop;
   logic [N_DMA_CH-1:0] hw_r_fifo_pop_enable;
   logic [N_DMA_CH-1:0] hw_r_fifo_empty;
@@ -75,8 +79,8 @@ module streaming_interface
           .full_o(hw_r_fifo_full[rf]),
           .empty_o(hw_r_fifo_empty[rf]),
           .usage_o(hw_r_usage[rf]),
-          .data_i(hw_fifo_req_i[rf].data),
-          .push_i(hw_fifo_req_i[rf].push),
+          .data_i(fifo_req_i[rf].data),
+          .push_i(fifo_req_i[rf].push),
           .data_o(hw_r_fifo_dout[rf]),
           .pop_i(hw_r_fifo_pop[rf])
       );
@@ -97,39 +101,68 @@ module streaming_interface
           .testmode_i(1'b0),
           .flush_i(),
           .full_o(hw_w_fifo_full[wf]),
-          .empty_o(hw_fifo_resp_o[wf].empty),
+          .empty_o(fifo_resp_o[wf].empty),
           .usage_o(),
           .data_i(hw_w_fifo_din[wf]),
           .push_i(hw_w_fifo_push[wf]),
-          .data_o(hw_fifo_resp_o[wf].data),
-          .pop_i(hw_fifo_req_i[wf].pop)
+          .data_o(fifo_resp_o[wf].data),
+          .pop_i(fifo_req_i[wf].pop)
       );
     end
   endgenerate
 
+  always_ff @(posedge clk_i or negedge rst_n_i) begin
+    for (int i = 0; i < N_DMA_CH; i++) begin
+      if (~rst_n_i) begin
+        trans_counter[i] <= reg_trans_size_i[i];
+      end else begin
+        if (fifo_req_i[i].flush) begin
+          trans_counter[i] <= reg_trans_size_i[i];
+        end else if (fifo_req_i[i].push) begin
+          trans_counter[i] <= trans_counter[i] - 1;
+        end
+      end
+    end
+  end
+
+  assign mage_done_o = (trans_counter == '0);
+
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
-      hw_fifo_resp_o[i].full = hw_r_fifo_full[i] || (hw_r_usage[i] == 3);
+      fifo_resp_o[i].full = hw_r_fifo_full[i];
+      fifo_resp_o[i].alm_full = hw_r_usage == 2'd3;
     end
   end
 
   // Pop from Read FIFO
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
-      hw_r_fifo_pop[i] = 1'b0;
+      hw_r_fifo_pop_enable[i] = 1'b0;
       if (hw_r_fifo_empty[i] == 1'b0 && pea_ready_i[i] == 1'b1) begin
-        hw_r_fifo_pop[i] = 1'b1;
+        hw_r_fifo_pop_enable[i] = 1'b1;
       end
     end
   end
 
   always_comb begin
-    for (int i = 0; i < N_DMA_CH; i = i + 1) begin
-      if (reg_dma_ch_type_i[i] == 1'b1) begin
-        hw_fifo_resp_o[i].push = hw_w_fifo_push[i] == 1'b1;
-      end else begin
-        hw_fifo_resp_o[i].push = hw_fifo_req_i[i].push == 1'b1;
+    hw_r_fifo_pop = '0;
+    if(reg_synch_dma_ch_i == 1'b0) begin
+      for (int i = 0; i < N_DMA_CH; i = i + 1) begin
+        hw_r_fifo_pop[i] = hw_r_fifo_pop_enable[i];
       end
+    end else if(reg_synch_dma_ch_i == 1'b1) begin
+%for c in range(n_pea_cols):
+      hw_r_fifo_pop[${c}] =
+  %for i in range(len(pea_in_stream_placement[c])):
+    %if pea_in_stream_placement[c][i] != None:
+      %if i != len(pea_in_stream_placement[c]) - 1:
+        hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}] &
+      %else:
+        hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}];
+      %endif
+    %endif
+  %endfor 
+%endfor
     end
   end
 

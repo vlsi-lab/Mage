@@ -13,7 +13,7 @@ module mage_wrapper
   import xbar_pkg::*;
 %endif
 %if enable_streaming_interface == str(1):
-  import hw_fifo_pkg::*;
+  import fifo_pkg::*;
   import stream_intf_pkg::*;
 %endif
   import pea_pkg::*;
@@ -24,8 +24,9 @@ module mage_wrapper
     input  logic      rst_n_i,
 %if enable_streaming_interface == str(1):
     // HW FIFO interface
-    input hw_fifo_req_t [N_DMA_CH-1:0] hw_fifo_req_i,
-    output hw_fifo_resp_t [N_DMA_CH-1:0] hw_fifo_resp_o,
+    input fifo_req_t [N_DMA_CH-1:0] fifo_req_i,
+    output fifo_resp_t [N_DMA_CH-1:0] fifo_resp_o,
+    output logic mage_done_o,
 %endif
 %if enable_decoupling == str(1):
     // AHB Slave
@@ -78,8 +79,9 @@ module mage_wrapper
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
 %if enable_streaming_interface == str(1):
-      .hw_fifo_req_i(hw_fifo_req_i),
-      .hw_fifo_resp_o(hw_fifo_resp_o),
+      .fifo_req_i(fifo_req_i),
+      .fifo_resp_o(fifo_resp_o),
+      .mage_done_o(mage_done_o),
 %endif
 %if enable_decoupling == str(1):
       .state_o(state),

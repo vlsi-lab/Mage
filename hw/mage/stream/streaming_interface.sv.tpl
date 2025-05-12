@@ -21,6 +21,7 @@ module streaming_interface
     input logic [M-1:0] pea_ready_i,
     input logic [1:0] reg_separate_cols_i,
     input logic reg_synch_dma_ch_i,
+    input logic [${n_dma_ch}-1:0] reg_dma_cfg_i,
     input logic [N_DMA_CH-1:0][N_BITS-1:0] reg_trans_size_i,
 %if out_stream_xbar == str(1):
     input logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_i,
@@ -33,7 +34,7 @@ module streaming_interface
     input logic  [M-1:0] valid_pea_out_i,
     output logic [N_STREAM_IN_PEA-1:0] valid_pea_in_o,
     output logic [N_STREAM_IN_PEA-1:0][N_BITS-1:0] din_pea_o,
-    output logic mage_done_o
+    output logic [N_DMA_CH-1:0] mage_done_o
 );
 
   // Fifo signals
@@ -118,19 +119,23 @@ module streaming_interface
       end else begin
         if (fifo_req_i[i].flush) begin
           trans_counter[i] <= reg_trans_size_i[i];
-        end else if (fifo_req_i[i].push) begin
+        end else if ((!reg_dma_cfg_i[i] && hw_w_fifo_push[i]) || (reg_dma_cfg_i[i] && fifo_req_i[i].push)) begin
           trans_counter[i] <= trans_counter[i] - 1;
         end
       end
     end
   end
 
-  assign mage_done_o = (trans_counter == '0);
+  always_comb begin
+    for (int i = 0; i < N_DMA_CH; i = i + 1) begin
+      mage_done_o[i] = (trans_counter[i] == '0);
+    end
+  end
 
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
       fifo_resp_o[i].full = hw_r_fifo_full[i];
-      fifo_resp_o[i].alm_full = hw_r_usage == 2'd3;
+      fifo_resp_o[i].alm_full = hw_r_usage[i] == 2'd3;
     end
   end
 

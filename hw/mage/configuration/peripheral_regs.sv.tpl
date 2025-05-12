@@ -60,6 +60,7 @@ module peripheral_regs
     ////////////////////////////////////////////////////////////////
     output logic [1:0] reg_separate_cols_o,
     output logic reg_synch_dma_ch_o,
+    output logic [${n_dma_ch}-1:0] reg_dma_cfg_o,
     output logic [N_DMA_CH-1:0][N_BITS-1:0] reg_trans_size_o,
     output logic [M-1:0][LOG_N:0] reg_sel_out_col_pea_o,
     output logic [N-1:0][M-1:0][31:0] reg_acc_value_pe_o,
@@ -192,6 +193,7 @@ module peripheral_regs
     reg_separate_cols_o = reg2hw.separate_cols.q;
     reg_synch_dma_ch_o = reg2hw.synch_dma_ch.q;
   %for i in range(n_dma_ch):
+    reg_dma_cfg_o[${i}] = reg2hw.dma_cfg.q[${i}];
     reg_trans_size_o[${i}] = reg2hw.trans_size_${i}.q;
   %endfor
   %for c in range(n_pea_cols):

@@ -341,6 +341,17 @@
       ],
     },
   %endfor
+    { name: "DMA_CFG",
+      desc: "If set to 1, the downcounter for DMA i downcounts each time a data is pushed to the read fifo, otherwise the downcount is based on the write fifo push",
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+      { bits: "${n_dma_ch-1}:0",
+        name: "DMA_CFG",
+        desc: "Configuration for DMA i"
+      },
+      ],
+    },
     { name: "SEPARATE_COLS",
       desc: "If set to 1, each column of Mage works in streaming separately from all the other. If 0, all columns work together. If 2, columns are grouped in 2 groups of 2 each",
       swaccess: "rw",

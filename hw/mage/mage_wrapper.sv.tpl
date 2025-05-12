@@ -26,7 +26,7 @@ module mage_wrapper
     // HW FIFO interface
     input fifo_req_t [N_DMA_CH-1:0] fifo_req_i,
     output fifo_resp_t [N_DMA_CH-1:0] fifo_resp_o,
-    output logic mage_done_o,
+    output logic [N_DMA_CH-1:0] mage_done_o,
 %endif
 %if enable_decoupling == str(1):
     // AHB Slave

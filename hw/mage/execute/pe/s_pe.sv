@@ -13,6 +13,7 @@ module s_pe
 (
     input  logic                                 clk_i,
     input  logic                                 rst_n_i,
+    input  logic                                 mage_done_i,
     input  logic [N_CFG_BITS_PE-1:0]             ctrl_pe_i,
     // Streaming Interface
     input  logic [             31:0]             reg_acc_value_i,
@@ -173,7 +174,7 @@ module s_pe
       delay_op_out_d1 <= '0;
       delay_op_out_d2 <= '0;
     end else begin
-      if (pea_ready_i) begin
+      if (!mage_done_i && pea_ready_i) begin
         delay_op_out_d1 <= delay_op_out;
         delay_op_out_d2 <= delay_op_out_d1;
       end
@@ -186,7 +187,7 @@ module s_pe
       delay_op_valid_out_d1 <= 1'b0;
       delay_op_valid_out_d2 <= 1'b0;
     end else begin
-      if (pea_ready_i) begin
+      if (!mage_done_i && pea_ready_i) begin
         delay_op_valid_out_d1 <= delay_op_valid_out;
         delay_op_valid_out_d2 <= delay_op_valid_out_d1;
       end
@@ -219,12 +220,16 @@ module s_pe
     if (!rst_n_i) begin
       pe_res_o <= '0;
     end else begin
-      if (fu_instr == NOP) begin
-        pe_res_o <= '0;
-      end else if((pea_ready_i && fu_valid) || ((fu_instr == ACC || fu_instr == MAX) && fu_ops_valid && pea_ready_i)) begin
-        pe_res_o <= fu_out;
+      if (!mage_done_i) begin
+        if (fu_instr == NOP) begin
+          pe_res_o <= '0;
+        end else if((pea_ready_i && fu_valid) || ((fu_instr == ACC || fu_instr == MAX) && fu_ops_valid && pea_ready_i)) begin
+          pe_res_o <= fu_out;
+        end else begin
+          pe_res_o <= pe_res_o;
+        end
       end else begin
-        pe_res_o <= pe_res_o;
+        pe_res_o <= '0;
       end
     end
   end
@@ -243,12 +248,16 @@ module s_pe
     if (!rst_n_i) begin
       valid <= '0;
     end else begin
-      if (fu_instr == NOP) begin
-        valid <= 1'b0;
-      end else if (pea_ready_i) begin
-        valid <= fu_valid;
+      if (!mage_done_i) begin
+        if (fu_instr == NOP) begin
+          valid <= 1'b0;
+        end else if (pea_ready_i) begin
+          valid <= fu_valid;
+        end else begin
+          valid <= valid_o;
+        end
       end else begin
-        valid <= valid_o;
+        valid <= 1'b0;
       end
     end
   end

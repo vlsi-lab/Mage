@@ -57,6 +57,8 @@ package mage_reg_pkg;
 
   typedef struct packed {logic [31:0] q;} mage_reg2hw_trans_size_3_reg_t;
 
+  typedef struct packed {logic [3:0] q;} mage_reg2hw_dma_cfg_reg_t;
+
   typedef struct packed {logic [1:0] q;} mage_reg2hw_separate_cols_reg_t;
 
   typedef struct packed {logic q;} mage_reg2hw_synch_dma_ch_reg_t;
@@ -84,28 +86,29 @@ package mage_reg_pkg;
 
   // Register -> HW type
   typedef struct packed {
-    mage_reg2hw_cfg_pe_00_mreg_t [0:0] cfg_pe_00;  // [2218:2187]
-    mage_reg2hw_cfg_pe_01_mreg_t [0:0] cfg_pe_01;  // [2186:2155]
-    mage_reg2hw_cfg_pe_02_mreg_t [0:0] cfg_pe_02;  // [2154:2123]
-    mage_reg2hw_cfg_pe_03_mreg_t [0:0] cfg_pe_03;  // [2122:2091]
-    mage_reg2hw_cfg_pe_10_mreg_t [0:0] cfg_pe_10;  // [2090:2059]
-    mage_reg2hw_cfg_pe_11_mreg_t [0:0] cfg_pe_11;  // [2058:2027]
-    mage_reg2hw_cfg_pe_12_mreg_t [0:0] cfg_pe_12;  // [2026:1995]
-    mage_reg2hw_cfg_pe_13_mreg_t [0:0] cfg_pe_13;  // [1994:1963]
-    mage_reg2hw_cfg_pe_20_mreg_t [0:0] cfg_pe_20;  // [1962:1931]
-    mage_reg2hw_cfg_pe_21_mreg_t [0:0] cfg_pe_21;  // [1930:1899]
-    mage_reg2hw_cfg_pe_22_mreg_t [0:0] cfg_pe_22;  // [1898:1867]
-    mage_reg2hw_cfg_pe_23_mreg_t [0:0] cfg_pe_23;  // [1866:1835]
-    mage_reg2hw_cfg_pe_30_mreg_t [0:0] cfg_pe_30;  // [1834:1803]
-    mage_reg2hw_cfg_pe_31_mreg_t [0:0] cfg_pe_31;  // [1802:1771]
-    mage_reg2hw_cfg_pe_32_mreg_t [0:0] cfg_pe_32;  // [1770:1739]
-    mage_reg2hw_cfg_pe_33_mreg_t [0:0] cfg_pe_33;  // [1738:1707]
-    mage_reg2hw_pea_constants_mreg_t [15:0] pea_constants;  // [1706:1195]
-    mage_reg2hw_pea_rf_mreg_t [15:0] pea_rf;  // [1194:683]
-    mage_reg2hw_trans_size_0_reg_t trans_size_0;  // [682:651]
-    mage_reg2hw_trans_size_1_reg_t trans_size_1;  // [650:619]
-    mage_reg2hw_trans_size_2_reg_t trans_size_2;  // [618:587]
-    mage_reg2hw_trans_size_3_reg_t trans_size_3;  // [586:555]
+    mage_reg2hw_cfg_pe_00_mreg_t [0:0] cfg_pe_00;  // [2222:2191]
+    mage_reg2hw_cfg_pe_01_mreg_t [0:0] cfg_pe_01;  // [2190:2159]
+    mage_reg2hw_cfg_pe_02_mreg_t [0:0] cfg_pe_02;  // [2158:2127]
+    mage_reg2hw_cfg_pe_03_mreg_t [0:0] cfg_pe_03;  // [2126:2095]
+    mage_reg2hw_cfg_pe_10_mreg_t [0:0] cfg_pe_10;  // [2094:2063]
+    mage_reg2hw_cfg_pe_11_mreg_t [0:0] cfg_pe_11;  // [2062:2031]
+    mage_reg2hw_cfg_pe_12_mreg_t [0:0] cfg_pe_12;  // [2030:1999]
+    mage_reg2hw_cfg_pe_13_mreg_t [0:0] cfg_pe_13;  // [1998:1967]
+    mage_reg2hw_cfg_pe_20_mreg_t [0:0] cfg_pe_20;  // [1966:1935]
+    mage_reg2hw_cfg_pe_21_mreg_t [0:0] cfg_pe_21;  // [1934:1903]
+    mage_reg2hw_cfg_pe_22_mreg_t [0:0] cfg_pe_22;  // [1902:1871]
+    mage_reg2hw_cfg_pe_23_mreg_t [0:0] cfg_pe_23;  // [1870:1839]
+    mage_reg2hw_cfg_pe_30_mreg_t [0:0] cfg_pe_30;  // [1838:1807]
+    mage_reg2hw_cfg_pe_31_mreg_t [0:0] cfg_pe_31;  // [1806:1775]
+    mage_reg2hw_cfg_pe_32_mreg_t [0:0] cfg_pe_32;  // [1774:1743]
+    mage_reg2hw_cfg_pe_33_mreg_t [0:0] cfg_pe_33;  // [1742:1711]
+    mage_reg2hw_pea_constants_mreg_t [15:0] pea_constants;  // [1710:1199]
+    mage_reg2hw_pea_rf_mreg_t [15:0] pea_rf;  // [1198:687]
+    mage_reg2hw_trans_size_0_reg_t trans_size_0;  // [686:655]
+    mage_reg2hw_trans_size_1_reg_t trans_size_1;  // [654:623]
+    mage_reg2hw_trans_size_2_reg_t trans_size_2;  // [622:591]
+    mage_reg2hw_trans_size_3_reg_t trans_size_3;  // [590:559]
+    mage_reg2hw_dma_cfg_reg_t dma_cfg;  // [558:555]
     mage_reg2hw_separate_cols_reg_t separate_cols;  // [554:553]
     mage_reg2hw_synch_dma_ch_reg_t synch_dma_ch;  // [552:552]
     mage_reg2hw_stream_out_xbar_sel_reg_t stream_out_xbar_sel;  // [551:544]
@@ -171,26 +174,27 @@ package mage_reg_pkg;
   parameter logic [BlockAw-1:0] MAGE_TRANS_SIZE_1_OFFSET = 9'hc4;
   parameter logic [BlockAw-1:0] MAGE_TRANS_SIZE_2_OFFSET = 9'hc8;
   parameter logic [BlockAw-1:0] MAGE_TRANS_SIZE_3_OFFSET = 9'hcc;
-  parameter logic [BlockAw-1:0] MAGE_SEPARATE_COLS_OFFSET = 9'hd0;
-  parameter logic [BlockAw-1:0] MAGE_SYNCH_DMA_CH_OFFSET = 9'hd4;
-  parameter logic [BlockAw-1:0] MAGE_STREAM_OUT_XBAR_SEL_OFFSET = 9'hd8;
-  parameter logic [BlockAw-1:0] MAGE_SEL_OUT_COL_PEA_OFFSET = 9'hdc;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_0_OFFSET = 9'he0;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_1_OFFSET = 9'he4;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_2_OFFSET = 9'he8;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_3_OFFSET = 9'hec;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_4_OFFSET = 9'hf0;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_5_OFFSET = 9'hf4;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_6_OFFSET = 9'hf8;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_7_OFFSET = 9'hfc;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_8_OFFSET = 9'h100;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_9_OFFSET = 9'h104;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_10_OFFSET = 9'h108;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_11_OFFSET = 9'h10c;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_12_OFFSET = 9'h110;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_13_OFFSET = 9'h114;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_14_OFFSET = 9'h118;
-  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_15_OFFSET = 9'h11c;
+  parameter logic [BlockAw-1:0] MAGE_DMA_CFG_OFFSET = 9'hd0;
+  parameter logic [BlockAw-1:0] MAGE_SEPARATE_COLS_OFFSET = 9'hd4;
+  parameter logic [BlockAw-1:0] MAGE_SYNCH_DMA_CH_OFFSET = 9'hd8;
+  parameter logic [BlockAw-1:0] MAGE_STREAM_OUT_XBAR_SEL_OFFSET = 9'hdc;
+  parameter logic [BlockAw-1:0] MAGE_SEL_OUT_COL_PEA_OFFSET = 9'he0;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_0_OFFSET = 9'he4;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_1_OFFSET = 9'he8;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_2_OFFSET = 9'hec;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_3_OFFSET = 9'hf0;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_4_OFFSET = 9'hf4;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_5_OFFSET = 9'hf8;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_6_OFFSET = 9'hfc;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_7_OFFSET = 9'h100;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_8_OFFSET = 9'h104;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_9_OFFSET = 9'h108;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_10_OFFSET = 9'h10c;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_11_OFFSET = 9'h110;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_12_OFFSET = 9'h114;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_13_OFFSET = 9'h118;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_14_OFFSET = 9'h11c;
+  parameter logic [BlockAw-1:0] MAGE_ACC_VALUE_15_OFFSET = 9'h120;
 
   // Register index
   typedef enum int {
@@ -246,6 +250,7 @@ package mage_reg_pkg;
     MAGE_TRANS_SIZE_1,
     MAGE_TRANS_SIZE_2,
     MAGE_TRANS_SIZE_3,
+    MAGE_DMA_CFG,
     MAGE_SEPARATE_COLS,
     MAGE_SYNCH_DMA_CH,
     MAGE_STREAM_OUT_XBAR_SEL,
@@ -269,7 +274,7 @@ package mage_reg_pkg;
   } mage_id_e;
 
   // Register width information to check illegal writes
-  parameter logic [3:0] MAGE_PERMIT[72] = '{
+  parameter logic [3:0] MAGE_PERMIT[73] = '{
       4'b1111,  // index[ 0] MAGE_CFG_PE_00
       4'b1111,  // index[ 1] MAGE_CFG_PE_01
       4'b1111,  // index[ 2] MAGE_CFG_PE_02
@@ -322,26 +327,27 @@ package mage_reg_pkg;
       4'b1111,  // index[49] MAGE_TRANS_SIZE_1
       4'b1111,  // index[50] MAGE_TRANS_SIZE_2
       4'b1111,  // index[51] MAGE_TRANS_SIZE_3
-      4'b0001,  // index[52] MAGE_SEPARATE_COLS
-      4'b0001,  // index[53] MAGE_SYNCH_DMA_CH
-      4'b0001,  // index[54] MAGE_STREAM_OUT_XBAR_SEL
-      4'b1111,  // index[55] MAGE_SEL_OUT_COL_PEA
-      4'b1111,  // index[56] MAGE_ACC_VALUE_0
-      4'b1111,  // index[57] MAGE_ACC_VALUE_1
-      4'b1111,  // index[58] MAGE_ACC_VALUE_2
-      4'b1111,  // index[59] MAGE_ACC_VALUE_3
-      4'b1111,  // index[60] MAGE_ACC_VALUE_4
-      4'b1111,  // index[61] MAGE_ACC_VALUE_5
-      4'b1111,  // index[62] MAGE_ACC_VALUE_6
-      4'b1111,  // index[63] MAGE_ACC_VALUE_7
-      4'b1111,  // index[64] MAGE_ACC_VALUE_8
-      4'b1111,  // index[65] MAGE_ACC_VALUE_9
-      4'b1111,  // index[66] MAGE_ACC_VALUE_10
-      4'b1111,  // index[67] MAGE_ACC_VALUE_11
-      4'b1111,  // index[68] MAGE_ACC_VALUE_12
-      4'b1111,  // index[69] MAGE_ACC_VALUE_13
-      4'b1111,  // index[70] MAGE_ACC_VALUE_14
-      4'b1111  // index[71] MAGE_ACC_VALUE_15
+      4'b0001,  // index[52] MAGE_DMA_CFG
+      4'b0001,  // index[53] MAGE_SEPARATE_COLS
+      4'b0001,  // index[54] MAGE_SYNCH_DMA_CH
+      4'b0001,  // index[55] MAGE_STREAM_OUT_XBAR_SEL
+      4'b1111,  // index[56] MAGE_SEL_OUT_COL_PEA
+      4'b1111,  // index[57] MAGE_ACC_VALUE_0
+      4'b1111,  // index[58] MAGE_ACC_VALUE_1
+      4'b1111,  // index[59] MAGE_ACC_VALUE_2
+      4'b1111,  // index[60] MAGE_ACC_VALUE_3
+      4'b1111,  // index[61] MAGE_ACC_VALUE_4
+      4'b1111,  // index[62] MAGE_ACC_VALUE_5
+      4'b1111,  // index[63] MAGE_ACC_VALUE_6
+      4'b1111,  // index[64] MAGE_ACC_VALUE_7
+      4'b1111,  // index[65] MAGE_ACC_VALUE_8
+      4'b1111,  // index[66] MAGE_ACC_VALUE_9
+      4'b1111,  // index[67] MAGE_ACC_VALUE_10
+      4'b1111,  // index[68] MAGE_ACC_VALUE_11
+      4'b1111,  // index[69] MAGE_ACC_VALUE_12
+      4'b1111,  // index[70] MAGE_ACC_VALUE_13
+      4'b1111,  // index[71] MAGE_ACC_VALUE_14
+      4'b1111  // index[72] MAGE_ACC_VALUE_15
   };
 
 endpackage

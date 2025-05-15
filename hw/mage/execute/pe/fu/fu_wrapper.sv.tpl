@@ -196,7 +196,7 @@ module fu_wrapper
     if (!rst_n_i) begin
       sign_op1_d <= 1'b0;
     end else begin
-      if(instr_i == SGNCSUB) begin
+      if(pea_ready_i && instr_i == SGNCSUB) begin
         sign_op1_d <= sign_op1;
       end
     end
@@ -255,10 +255,12 @@ module fu_wrapper
     if (!rst_n_i) begin
       temp_op_reg <= '0;
     end else begin
-      if (instr_i == CADDMUL || instr_i == CMULADD || instr_i == ABSMIN || instr_i == CLSHSUB) begin
-        temp_op_reg <= b_signed;
-      end else if (instr_i == SGNCSUB) begin
-        temp_op_reg <= a_signed;
+      if(pea_ready_i) begin
+        if (instr_i == CADDMUL || instr_i == CMULADD || instr_i == ABSMIN || instr_i == CLSHSUB) begin
+          temp_op_reg <= b_signed;
+        end else if (instr_i == SGNCSUB) begin
+          temp_op_reg <= a_signed;
+        end
       end
     end
   end

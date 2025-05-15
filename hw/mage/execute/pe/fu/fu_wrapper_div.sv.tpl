@@ -102,7 +102,7 @@ module fu_wrapper_div
       acc_loopback_o <= 1'b0;
     end else begin
       if (instr_i == ACC || instr_i == MAX) begin
-        if (acc_cnt == reg_acc_value_i && ops_valid_i) begin
+        if (acc_cnt == reg_acc_value_i && ops_valid_i && pea_ready_i) begin
           acc_cnt <= '0;
           acc_loopback_o <= 1'b0;
         end else if (ops_valid_i && pea_ready_i) begin
@@ -265,7 +265,7 @@ module fu_wrapper_div
     if (!rst_n_i) begin
       sign_op1_d <= 1'b0;
     end else begin
-      if(instr_i == SGNCSUB) begin
+      if(pea_ready_i && instr_i == SGNCSUB) begin
         sign_op1_d <= sign_op1;
       end
     end
@@ -330,10 +330,12 @@ module fu_wrapper_div
     if (!rst_n_i) begin
       temp_op_reg <= '0;
     end else begin
-      if (instr_i == CADDMUL || instr_i == CMULADD || instr_i == ABSMIN || instr_i == CLSHSUB || instr_i == ABSDIV || instr_i == ABSREM || instr_i == CADDDIV) begin
-        temp_op_reg <= b_signed;
-      end else if (instr_i == SGNCSUB) begin
-        temp_op_reg <= a_signed;
+      if (pea_ready_i) begin
+        if (instr_i == CADDMUL || instr_i == CMULADD || instr_i == ABSMIN || instr_i == CLSHSUB || instr_i == ABSDIV || instr_i == ABSREM || instr_i == CADDDIV) begin
+          temp_op_reg <= b_signed;
+        end else if (instr_i == SGNCSUB) begin
+          temp_op_reg <= a_signed;
+        end
       end
     end
   end

@@ -26,17 +26,19 @@ module pea
 %endif
 %if enable_streaming_interface == str(1):
     // Streaming Interface
-    input  logic   [        N-1:0][     M-1:0][             31:0] reg_pea_rf_i,
+    input  logic   [        N-1:0][     M-1:0][             31:0]  reg_pea_rf_i,
+    input  logic [1:0]                                             reg_separate_cols_i,
+    input  logic [M-1:0][ LOG_N:0]                                 reg_stream_sel_out_pea_i,
+    input  logic [N-1:0][M-1:0][31:0]                              reg_acc_value_i,
+    input  logic [M-1:0]                                           stream_valid_i,
+    input  logic [M-1:0][N_BITS-1:0]                               stream_data_i,
+    output logic [M-1:0]                                           pea_ready_o,
+    output logic [M-1:0]                                           stream_valid_o,
+    output logic [M-1:0][N_BITS-1:0]                               stream_data_o,
     output  logic   [        N-1:0][     M-1:0][             31:0] reg_pea_rf_d_o,
     output  logic   [        N-1:0][     M-1:0]                    reg_pea_rf_de_o,
-    input  logic [1:0]                                            reg_separate_cols_i,
-    input  logic [M-1:0][ LOG_N:0]                                reg_stream_sel_out_pea_i,
-    input  logic [N-1:0][M-1:0][31:0]                             reg_acc_value_i,
-    input  logic [M-1:0]                            stream_valid_i,
-    input  logic [M-1:0][N_BITS-1:0]                stream_data_i,
-    output logic [M-1:0]                                          pea_ready_o,
-    output logic [M-1:0]                                          stream_valid_o,
-    output logic [M-1:0][N_BITS-1:0]                              stream_data_o,
+    input logic                                                    mage_done_i,
+    input logic [M-1:0]                                stream_intf_ready_i,
     // end Streaming Interface
 %endif
     input  logic   [        N-1:0][     M-1:0][N_CFG_BITS_PE-1:0] ctrl_pea_i,
@@ -403,6 +405,7 @@ logic out_delay_op_valid${r}${c};
       %endif
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
+      .mage_done_i(mage_done_i),
       .neigh_pe_op_i(in_data_pe${r}${c}),
       .reg_const_i(reg_pea_rf_i[${r}][${c}]),
       .reg_pea_rf_d_o(reg_pea_rf_d_o[${r}][${c}]),
@@ -481,15 +484,15 @@ logic out_delay_op_valid${r}${c};
   always_comb begin
     if(reg_separate_cols_i == 2'b00) begin
 %for c in range(n_pea_cols):
-      ready_in_pe[${c}] = pea_ready_all_cols;
+      ready_in_pe[${c}] = pea_ready_all_cols && stream_intf_ready_i[${c}];
 %endfor
     end else if (reg_separate_cols_i == 2'b01) begin
 %for c in range(n_pea_cols):
-      ready_in_pe[${c}] = pea_ready_single_cols[${c}];
+      ready_in_pe[${c}] = pea_ready_single_cols[${c}] && stream_intf_ready_i[${c}];
 %endfor
     end else begin
 %for c in range(n_pea_cols):
-      ready_in_pe[${c}] = pea_ready_twin_cols[${m.floor(c/2)}];
+      ready_in_pe[${c}] = pea_ready_twin_cols[${m.floor(c/2)}] && stream_intf_ready_i[${c}];
 %endfor
     end
   end

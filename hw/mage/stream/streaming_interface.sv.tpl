@@ -32,6 +32,7 @@ module streaming_interface
     // I/O interface with PEA
     input logic  [M-1:0][N_BITS-1:0] dout_pea_i,
     input logic  [M-1:0] valid_pea_out_i,
+    output logic [M-1:0] stream_intf_ready_o,
     output logic [N_STREAM_IN_PEA-1:0] valid_pea_in_o,
     output logic [N_STREAM_IN_PEA-1:0][N_BITS-1:0] din_pea_o,
     output logic [N_DMA_CH-1:0] mage_done_o
@@ -115,7 +116,7 @@ module streaming_interface
   always_ff @(posedge clk_i or negedge rst_n_i) begin
     for (int i = 0; i < N_DMA_CH; i++) begin
       if (~rst_n_i) begin
-        trans_counter[i] <= reg_trans_size_i[i];
+        trans_counter[i] <= '0;
       end else begin
         if (fifo_req_i[i].flush) begin
           trans_counter[i] <= reg_trans_size_i[i];
@@ -276,4 +277,29 @@ module streaming_interface
       end
     end
   end
+
+  logic all_ready;
+
+  always_comb begin
+
+    all_ready = hw_w_fifo_full == '0;
+
+    if (reg_separate_cols_i == 2'b00) begin
+      stream_intf_ready_o[0] = all_ready;
+      stream_intf_ready_o[1] = all_ready;
+      stream_intf_ready_o[2] = all_ready;
+      stream_intf_ready_o[3] = all_ready;
+    end else if (reg_separate_cols_i == 2'b01) begin
+      stream_intf_ready_o[0] = hw_w_fifo_full[0] == 1'b0;
+      stream_intf_ready_o[1] = hw_w_fifo_full[1] == 1'b0;
+      stream_intf_ready_o[2] = hw_w_fifo_full[2] == 1'b0;
+      stream_intf_ready_o[3] = hw_w_fifo_full[3] == 1'b0;
+    end else begin
+      stream_intf_ready_o[0] = hw_w_fifo_full[0] == 1'b0 && hw_w_fifo_full[1] == 1'b0;
+      stream_intf_ready_o[1] = hw_w_fifo_full[1] == 1'b0 && hw_w_fifo_full[0] == 1'b0;
+      stream_intf_ready_o[2] = hw_w_fifo_full[2] == 1'b0 && hw_w_fifo_full[3] == 1'b0;
+      stream_intf_ready_o[3] = hw_w_fifo_full[3] == 1'b0 && hw_w_fifo_full[2] == 1'b0;
+    end
+  end
+
 endmodule

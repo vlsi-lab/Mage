@@ -140,6 +140,8 @@ module mage_top
   logic [M-1:0]                            stream_pea_in_valid;
   logic [M-1:0][N_BITS-1:0]                stream_pea_data_in;
   logic [M-1:0] pea_ready;
+  logic mage_done;
+  logic [M-1:0] stream_intf_ready;
   ////////////////////////////////////////////////////////////////
   //                 Stream Peripheral Registers                //
   ////////////////////////////////////////////////////////////////
@@ -281,11 +283,16 @@ module mage_top
       .ctrl_pea_o(cfg_pea)
   );
 
+%if enable_streaming_interface == str(1):
+  assign mage_done = &mage_done_o;
+%endif
+
   pea pea_inst (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .ctrl_pea_i(cfg_pea),
 %if enable_streaming_interface == str(1):
+      .mage_done_i(mage_done),
       .reg_pea_rf_de_o(reg_rf_de_pea),
       .reg_pea_rf_d_o(reg_rf_d_pea),
       .reg_pea_rf_i(reg_rf_in_pea),
@@ -297,6 +304,7 @@ module mage_top
       .stream_valid_i(stream_pea_in_valid),
       .stream_data_i(stream_pea_data_in),
       .pea_ready_o(pea_ready),
+      .stream_intf_ready_i(stream_intf_ready),
 %endif
 %if enable_decoupling == str(1):
       .sel_output_i(cfg_sel_pea_output),
@@ -491,6 +499,7 @@ module mage_top
       .rst_n_i(rst_n_i),
       .pea_ready_i(pea_ready),
       .reg_trans_size_i(reg_trans_size),
+      .stream_intf_ready_o(stream_intf_ready),
       .fifo_req_i(fifo_req_i),
       .fifo_resp_o(fifo_resp_o),
       .reg_separate_cols_i(reg_separate_cols),

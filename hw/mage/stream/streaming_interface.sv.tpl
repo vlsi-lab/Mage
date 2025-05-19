@@ -119,35 +119,35 @@ module streaming_interface
     end
   endgenerate
 
+%for i in range(n_dma_ch):
   always_ff @(posedge clk_i or negedge rst_n_i) begin
-    for (int i = 0; i < N_DMA_CH; i++) begin
-      if (~rst_n_i) begin
-        trans_counter[i] <= '0;
-      end else begin
-        if (fifo_req_i[i].flush) begin
-          trans_counter[i] <= reg_trans_size_dma_ch_i[i];
-        end else if ((!reg_dma_rnw_i[i] && hw_w_fifo_push[i]) || (reg_dma_rnw_i[i] && fifo_req_i[i].push)) begin
-          trans_counter[i] <= trans_counter[i] - 1;
-        end
+    if (~rst_n_i) begin
+      trans_counter[${i}] <= '0;
+    end else begin
+      if (fifo_req_i[${i}].flush) begin
+        trans_counter[${i}] <= reg_trans_size_dma_ch_i[${i}];
+      end else if ((!reg_dma_rnw_i[${i}] && hw_w_fifo_push[${i}]) || (reg_dma_rnw_i[${i}] && fifo_req_i[${i}].push)) begin
+        trans_counter[${i}] <= trans_counter[${i}] - 1;
       end
     end
   end
+%endfor
 
+%for i in range(n_dma_ch):
   always_ff @(posedge clk_i or negedge rst_n_i) begin
-    for (int i = 0; i < N_DMA_CH; i++) begin
-      if (~rst_n_i) begin
-        trans_counter_sync[i] <= '0;
-      end else begin
-        if (fifo_req_i[i].flush) begin
-          trans_counter_sync[i] <= reg_trans_size_sync_dma_ch_i[i];
-        end else if (hw_r_fifo_pop[i] && |trans_counter_sync[i] == 1'b0) begin
-          trans_counter_sync[i] <= reg_trans_size_sync_dma_ch_i[i];
-        end else if (hw_r_fifo_pop[i]) begin
-          trans_counter_sync[i] <= trans_counter_sync[i] - 1;
-        end
+    if (~rst_n_i) begin
+      trans_counter_sync[${i}] <= '0;
+    end else begin
+      if (fifo_req_i[${i}].flush) begin
+        trans_counter_sync[${i}] <= reg_trans_size_sync_dma_ch_i[${i}];
+      end else if (hw_r_fifo_pop[${i}] && |trans_counter_sync[${i}] == 1'b0) begin
+        trans_counter_sync[${i}] <= reg_trans_size_sync_dma_ch_i[${i}];
+      end else if (hw_r_fifo_pop[${i}]) begin
+        trans_counter_sync[${i}] <= trans_counter_sync[${i}] - 1;
       end
     end
   end
+%endfor
 
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
@@ -218,20 +218,19 @@ module streaming_interface
 %endfor
     end
   end
-
+%for i in range(n_dma_ch):
   always_ff @(posedge clk_i or negedge rst_n_i) begin
-    for (int i = 0; i < N_DMA_CH; i++) begin
-      if(~rst_n_i) begin
-        hw_r_fifo_pop_d[i] <= 1'b0;
-        hw_r_fifo_dout_d[i] <= 1'b0;
-      end else begin
-        if (reg_sync_dma_ch_trans_i[i] && hw_r_fifo_pop[i]) begin
-          hw_r_fifo_pop_d[i] <= 1'b1;
-          hw_r_fifo_dout_d[i] <= hw_r_fifo_dout[i];
-        end
+    if(~rst_n_i) begin
+      hw_r_fifo_pop_d[${i}] <= 1'b0;
+      hw_r_fifo_dout_d[${i}] <= 1'b0;
+    end else begin
+      if (reg_sync_dma_ch_trans_i[${i}] && hw_r_fifo_pop[${i}]) begin
+        hw_r_fifo_pop_d[${i}] <= 1'b1;
+        hw_r_fifo_dout_d[${i}] <= hw_r_fifo_dout[${i}];
       end
     end
   end
+%endfor
 
   //--------------------------------- Interface Management and Crossbars
 

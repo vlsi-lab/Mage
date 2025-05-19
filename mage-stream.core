@@ -76,6 +76,7 @@ targets:
     - files_execute
     - files_stream
     - files_wrapper
+    - files_verilator_waiver
 
   sim:
     <<: *default

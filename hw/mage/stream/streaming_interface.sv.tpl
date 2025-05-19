@@ -51,6 +51,7 @@ module streaming_interface
   logic [N_DMA_CH-1:0] hw_r_fifo_full;
   logic [N_DMA_CH-1:0][$clog2(4)-1:0] hw_r_usage;
   logic [N_DMA_CH-1:0][N_BITS-1:0] hw_r_fifo_dout;
+  logic [N_DMA_CH-1:0][N_BITS-1:0] hw_r_fifo_dout_d;
   logic [N_DMA_CH-1:0] hw_w_fifo_push;
   logic [N_DMA_CH-1:0] hw_w_fifo_full;
   logic [N_DMA_CH-1:0][N_BITS-1:0] hw_w_fifo_din;
@@ -241,7 +242,7 @@ module streaming_interface
         % if i == nis and j == ndc:
           %if in_stream_dma_ch_placement[i][j] != None:
   assign stream_in_dma_ch_data[${nis}][${ndc}] = reg_sync_dma_ch_trans_i[${in_stream_dma_ch_placement[i][j]}] ? (hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}] ? hw_r_fifo_dout[${in_stream_dma_ch_placement[i][j]}] : hw_r_fifo_dout_d[${in_stream_dma_ch_placement[i][j]}]) : hw_r_fifo_dout[${in_stream_dma_ch_placement[i][j]}];
-  assign stream_in_dma_ch_valid[0][0] = reg_sync_dma_ch_trans_i[${in_stream_dma_ch_placement[i][j]}] ? ((hw_r_fifo_pop_d[${in_stream_dma_ch_placement[i][j]}] || hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}]) && pea_ready_i[${in_stream_dma_ch_placement[i][j]}]) : (hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}] && pea_ready_i[${in_stream_dma_ch_placement[i][j]}]);
+  assign stream_in_dma_ch_valid[${nis}][${ndc}] = reg_sync_dma_ch_trans_i[${in_stream_dma_ch_placement[i][j]}] ? ((hw_r_fifo_pop_d[${in_stream_dma_ch_placement[i][j]}] || hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}]) && pea_ready_i[${in_stream_dma_ch_placement[i][j]}]) : (hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}] && pea_ready_i[${in_stream_dma_ch_placement[i][j]}]);
           %else:
   assign stream_in_dma_ch_data[${nis}][${ndc}] = '0;
   assign stream_in_dma_ch_valid[${nis}][${ndc}] = 1'b0;

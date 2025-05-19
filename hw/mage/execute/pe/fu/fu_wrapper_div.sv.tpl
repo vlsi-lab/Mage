@@ -19,7 +19,7 @@ module fu_wrapper_div
     input  logic      [N_BITS-1:0] const_i,
     input  logic                   ops_valid_i,
     input  logic                   pea_ready_i,
-    input  logic     [       31:0] reg_acc_value_i,
+    input  logic     [       15:0] reg_acc_value_i,
     output logic                   acc_loopback_o,
     output logic                   valid_o,
     output logic                   ready_o,
@@ -188,6 +188,10 @@ module fu_wrapper_div
         end
         MAX: begin
           valid = (reg_acc_value_i == '0) ? ops_valid_i : acc_valid;
+          ready = 1'b1;
+        end
+        default: begin
+          valid = ops_valid_i;
           ready = 1'b1;
         end
       endcase
@@ -457,6 +461,15 @@ module fu_wrapper_div
       SGNCSUB: begin
         add_op1 = {const_i, 1'b1};
         add_op2 = {op2_neg, 1'b1};
+      end
+
+      default: begin
+        add_op1   = {a_signed, 1'b0};
+        add_op2   = {b_signed, 1'b0};
+        mul_op1   = a_signed;
+        mul_op2   = b_signed;
+        shift_op1 = a_signed;
+        shift_op2 = b_signed;
       end
     endcase
   end

@@ -52,8 +52,8 @@ module r_div
   logic d_is_zero;
 
   // dividend and divisor sign
-  assign n_is_neg = n_i[N_BITS-1];
-  assign d_is_neg = d_i[N_BITS-1];
+  assign n_is_neg  = n_i[N_BITS-1];
+  assign d_is_neg  = d_i[N_BITS-1];
 
   // zero check
   assign n_is_zero = (n_i == '0);
@@ -147,7 +147,7 @@ module r_div
     end
   end
 
-  
+
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
@@ -165,7 +165,7 @@ module r_div
   assign q_final = {q_out[N_BITS-1-$clog2(N_RADIX):0], q_out_stage[$clog2(N_RADIX)-1:0]};
   assign r_final = r_out_stage_in_reg;
   assign q_final_inv = ~q_final + 1;
-  assign r_final_inv = ~r_final + 1; 
+  assign r_final_inv = ~r_final + 1;
 
   always_comb begin
     valid_o = (div_state_c == FINISH);

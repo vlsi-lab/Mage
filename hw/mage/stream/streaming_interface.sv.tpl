@@ -19,10 +19,12 @@ module streaming_interface
     output fifo_resp_t [N_DMA_CH-1:0] fifo_resp_o,
     // Configuration signals
     input logic [M-1:0] pea_ready_i,
-    input logic [1:0] reg_separate_cols_i,
-    input logic reg_synch_dma_ch_i,
-    input logic [${n_dma_ch}-1:0] reg_dma_cfg_i,
-    input logic [N_DMA_CH-1:0][N_BITS-1:0] reg_trans_size_i,
+    input logic [1:0] reg_cols_grouping_i,
+    input logic reg_sync_dma_ch_i,
+    input logic [${n_dma_ch}-1:0] reg_dma_rnw_i,
+    input logic [N_DMA_CH-1:0][31:0] reg_trans_size_dma_ch_i,
+    input logic [N_DMA_CH-1:0] reg_sync_dma_ch_trans_i,
+    input logic [N_DMA_CH-1:0][15:0] reg_trans_size_sync_dma_ch_i,
 %if out_stream_xbar == str(1):
     input logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_i,
 %endif
@@ -39,7 +41,7 @@ module streaming_interface
 );
 
   // Fifo signals
-  logic [N_DMA_CH-1:0][N_BITS-1:0] trans_counter;
+  logic [N_DMA_CH-1:0][31:0] trans_counter;
   logic [N_DMA_CH-1:0] hw_r_fifo_pop;
   logic [N_DMA_CH-1:0] hw_r_fifo_pop_enable;
   logic [N_DMA_CH-1:0] hw_r_fifo_empty;
@@ -119,8 +121,8 @@ module streaming_interface
         trans_counter[i] <= '0;
       end else begin
         if (fifo_req_i[i].flush) begin
-          trans_counter[i] <= reg_trans_size_i[i];
-        end else if ((!reg_dma_cfg_i[i] && hw_w_fifo_push[i]) || (reg_dma_cfg_i[i] && fifo_req_i[i].push)) begin
+          trans_counter[i] <= reg_trans_size_dma_ch_i[i];
+        end else if ((!reg_dma_rnw_i[i] && hw_w_fifo_push[i]) || (reg_dma_rnw_i[i] && fifo_req_i[i].push)) begin
           trans_counter[i] <= trans_counter[i] - 1;
         end
       end
@@ -152,11 +154,11 @@ module streaming_interface
 
   always_comb begin
     hw_r_fifo_pop = '0;
-    if(reg_synch_dma_ch_i == 1'b0) begin
+    if(reg_sync_dma_ch_i == 1'b0) begin
       for (int i = 0; i < N_DMA_CH; i = i + 1) begin
         hw_r_fifo_pop[i] = hw_r_fifo_pop_enable[i];
       end
-    end else if(reg_synch_dma_ch_i == 1'b1) begin
+    end else if(reg_sync_dma_ch_i == 1'b1) begin
 %for c in range(n_pea_cols):
       hw_r_fifo_pop[${c}] =
   %for i in range(len(pea_in_stream_placement[c])):
@@ -284,12 +286,12 @@ module streaming_interface
 
     all_ready = hw_w_fifo_full == '0;
 
-    if (reg_separate_cols_i == 2'b00) begin
+    if (reg_cols_grouping_i == 2'b00) begin
       stream_intf_ready_o[0] = all_ready;
       stream_intf_ready_o[1] = all_ready;
       stream_intf_ready_o[2] = all_ready;
       stream_intf_ready_o[3] = all_ready;
-    end else if (reg_separate_cols_i == 2'b01) begin
+    end else if (reg_cols_grouping_i == 2'b01) begin
       stream_intf_ready_o[0] = hw_w_fifo_full[0] == 1'b0;
       stream_intf_ready_o[1] = hw_w_fifo_full[1] == 1'b0;
       stream_intf_ready_o[2] = hw_w_fifo_full[2] == 1'b0;

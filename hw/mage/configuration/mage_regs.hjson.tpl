@@ -331,8 +331,8 @@
 %endif
 %if enable_streaming_interface == str(1):
   %for i in range(n_dma_ch):
-    { name: "TRANS_SIZE_${i}",
-      desc: "Transaction size for DMA ${i}",
+    { name: "TRANS_SIZE_DMA_CH_${i}",
+      desc: "Transaction size for DMA channel ${i}. It indicates the number of elements to be read or written by that dma channel. Once the associated down-counter reaches zero, the DMA channel is will receive a done signal",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
@@ -340,37 +340,49 @@
       }
       ],
     },
+    { name: "TRANS_SIZE_SYNC_DMA_CH_${i}",
+      desc: "Transaction size for DMA channel ${i} useful to sync with another DMA channel. When the associated down-counter reaches zero, the other DMA channel will be informed that it can operate. This is useful to let one DMA channel be dependent on a transaction window of another channel.",
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+      { bits: "15:0"
+      }
+      ],
+    },
   %endfor
-    { name: "DMA_CFG",
+    { name: "DMA_RNW",
       desc: "If set to 1, the downcounter for DMA i downcounts each time a data is pushed to the read fifo, otherwise the downcount is based on the write fifo push",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
-      { bits: "${n_dma_ch-1}:0",
-        name: "DMA_CFG",
-        desc: "Configuration for DMA i"
+      { bits: "${n_dma_ch-1}:0"
       },
       ],
     },
-    { name: "SEPARATE_COLS",
-      desc: "If set to 1, each column of Mage works in streaming separately from all the other. If 0, all columns work together. If 2, columns are grouped in 2 groups of 2 each",
+    { name: "COLS_GROUPING",
+      desc: "If set to 1, each column of Mage works in streaming separately from all the others. If 2, columns are grouped in 2 groups of 2 each. If 0, all columns are grouped together.",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
       { bits: "1:0",
-        name: "SEP_COLS",
-        desc: "Configuration for separate Mage columns in streaming"
       },
       ],
     },
-    { name: "SYNCH_DMA_CH",
-      desc: "It makes the DMA channels work in synch or not",  
+    { name: "SYNC_DMA_CH",
+      desc: "It makes DMA channels in each stream of pea_in_stream_placement work in sync if set to 1",  
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
       { bits: "0",
-        name: "SYNCH_DMA_CH",
-        desc: "Configuration for synch DMA channels in streaming"
+      },
+      ],
+    },
+    { name: "SYNC_DMA_CH_TRANS",
+      desc: "It makes the related DMA channel (bit 0 -> dma ch 0) work in sync with its stream mate in pea_in_stream_placement based on TRANS_SIZE_SYNC_DMA_CH_{i}. If bit 0 is set to 1, DMA ch 0 will be syncronized to its stream mate based on TRANS_SIZE_SYNC_DMA_CH_{mate}",  
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+      { bits: "${n_dma_ch-1}:0",
       },
       ],
     },
@@ -406,28 +418,18 @@
   %endif
     { multireg:
       { name: "SEL_OUT_COL_PEA",
-      desc: "Selection signals for output of MAGE-CGRA PEA",
+      desc: "Selection signals for output of PEA Column",
       count : "${m.ceil((int(m.ceil(m.log2(n_pea_cols)))*n_pea_rows)/32)}",
       cname: "SEL_OUT_COL_PEA",
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
-      { bits: "7:0", 
-        name: "SEL_COL_0",
-        desc: "Selector for column 0" 
+  %for i in range(n_pea_cols):
+      { bits: "${4*i+3}:${4*i}", 
+        name: "SEL_COL_${i}",
+        desc: "Selection signals for column ${i} output" 
       },
-      { bits: "15:8", 
-        name: "SEL_COL_1",
-        desc: "Selector for column 1"
-      },
-      { bits: "23:16", 
-        name: "SEL_COL_2",
-        desc: "Selector for column 2"
-      },
-      { bits: "31:24", 
-        name: "SEL_COL_3",
-        desc: "Selector for column 3"
-      },
+  %endfor
       ],
       }
     },
@@ -439,7 +441,7 @@
       swaccess: "rw",
       hwaccess: "hro",
       fields: [
-      { bits: "31:0", 
+      { bits: "15:0", 
         name: "ACC",
         desc: "Accumulation value" 
       },

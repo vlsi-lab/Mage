@@ -44,22 +44,23 @@ def write_template(tpl_path, outdir, outfile, **kwargs):
 
 def main():
 
+    # It describes how input dma nodes are organized
+    # i.e. The elements at position 0 (0) indicates the dma channels connected to fifo 0
     # has to be [N_IN_STREAM[N_DMA_CH_PER_IN_STREAM]]
-    in_stream_dma_ch_placement = [[0, 1, 2, 3]];
-    # has to be [N_IN_STREAM[N_PEA_DIN_PER_IN_STREAM]]
-    in_stream_pea_din_placement = [[0, 1, 2, 3]];
-    # has to be [N_PEA_COL[N_STREAM_INPUT_PE_PE]]
-    in_stream_pe_din_placement = [[0, 1], [0, 1], [2, 3], [2, 3]];
-    # the entry at poition i,j indicates to which pea col the j-th ch of output stream is connected
+    in_stream_dma_ch_placement = [[0], [1], [2], [3]];
+    
+    # It indicates which PEA columns outputs are to be connected to each output dma node
+    # i.e. The elements at position 0 (0, 1) are PEA columns connected to dma channel 0 output 
     # has to be [N_OUT_STREAM[N_PEA_DOUT_PER_OUT_STREAM]]
     out_stream_pea_dout_placement = [[0, 1], [0, 1], [2, 3], [2, 3]];
-    # has to be [N_OUT_STREAM[N_DMA_CH_PER_OUT_STREAM]]
-    out_stream_dma_ch_placement = [[0, 1, 2, 3]];
+
+    # It describes how PEA inputs coming from DMA must be organized
+    # i.e. The elements at position 0 (0, 1) indicates the dma channels that are connected to PEA column 0
+    # has to be [N_PEA_COL[N_PE_IN_STREAM]]
+    pea_in_stream_placement = [[0, 1], [1, 0], [2, 3], [3, 2]];
 
     # has to be [N_PEA_COL][N_IN_MEM]?
     pea_in_mem_placement = [[0, 1, 4, 5], [0, 1, 4, 5], [2, 3, 6, 7], [2, 3, 6, 7]];
-    # has to be [N_PEA_COL[N_IN_STREAM]]?
-    pea_in_stream_placement = [[0, 1], [1, 0], [2, 3], [3, 2]];
 
     parser = argparse.ArgumentParser(prog="mage-gen")
     
@@ -156,24 +157,6 @@ def main():
                         default=in_stream_dma_ch_placement,
                         help="")
     
-    parser.add_argument("--in_stream_pea_din_placement",
-                        metavar="",
-                        nargs='?',
-                        default=in_stream_pea_din_placement,
-                        help="")
-    
-    parser.add_argument("--in_stream_pe_din_placement",
-                        metavar="",
-                        nargs='?',
-                        default=in_stream_pe_din_placement,
-                        help="")
-    
-    parser.add_argument("--out_stream_dma_ch_placement",
-                        metavar="",
-                        nargs='?',
-                        default=out_stream_dma_ch_placement,
-                        help="")
-
     parser.add_argument("--out_stream_pea_dout_placement",
                         metavar="",
                         nargs='?',
@@ -326,15 +309,6 @@ def main():
     if args.in_stream_dma_ch_placement != None:
         in_stream_dma_ch_placement = args.in_stream_dma_ch_placement
 
-    if args.in_stream_pea_din_placement != None:
-        in_stream_pea_din_placement = args.in_stream_pea_din_placement
-
-    if args.in_stream_pe_din_placement != None:
-        in_stream_pe_din_placement = args.in_stream_pe_din_placement
-
-    if args.out_stream_dma_ch_placement != None:
-        out_stream_dma_ch_placement = args.out_stream_dma_ch_placement
-
     if args.out_stream_pea_dout_placement != None:
         out_stream_pea_dout_placement = args.out_stream_pea_dout_placement
 
@@ -400,9 +374,6 @@ def main():
         "in_stream_xbar"                   : in_stream_xbar,
         "out_stream_xbar"                  : out_stream_xbar,
         "in_stream_dma_ch_placement"       : in_stream_dma_ch_placement,
-        "out_stream_dma_ch_placement"      : out_stream_dma_ch_placement,
-        "in_stream_pea_din_placement"      : in_stream_pea_din_placement,
-        "in_stream_pe_din_placement"       : in_stream_pe_din_placement,
         "out_stream_pea_dout_placement"    : out_stream_pea_dout_placement,
         "n_age_tot"                        : n_age_tot,
         "n_age_per_stream"                 : n_age_per_stream,

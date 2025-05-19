@@ -16,7 +16,7 @@ module s_div_pe
     input  logic                                 mage_done_i,
     input  logic [N_CFG_BITS_PE-1:0]             ctrl_pe_i,
     // Streaming Interface
-    input  logic [             31:0]             reg_acc_value_i,
+    input  logic [             15:0]             reg_acc_value_i,
     input  logic                                 pea_ready_i,
     input  logic [       N_BITS-1:0]             reg_const_i,
     output logic                                 reg_pea_rf_de_o,
@@ -65,13 +65,11 @@ module s_div_pe
   logic                                            acc_loopback;
   // accumulation signals
   logic              [            1:0]             vec_mode;
-  logic                                            acc_counter_sel;
   //fu signals
   logic              [     N_BITS-1:0]             fu_out;
   logic              [     N_BITS-1:0]             rem_q_out;
   fu_instr_t                                       fu_instr;
   // RF
-  logic              [     N_BITS-1:0]             rf;
   logic                                            rf_en;
 
   always_comb begin
@@ -81,7 +79,7 @@ module s_div_pe
     end
     operands[N_INPUTS_PE-3] = pe_res_o;
     operands_valid[N_INPUTS_PE-3] = valid_o;
-    operands[N_INPUTS_PE-2] = rf;
+    operands[N_INPUTS_PE-2] = reg_const_i;
     operands_valid[N_INPUTS_PE-2] = 1'b1;
     operands[N_INPUTS_PE-1] = delay_op_fu;
     operands_valid[N_INPUTS_PE-1] = delay_op_valid;

@@ -1,14 +1,7 @@
 `verilator_config
-lint_off -rule PINCONNECTEMPTY
-lint_off -rule DECLFILENAME
-lint_off -rule CASEINCOMPLETE
-lint_off -rule UNUSED
-lint_off -rule WIDTH
-lint_off -rule ASSIGNDLY
-lint_off -rule UNSIGNED
-lint_off -rule UNDRIVEN
-lint_off -rule BLKLOOPINIT
-lint_off -rule SYNCASYNCNET
-lint_off -rule WIDTH -file "*/hw/mage/execute/pe/fu/div/mage_cv32e40p_ff_one.sv" -match "Operator ASSIGNW expects 5 bits on the Assign RHS, but Assign RHS's UNSIGNED generates 32 bits."
-lint_off -rule UNOPTFLAT -file "*/hw/mage/execute/pe/fu/div/mage_cv32e40p_ff_one.sv" -match "*"
+lint_off -rule DECLFILENAME -file "*configuration/mage_reg_top.sv" -match "Filename 'mage_reg_top' does not match MODULE name: 'mage_reg_top_intf'"
 lint_off -rule UNOPTFLAT -file "*/hw/mage/execute/pe/fu/div/r_div_stage.sv" -match "*"
+lint_off -rule UNUSED -file "*hw/vendor/mage/hw/mage/execute/pe/s_pe.sv" -match "Signal is not used: 'vec_mode'"
+lint_off -rule UNUSED -file "*hw/vendor/mage/hw/mage/execute/pe/s_div_pe.sv" -match "Signal is not used: 'vec_mode'"
+lint_off -rule UNUSED -file "*hw/vendor/mage/hw/mage/execute/pe/fu/div/r_div_stage.sv" -match "Bits of signal are not used: 'r_i'[31]"
+lint_off -rule WIDTH

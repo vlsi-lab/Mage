@@ -58,12 +58,14 @@ module peripheral_regs
     ////////////////////////////////////////////////////////////////
     //               Mage Streaming Configuration                 //
     ////////////////////////////////////////////////////////////////
-    output logic [1:0] reg_separate_cols_o,
-    output logic reg_synch_dma_ch_o,
-    output logic [${n_dma_ch}-1:0] reg_dma_cfg_o,
-    output logic [N_DMA_CH-1:0][N_BITS-1:0] reg_trans_size_o,
+    output logic [1:0] reg_cols_grouping_o,
+    output logic reg_sync_dma_ch_o,
+    output logic [${n_dma_ch}-1:0] reg_sync_dma_ch_trans_o,
+    output logic [${n_dma_ch}-1:0] reg_dma_rnw_o,
+    output logic [N_DMA_CH-1:0][31:0] reg_trans_size_dma_ch_o,
+    output logic [N_DMA_CH-1:0][15:0] reg_trans_size_sync_dma_ch_o,
     output logic [M-1:0][LOG_N:0] reg_sel_out_col_pea_o,
-    output logic [N-1:0][M-1:0][31:0] reg_acc_value_pe_o,
+    output logic [N-1:0][M-1:0][15:0] reg_acc_value_pe_o,
     input logic [N-1:0][M-1:0] reg_pea_rf_de_i,
     input logic [N-1:0][M-1:0][31:0] reg_pea_rf_d_i,
     output logic [N-1:0][M-1:0][31:0] reg_pea_rf_o,
@@ -190,14 +192,16 @@ module peripheral_regs
     ////////////////////////////////////////////////////////////////
     //                Streaming Mage Configuration                //
     ////////////////////////////////////////////////////////////////
-    reg_separate_cols_o = reg2hw.separate_cols.q;
-    reg_synch_dma_ch_o = reg2hw.synch_dma_ch.q;
+    reg_cols_grouping_o = reg2hw.cols_grouping.q;
+    reg_sync_dma_ch_o = reg2hw.sync_dma_ch.q;
   %for i in range(n_dma_ch):
-    reg_dma_cfg_o[${i}] = reg2hw.dma_cfg.q[${i}];
-    reg_trans_size_o[${i}] = reg2hw.trans_size_${i}.q;
+    reg_dma_rnw_o[${i}] = reg2hw.dma_rnw.q[${i}];
+    reg_sync_dma_ch_trans_o[${i}] = reg2hw.sync_dma_ch_trans.q[${i}];
+    reg_trans_size_dma_ch_o[${i}] = reg2hw.trans_size_dma_ch_${i}.q;
+    reg_trans_size_sync_dma_ch_o[${i}] = reg2hw.trans_size_sync_dma_ch_${i}.q;
   %endfor
   %for c in range(n_pea_cols):
-    reg_sel_out_col_pea_o[${c}] = reg2hw.sel_out_col_pea[0].sel_col_${c}.q;
+    reg_sel_out_col_pea_o[${c}] = reg2hw.sel_out_col_pea[0].sel_col_${c}.q[LOG_N:0];
   %endfor
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
@@ -207,14 +211,14 @@ module peripheral_regs
   %if out_stream_xbar == str(1):
     %for i in range(n_out_stream):
       %for j in range(n_dma_ch_per_out_stream):
-    reg_out_stream_sel_o[${i}][${j}] = reg2hw.stream_out_xbar_sel.sel_out_xbar_${i*n_dma_ch_per_out_stream+j};  
+    reg_out_stream_sel_o[${i}][${j}] = reg2hw.stream_out_xbar_sel.sel_out_xbar_${i*n_dma_ch_per_out_stream+j}.q[LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0];  
       %endfor
     %endfor
   %endif
   %if in_stream_xbar == str(1):
     %for i in range(n_in_stream):
       %for j in range(n_dma_ch_per_out_stream):
-    reg_in_stream_sel_o[${i}][${j}] = reg2hw.stream_in_xbar_sel.sel_in_xbar_${i*n_dma_ch_per_out_stream+j};  
+    reg_in_stream_sel_o[${i}][${j}] = reg2hw.stream_in_xbar_sel.sel_in_xbar_${i*n_dma_ch_per_out_stream+j}.q[LOG_N_DMA_CH_PER_IN_STREAM-1:0];  
       %endfor
     %endfor
   %endif

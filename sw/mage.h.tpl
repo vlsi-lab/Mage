@@ -307,7 +307,7 @@ void mage_set_sel_out_xbar(uint8_t sel_out);
  * @param n_dma_ch Number of the DMA channel.
  * @param cfg DMA channel configuration.
  */
-void mage_set_dma_cfg(uint8_t n_dma_ch, uint8_t cfg);
+void mage_set_dma_rnw(uint8_t n_dma_ch, uint8_t cfg);
 
 %endif
 #ifdef __cplusplus

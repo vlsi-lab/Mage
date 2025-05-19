@@ -42,7 +42,10 @@ module streaming_interface
 
   // Fifo signals
   logic [N_DMA_CH-1:0][31:0] trans_counter;
+  logic [N_DMA_CH-1:0][15:0] trans_counter_sync;
+  logic [N_DMA_CH-1:0] dma_sync;
   logic [N_DMA_CH-1:0] hw_r_fifo_pop;
+  logic [N_DMA_CH-1:0] hw_r_fifo_pop_d;
   logic [N_DMA_CH-1:0] hw_r_fifo_pop_enable;
   logic [N_DMA_CH-1:0] hw_r_fifo_empty;
   logic [N_DMA_CH-1:0] hw_r_fifo_full;
@@ -129,9 +132,31 @@ module streaming_interface
     end
   end
 
+  always_ff @(posedge clk_i or negedge rst_n_i) begin
+    for (int i = 0; i < N_DMA_CH; i++) begin
+      if (~rst_n_i) begin
+        trans_counter_sync[i] <= '0;
+      end else begin
+        if (fifo_req_i[i].flush) begin
+          trans_counter_sync[i] <= reg_trans_size_sync_dma_ch_i[i];
+        end else if (hw_r_fifo_pop[i] && |trans_counter_sync[i] == 1'b0) begin
+          trans_counter_sync[i] <= reg_trans_size_sync_dma_ch_i[i];
+        end else if (hw_r_fifo_pop[i]) begin
+          trans_counter_sync[i] <= trans_counter_sync[i] - 1;
+        end
+      end
+    end
+  end
+
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
       mage_done_o[i] = (trans_counter[i] == '0);
+    end
+  end
+
+  always_comb begin
+    for (int i = 0; i < N_DMA_CH; i = i + 1) begin
+      dma_sync[i] = (trans_counter_sync[i] == reg_trans_size_sync_dma_ch_i[i]);
     end
   end
 
@@ -146,7 +171,9 @@ module streaming_interface
   always_comb begin
     for (int i = 0; i < N_DMA_CH; i = i + 1) begin
       hw_r_fifo_pop_enable[i] = 1'b0;
-      if (hw_r_fifo_empty[i] == 1'b0 && pea_ready_i[i] == 1'b1) begin
+      if (reg_sync_dma_ch_trans_i[i]) begin
+        hw_r_fifo_pop_enable[i] = (hw_r_fifo_empty[i] == 1'b0 && pea_ready_i[i] == 1'b1) || (hw_r_fifo_pop_d[i] == 1'b1 && pea_ready_i[i] == 1'b1);
+      end else if(hw_r_fifo_empty[i] == 1'b0 && pea_ready_i[i] == 1'b1) begin
         hw_r_fifo_pop_enable[i] = 1'b1;
       end
     end
@@ -160,17 +187,48 @@ module streaming_interface
       end
     end else if(reg_sync_dma_ch_i == 1'b1) begin
 %for c in range(n_pea_cols):
-      hw_r_fifo_pop[${c}] =
+      hw_r_fifo_pop[${c}] = reg_sync_dma_ch_trans_i[${c}] ? (
+  %for i in range(len(pea_in_stream_placement[c])):
+    %if pea_in_stream_placement[c][i] != None:
+      %if i != len(pea_in_stream_placement[c]) - 1:
+        %if pea_in_stream_placement[c][i] != c:
+          hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}] & dma_sync[${pea_in_stream_placement[c][i]}]
+        %else:
+          hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}] &
+        %endif
+      %else:
+        %if pea_in_stream_placement[c][i] != c:
+          hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}] & dma_sync[${pea_in_stream_placement[c][i]}]) : (
+        %else:
+          hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}]) : (
+        %endif
+      %endif
+    %endif
+  %endfor
   %for i in range(len(pea_in_stream_placement[c])):
     %if pea_in_stream_placement[c][i] != None:
       %if i != len(pea_in_stream_placement[c]) - 1:
         hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}] &
       %else:
-        hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}];
+        hw_r_fifo_pop_enable[${pea_in_stream_placement[c][i]}]);
       %endif
     %endif
-  %endfor 
+  %endfor
 %endfor
+    end
+  end
+
+  always_ff @(posedge clk_i or negedge rst_n_i) begin
+    for (int i = 0; i < N_DMA_CH; i++) begin
+      if(~rst_n_i) begin
+        hw_r_fifo_pop_d[i] <= 1'b0;
+        hw_r_fifo_dout_d[i] <= 1'b0;
+      end else begin
+        if (reg_sync_dma_ch_trans_i[i] && hw_r_fifo_pop[i]) begin
+          hw_r_fifo_pop_d[i] <= 1'b1;
+          hw_r_fifo_dout_d[i] <= hw_r_fifo_dout[i];
+        end
+      end
     end
   end
 
@@ -182,8 +240,8 @@ module streaming_interface
       % for j in range(len(in_stream_dma_ch_placement[i])):
         % if i == nis and j == ndc:
           %if in_stream_dma_ch_placement[i][j] != None:
-  assign stream_in_dma_ch_data[${nis}][${ndc}] = hw_r_fifo_dout[${in_stream_dma_ch_placement[i][j]}];
-  assign stream_in_dma_ch_valid[${nis}][${ndc}] = hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}] && pea_ready_i[${in_stream_dma_ch_placement[i][j]}];
+  assign stream_in_dma_ch_data[${nis}][${ndc}] = reg_sync_dma_ch_trans_i[${in_stream_dma_ch_placement[i][j]}] ? (hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}] ? hw_r_fifo_dout[${in_stream_dma_ch_placement[i][j]}] : hw_r_fifo_dout_d[${in_stream_dma_ch_placement[i][j]}]) : hw_r_fifo_dout[${in_stream_dma_ch_placement[i][j]}];
+  assign stream_in_dma_ch_valid[0][0] = reg_sync_dma_ch_trans_i[${in_stream_dma_ch_placement[i][j]}] ? ((hw_r_fifo_pop_d[${in_stream_dma_ch_placement[i][j]}] || hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}]) && pea_ready_i[${in_stream_dma_ch_placement[i][j]}]) : (hw_r_fifo_pop[${in_stream_dma_ch_placement[i][j]}] && pea_ready_i[${in_stream_dma_ch_placement[i][j]}]);
           %else:
   assign stream_in_dma_ch_data[${nis}][${ndc}] = '0;
   assign stream_in_dma_ch_valid[${nis}][${ndc}] = 1'b0;

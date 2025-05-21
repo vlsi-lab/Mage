@@ -23,12 +23,12 @@ module s_pe
     output logic [       N_BITS-1:0]             reg_pea_rf_d_o,
     input  logic [  N_INPUTS_PE-4:0][N_BITS-1:0] neigh_pe_op_i,
     input  logic [  N_INPUTS_PE-4:0]             neigh_pe_op_valid_i,
-    input  logic [   N_NEIGH_PE-1:0][N_BITS-1:0] neigh_delay_op_i,
+    input  logic [   N_NEIGH_PE-1:0][  N_BITS:0] neigh_delay_op_i,
     input  logic [   N_NEIGH_PE-1:0]             neigh_delay_op_valid_i,
     output logic                                 valid_o,
     output logic                                 ready_o,
     output logic                                 delay_op_valid_o,
-    output logic [       N_BITS-1:0]             delay_op_o,
+    output logic [         N_BITS:0]             delay_op_o,
     output logic [       N_BITS-1:0]             pe_res_o
     // end Streaming Interface
 );
@@ -43,11 +43,12 @@ module s_pe
   logic                                            op_a_valid;
   logic                                            op_b_valid;
   // delay operands signals
-  delay_pe_mux_sel_t                               delay_op_sel;
-  logic              [     N_BITS-1:0]             delay_op_fu;
-  logic              [     N_BITS-1:0]             delay_op_out;
-  logic              [     N_BITS-1:0]             delay_op_out_d1;
-  logic              [     N_BITS-1:0]             delay_op_out_d2;
+  delay_pe_mux_sel_t                               delay_pe_mux_sel;
+  delay_pe_op_mux_sel_t                            delay_pe_op_mux_sel;
+  logic              [       N_BITS:0]             delay_op_fu;
+  logic              [       N_BITS:0]             delay_op_out;
+  logic              [       N_BITS:0]             delay_op_out_d1;
+  logic              [       N_BITS:0]             delay_op_out_d2;
   logic                                            delay_op_valid;
   logic                                            delay_op_valid_out;
   logic                                            delay_op_valid_out_d1;
@@ -80,7 +81,7 @@ module s_pe
     operands_valid[N_INPUTS_PE-3] = valid_o;
     operands[N_INPUTS_PE-2] = reg_const_i;
     operands_valid[N_INPUTS_PE-2] = 1'b1;
-    operands[N_INPUTS_PE-1] = delay_op_fu;
+    operands[N_INPUTS_PE-1] = delay_op_fu[N_BITS-1:0];
     operands_valid[N_INPUTS_PE-1] = delay_op_valid;
   end
 
@@ -97,7 +98,8 @@ module s_pe
   assign fu_instr         = fu_instr_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS - 1 : 2 * LOG_N_INPUTS_PE]);
   assign vec_mode         = ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS];
   assign rf_en = ctrl_pe_i[2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+2];
-  assign delay_op_sel     = delay_pe_mux_sel_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 5 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3]);
+  assign delay_pe_mux_sel     = delay_pe_mux_sel_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(N_NEIGH_PE) - 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3]);
+  assign delay_pe_op_mux_sel     = delay_pe_op_mux_sel_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(N_NEIGH_PE) + 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(N_NEIGH_PE)]);
 
   ////////////////////////////////////////////////////////////////
   //                       Operand Selection                    //
@@ -125,6 +127,7 @@ module s_pe
       .rst_n_i(rst_n_i),
       .a_i(op_a),
       .b_i(op_b),
+      .delay_sign_i(delay_op_fu[N_BITS]),
       .const_i(reg_const_i),
       .reg_acc_value_i,
       .pea_ready_i,
@@ -141,26 +144,26 @@ module s_pe
   ////////////////////////////////////////////////////////////////
 
   // delayed operand selection, it is one among the possible operands of the PE FU 
-  assign delay_op_fu    = neigh_delay_op_i[delay_op_sel];
+  assign delay_op_fu    = neigh_delay_op_i[delay_pe_mux_sel];
   // delayed operand valid selection
-  assign delay_op_valid = neigh_delay_op_valid_i[delay_op_sel];
+  assign delay_op_valid = neigh_delay_op_valid_i[delay_pe_mux_sel];
   /* output delay data selection
-    ->  delay_op_out = fu_out      if delay_op_sel == D_PE_RES
-    ->  delay_op_out = op_a        if delay_op_sel == D_PE_OP_A
-    ->  delay_op_out = op_b        if delay_op_sel == D_PE_OP_B
-    ->  delay_op_out = delay_op_fu if delay_op_sel == D_PE_DELAY_OP
+    ->  delay_op_out = fu_out      if delay_pe_mux_sel == D_PE_RES
+    ->  delay_op_out = op_a        if delay_pe_mux_sel == D_PE_OP_A
+    ->  delay_op_out = op_b        if delay_pe_mux_sel == D_PE_OP_B
+    ->  delay_op_out = delay_op_fu if delay_pe_mux_sel == D_PE_DELAY_OP
     in the default case, delay_op_out is set fed with delay_op_fu,
     but it can be decided to forward also the result of the PE FU or one of its operands
   */
   always_comb begin
-    delay_op_out = (delay_op_sel == D_PE_RES) ? fu_out : (
-                   (delay_op_sel == D_PE_OP_A) ? op_a : (
-                   (delay_op_sel == D_PE_OP_B) ? op_b : delay_op_fu
+    delay_op_out = (delay_pe_op_mux_sel == D_PE_RES) ?  {delay_op_fu[N_BITS], fu_out} : (
+                   (delay_pe_op_mux_sel == D_PE_OP_A) ? {delay_op_fu[N_BITS], op_a} : (
+                   (delay_pe_op_mux_sel == D_PE_OP_B) ? {delay_op_fu[N_BITS], op_b} : delay_op_fu
                   ));
-    delay_op_valid_out = (delay_op_sel == D_PE_RES) ? fu_valid : (
-                   (delay_op_sel == D_PE_OP_A) ? op_a_valid : (
-                   (delay_op_sel == D_PE_OP_B) ? op_b_valid : delay_op_valid
-                  ));
+    delay_op_valid_out = (delay_pe_op_mux_sel == D_PE_RES) ? fu_valid : (
+                         (delay_pe_op_mux_sel == D_PE_OP_A) ? op_a_valid : (
+                         (delay_pe_op_mux_sel == D_PE_OP_B) ? op_b_valid : delay_op_valid
+                         ));
   end
 
   // multi_op_instr is asserted when the instruction is a multi-operand one
@@ -199,9 +202,23 @@ module s_pe
     Otherwise, the output is selected from the first delay register
   */
   always_comb begin
-    delay_op_o = (!multi_op_instr || delay_op_sel == D_PE_RES) ? delay_op_out_d1 : delay_op_out_d2;
-    delay_op_valid_o = (!multi_op_instr || delay_op_sel == D_PE_RES) ? delay_op_valid_out_d1 : delay_op_valid_out_d2;
-  end
+    if (delay_pe_op_mux_sel == D_PE_RES && multi_op_instr) begin
+      delay_op_o = {delay_op_out_d2[N_BITS], delay_op_out_d1[N_BITS-1:0]};
+      delay_op_valid_o = delay_op_valid_out_d1;
+    end else if (delay_pe_op_mux_sel == D_PE_RES && !multi_op_instr) begin
+      delay_op_o = delay_op_out_d1;
+      delay_op_valid_o = delay_op_valid_out_d1;
+    end else if (delay_pe_op_mux_sel != D_PE_RES && multi_op_instr) begin
+      delay_op_o = delay_op_out_d2;
+      delay_op_valid_o = delay_op_valid_out_d2;
+    end else if (delay_pe_op_mux_sel != D_PE_RES && !multi_op_instr) begin
+      delay_op_o = delay_op_out_d1;
+      delay_op_valid_o = delay_op_valid_out_d1;
+    end else begin
+      delay_op_o = delay_op_out_d1;
+      delay_op_valid_o = delay_op_valid_out_d1;
+    end
+ end
 
   ////////////////////////////////////////////////////////////////
   //                      Output Register                       //

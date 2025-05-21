@@ -170,15 +170,19 @@ package pea_pkg;
   }pe_mux_sel_t;
 
 %if enable_streaming_interface == str(1):
-  typedef enum logic [LOG_N_INPUTS_PE-2:0]{
-    D_UP         = 3'b000,
-    D_LEFT       = 3'b001,
-    D_RIGHT      = 3'b010,
-    D_DOWN       = 3'b011,
-    D_PE_RES     = 3'b100,
-    D_PE_OP_A    = 3'b101,
-    D_PE_OP_B    = 3'b110
-  }delay_pe_mux_sel_t;
+  typedef enum logic [$clog2(N_NEIGH_PE)-1:0] {
+    D_UP      = 2'b00,
+    D_LEFT    = 2'b01,
+    D_RIGHT   = 2'b10,
+    D_DOWN    = 2'b11
+  } delay_pe_mux_sel_t;
+
+  typedef enum logic [2:0] {
+    D_PE_OP_NONE  = 2'b00,
+    D_PE_RES      = 2'b01,
+    D_PE_OP_A     = 2'b10,
+    D_PE_OP_B     = 2'b11
+  } delay_pe_op_mux_sel_t;
 %endif
 %if enable_decoupling == str(1):
   ////////////////////////////////////////////////////////////////

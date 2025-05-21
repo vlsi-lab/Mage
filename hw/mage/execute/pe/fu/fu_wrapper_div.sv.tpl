@@ -16,6 +16,7 @@ module fu_wrapper_div
     input  logic      [N_BITS-1:0] b_i,
     input  fu_instr_t              instr_i,
 %if enable_streaming_interface == str(1):
+    input  logic                   delay_sign_i,
     input  logic      [N_BITS-1:0] const_i,
     input  logic                   ops_valid_i,
     input  logic                   pea_ready_i,
@@ -321,7 +322,7 @@ module fu_wrapper_div
           end else if (instr_i == SUBPOW) begin
             temp_res <= add_res[N_BITS:1];
           end else if (instr_i == CLSHSUB) begin
-            temp_res <= shift_res;
+            temp_res <= lsh_res;
           end
         end
       end
@@ -430,7 +431,7 @@ module fu_wrapper_div
       end
 
       CLSHSUB: begin
-        shift_op1 = {32'd0, a_signed};
+        shift_op1 = {32'd0, lsh_op1_rev};
         shift_op2 = const_i;
         add_op1 = {temp_res, 1'b1};
         add_op2 = {op2_neg_d1, 1'b1};
@@ -449,8 +450,8 @@ module fu_wrapper_div
       CADDDIV: begin
         add_op1 = {a_signed, 1'b0};
         add_op2 = {const_i, 1'b0};
-        div_op1 = temp_res;
-        div_op2 = temp_op_reg;
+        div_op1 = temp_op_reg;
+        div_op2 = temp_res;
       end
 
       ABSREM: begin
@@ -498,9 +499,11 @@ module fu_wrapper_div
       CADDMUL: res_o = mul_res;
       ADDCMUL: res_o = mul_res;
       CMULADD: res_o = add_res[N_BITS:1];
+      CLSHSUB: res_o = add_res[N_BITS:1];
       MULCARSH: res_o = shift_res;
       ABSMIN: res_o = (add_res[N_BITS-1]) ? temp_res : temp_op_reg;
       SGNCSUB: res_o = (|temp_op_reg == 1'b0) ? '0: add_one_res;
+      SGNSEL: res_o = delay_sign_i ? b_i : a_i;
       default: res_o = 0;
     endcase
   end

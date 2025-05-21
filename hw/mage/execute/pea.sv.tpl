@@ -98,13 +98,13 @@ module pea
 
 %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-logic [N_NEIGH_PE-1:0][N_BITS-1:0] in_delay_op${r}${c};  
+logic [N_NEIGH_PE-1:0][N_BITS:0] in_delay_op${r}${c};  
     %endfor
 %endfor
 
 %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-logic [N_BITS-1:0] out_delay_op${r}${c};  
+logic [N_BITS:0] out_delay_op${r}${c};  
     %endfor
 %endfor
 
@@ -312,7 +312,7 @@ logic out_delay_op_valid${r}${c};
             %if r1 < 0 or c1 < 0 or r1 >= n_pea_rows or c1 >= n_pea_cols:
               %if r1 == -1 and c1 == c:
                 %if pea_in_stream_placement[c][0] != None:
-  assign in_delay_op${r}${c}[${k}] = stream_data_in_reg[${pea_in_stream_placement[c][0]}]; <% k = k + 1 %>
+  assign in_delay_op${r}${c}[${k}] = {stream_data_in_reg[${pea_in_stream_placement[c][0]}][N_BITS-1], stream_data_in_reg[${pea_in_stream_placement[c][0]}]}; <% k = k + 1 %>
                 %else:
   assign in_delay_op${r}${c}[${k}] = '0; <% k = k + 1 %>
                 %endif

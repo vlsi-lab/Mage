@@ -56,6 +56,32 @@ module fu_wrapper
   logic [N_BITS-1:0]  add_one_op1;
   logic [N_BITS-1:0]  add_one_op2;
   logic [N_BITS-1:0]  add_one_res; 
+
+  logic [N_BITS:0] add_res;
+  logic [N_BITS-1:0] mul_res;
+  logic [N_BITS-1:0] shift_res;
+  logic [N_BITS-1:0] lsh_res;
+
+  logic [N_BITS-1:0] mul_op1;
+  logic [N_BITS-1:0] mul_op2;
+
+  logic [N_BITS-1:0] lsh_op1_rev;
+  logic [2*N_BITS-1:0] shift_op1;
+  logic [N_BITS-1:0] shift_op2;
+
+  logic [N_BITS:0] add_op1;
+  logic [N_BITS:0] add_op2;
+
+  logic [N_BITS-1:0] op1_neg;
+  logic [N_BITS-1:0] op2_neg;
+  logic [N_BITS-1:0] op2_neg_d1;
+  
+  logic sign_op1;
+  logic sign_op1_d;
+
+  logic [N_BITS-1:0] temp_res;
+  logic [N_BITS-1:0] temp_res_neg;
+  logic [N_BITS-1:0] temp_op_reg;
 %endif
 %if enable_streaming_interface == str(1):
 
@@ -154,32 +180,6 @@ module fu_wrapper
   ////////////////////////////////////////////////////////////////
   //                FU Input/Output Assignments                 //
   ////////////////////////////////////////////////////////////////
-
-  logic [N_BITS:0] add_res;
-  logic [N_BITS-1:0] mul_res;
-  logic [N_BITS-1:0] shift_res;
-  logic [N_BITS-1:0] lsh_res;
-
-  logic [N_BITS-1:0] mul_op1;
-  logic [N_BITS-1:0] mul_op2;
-
-  logic [N_BITS-1:0] lsh_op1_rev;
-  logic [2*N_BITS-1:0] shift_op1;
-  logic [N_BITS-1:0] shift_op2;
-
-  logic [N_BITS:0] add_op1;
-  logic [N_BITS:0] add_op2;
-
-  logic [N_BITS-1:0] op1_neg;
-  logic [N_BITS-1:0] op2_neg;
-  logic [N_BITS-1:0] op2_neg_d1;
-  
-  logic sign_op1;
-  logic sign_op1_d;
-
-  logic [N_BITS-1:0] temp_res;
-  logic [N_BITS-1:0] temp_res_neg;
-  logic [N_BITS-1:0] temp_op_reg;
 
   assign op1_neg = ~a_signed;
   assign op2_neg = ~b_signed;

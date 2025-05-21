@@ -220,19 +220,6 @@ module streaming_interface
   end
 %for i in range(n_dma_ch):
   always_ff @(posedge clk_i or negedge rst_n_i) begin
-    if(~rst_n_i) begin
-      hw_r_fifo_pop_d[${i}] <= 1'b0;
-      hw_r_fifo_dout_d[${i}] <= 1'b0;
-    end else begin
-      if (reg_sync_dma_ch_trans_i[${i}] && hw_r_fifo_pop[${i}]) begin
-        hw_r_fifo_pop_d[${i}] <= 1'b1;
-        hw_r_fifo_dout_d[${i}] <= hw_r_fifo_dout[${i}];
-      end
-    end
-  end
-%endfor
-%for i in range(n_dma_ch):
-  always_ff @(posedge clk_i or negedge rst_n_i) begin
     if (~rst_n_i) begin
       hw_r_fifo_pop_d[${i}]  <= 1'b0;
       hw_r_fifo_dout_d[${i}] <= 1'b0;

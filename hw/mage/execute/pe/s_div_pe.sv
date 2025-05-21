@@ -295,7 +295,7 @@ module s_div_pe
           valid <= valid_o;
         end
       end else begin
-        pe_res_o <= '0;
+        valid <= '0;
       end
     end
   end

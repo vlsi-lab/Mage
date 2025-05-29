@@ -59,41 +59,41 @@ module fu_wrapper_div
   logic              valid_mo_instr;
   logic              mo_instr;
   // +1 adder
-  logic [N_BITS-1:0] add_one_op1;
-  logic [N_BITS-1:0] add_one_op2;
-  logic [N_BITS-1:0] add_one_res;
+  logic signed [N_BITS-1:0] add_one_op1;
+  logic signed [N_BITS-1:0] add_one_op2;
+  logic signed [N_BITS-1:0] add_one_res;
 
-  logic [N_BITS:0] add_res;
-  logic [N_BITS-1:0] mul_res;
-  logic [N_BITS-1:0] shift_res;
-  logic [2*N_BITS-1:0] shift_res_ext;
-  logic [N_BITS-1:0] lsh_res;
+  logic signed [N_BITS:0] add_res;
+  logic signed [N_BITS-1:0] mul_res;
+  logic signed [N_BITS-1:0] shift_res;
+  logic signed [2*N_BITS-1:0] shift_res_ext;
+  logic signed [N_BITS-1:0] lsh_res;
 
-  logic [N_BITS-1:0] mul_op1;
-  logic [N_BITS-1:0] mul_op2;
+  logic signed [N_BITS-1:0] mul_op1;
+  logic signed [N_BITS-1:0] mul_op2;
 
-  logic [N_BITS-1:0] lsh_op1_rev;
-  logic [2*N_BITS-1:0] shift_op1;
-  logic [N_BITS-1:0] shift_op2;
+  logic signed [N_BITS-1:0] lsh_op1_rev;
+  logic signed [2*N_BITS-1:0] shift_op1;
+  logic signed [N_BITS-1:0] shift_op2;
 
-  logic [N_BITS:0] add_op1;
-  logic [N_BITS:0] add_op2;
+  logic signed [N_BITS:0] add_op1;
+  logic signed [N_BITS:0] add_op2;
 
-  logic [N_BITS-1:0] op1_neg;
-  logic [N_BITS-1:0] op2_neg;
-  logic [N_BITS-1:0] op2_neg_d1;
+  logic signed [N_BITS-1:0] op1_neg;
+  logic signed [N_BITS-1:0] op2_neg;
+  logic signed [N_BITS-1:0] op2_neg_d1;
   
   logic sign_op1;
   logic sign_op1_d;
 
-  logic [N_BITS-1:0] temp_res;
-  logic [N_BITS-1:0] temp_res_neg;
-  logic [N_BITS-1:0] temp_op_reg;
+  logic signed [N_BITS-1:0] temp_res;
+  logic signed [N_BITS-1:0] temp_res_neg;
+  logic signed [N_BITS-1:0] temp_op_reg;
 
-  logic [N_BITS-1:0] quotient_div;
-  logic [N_BITS-1:0] remainder_div;
-  logic [N_BITS-1:0] div_op1;
-  logic [N_BITS-1:0] div_op2;
+  logic signed [N_BITS-1:0] quotient_div;
+  logic signed [N_BITS-1:0] remainder_div;
+  logic signed [N_BITS-1:0] div_op1;
+  logic signed [N_BITS-1:0] div_op2;
 
 %endif
 
@@ -103,7 +103,7 @@ module fu_wrapper_div
   */
   always_comb begin
     add_one_op1 = '0;
-    add_one_op2[N_BITS-1:1] = '0;
+    add_one_op2 = '0;
     if(instr_i == ACC || instr_i == MAX) begin
       add_one_op1 = acc_cnt;
       add_one_op2[0] = 1'b1;

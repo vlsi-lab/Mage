@@ -13,10 +13,10 @@ module r_div
     input  logic              rst_n_i,
     input  logic              clk_i,
     input  logic              en_i,
-    input  logic [N_BITS-1:0] n_i,
-    input  logic [N_BITS-1:0] d_i,
-    output logic [N_BITS-1:0] r_o,
-    output logic [N_BITS-1:0] q_o,
+    input  logic signed [N_BITS-1:0] n_i,
+    input  logic signed [N_BITS-1:0] d_i,
+    output logic signed [N_BITS-1:0] r_o,
+    output logic signed [N_BITS-1:0] q_o,
     output logic              valid_o
 );
 
@@ -37,8 +37,11 @@ module r_div
   logic [N_BITS-1:0] q_final_inv;
   logic [N_BITS-1:0] r_final_inv;
   logic [N_BITS-1:0] q_out;
-  logic [N_BITS-1:0] n_in_stage;
+  logic signed [N_BITS-1:0] n_in_stage;
+  logic signed [N_BITS-1:0] n_in_signed;
+  logic signed [N_BITS-1:0] d_in_signed;
   logic [N_BITS-1:0] n_in;
+  logic [N_BITS-1:0] d_in;
 
   // fsm-realted signals
   logic [$clog2(N_RADIX)-1:0] cnt;
@@ -59,10 +62,28 @@ module r_div
   assign n_is_zero = (n_i == '0);
   assign d_is_zero = (d_i == '0);
 
+  assign d_in_signed = (d_i[N_BITS-1] == 1'b0) ? d_i : (~d_i + 1);
+  assign d_in = $unsigned(d_in_signed);
+
+  always_ff @(posedge clk_i, negedge rst_n_i) begin
+    if (!rst_n_i) begin
+      n_in_stage <= '0;
+    end else begin
+      if (en_i) begin
+        n_in_stage <= (n_in_signed << $clog2(N_RADIX));
+      end else begin
+        n_in_stage <= '0;
+      end
+    end
+  end
+
+  assign n_in_signed = (cnt == 0) ? ((n_i[N_BITS-1] == 1'b0) ? n_i : (~n_i + 1)) : n_in_stage;
+  assign n_in = $unsigned(n_in_signed);
+
   // radix-configurable divider core
   r_div_stage r_div_stage_inst (
       .n_i(n_in[N_BITS-1:N_BITS-$clog2(N_RADIX)]),
-      .d_i(d_i),
+      .d_i(d_in),
       .r_i(r_in_stage),
       .r_o(r_out_stage_in_reg),
       .q_o(q_out_stage)
@@ -83,7 +104,7 @@ module r_div
       cnt <= '0;
     end else begin
       if (en_i) begin
-        if(div_state_c == FINISH) begin
+        if (div_state_c == FINISH) begin
           cnt <= '0;
         end else begin
           cnt <= cnt + 1;
@@ -104,6 +125,8 @@ module r_div
       EXEC: begin
         if (cnt == N_DIV_STAGE - 2) begin
           div_state_n = FINISH;
+        end else begin
+          div_state_n = EXEC;
         end
       end
       FINISH: begin
@@ -144,28 +167,13 @@ module r_div
       q_out <= '0;
     end else begin
       if (div_state_c == EXEC || div_state_c == IDLE) begin
-        q_out <= (q_out << $clog2(N_RADIX)) | {{N_BITS-$clog2(N_RADIX){1'b0}}, q_out_stage};
+        q_out <= (q_out << $clog2(N_RADIX)) | {{N_BITS - $clog2(N_RADIX) {1'b0}}, q_out_stage};
       end else begin
         q_out <= '0;
       end
     end
   end
 
-
-
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
-    if (!rst_n_i) begin
-      n_in_stage <= '0;
-    end else begin
-      if (en_i) begin
-        n_in_stage <= (n_in << $clog2(N_RADIX));
-      end else begin
-        n_in_stage <= '0;
-      end
-    end
-  end
-
-  assign n_in = (cnt == 0) ? n_i : n_in_stage;
   assign q_final = {q_out[N_BITS-1-$clog2(N_RADIX):0], q_out_stage[$clog2(N_RADIX)-1:0]};
   assign r_final = r_out_stage_in_reg;
   assign q_final_inv = ~q_final + 1;

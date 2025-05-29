@@ -12,11 +12,11 @@ module div_wrapper
 (
     input logic rst_n_i,
     input logic clk_i,
-    input logic [N_BITS-1:0] a_i,
-    input logic [N_BITS-1:0] b_i,
+    input logic signed [N_BITS-1:0] a_i,
+    input logic signed [N_BITS-1:0] b_i,
     input logic in_valid_i,
-    output logic [N_BITS-1:0] q_o,
-    output logic [N_BITS-1:0] r_o,
+    output logic signed [N_BITS-1:0] q_o,
+    output logic signed [N_BITS-1:0] r_o,
     output logic valid_o
 );
 

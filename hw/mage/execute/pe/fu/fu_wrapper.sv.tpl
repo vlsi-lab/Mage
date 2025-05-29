@@ -45,7 +45,6 @@ module fu_wrapper
 
   // acuumulation ready-valid
   logic [N_BITS-1:0]  acc_cnt;
-  logic               acc_ready;
   logic               acc_valid;
   // ready-valid
   logic               valid;
@@ -140,7 +139,6 @@ module fu_wrapper
     end
   end
 
-  assign acc_ready = 1'b1;
   assign acc_valid = (acc_cnt[15:0] == reg_acc_value_i && acc_cnt != '0 && ops_valid_i);
 
   ////////////////////////////////////////////////////////////////
@@ -151,25 +149,14 @@ module fu_wrapper
 
   always_comb begin
     valid = ops_valid_i;
-    ready = 1'b1; 
     if(!mo_instr) begin
-      case (instr_i)
-        ACC: begin
-          valid = acc_valid;
-          ready = acc_ready;
-        end
-        MAX: begin
-          valid = (reg_acc_value_i == '0) ? ops_valid_i : acc_valid;
-          ready = 1'b1;
-        end
-        default: begin
-          valid = ops_valid_i;
-          ready = 1'b1;
-        end
-      endcase
+      if(instr_i == ACC) begin
+        valid = acc_valid;
+      end else if (instr_i == MAX) begin
+        valid = (reg_acc_value_i == '0) ? ops_valid_i : acc_valid;
+      end
     end else begin
       valid = valid_mo_instr;
-      ready = 1'b1;
     end
   end
 

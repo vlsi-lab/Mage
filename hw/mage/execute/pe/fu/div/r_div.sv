@@ -83,7 +83,11 @@ module r_div
       cnt <= '0;
     end else begin
       if (en_i) begin
-        cnt <= cnt + 1;
+        if(div_state_c == FINISH) begin
+          cnt <= '0;
+        end else begin
+          cnt <= cnt + 1;
+        end
       end
     end
   end

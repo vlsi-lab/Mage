@@ -41,7 +41,7 @@ module r_div
   logic [N_BITS-1:0] n_in;
 
   // fsm-realted signals
-  logic [$clog2(N_DIV_STAGE)-1:0] cnt;
+  logic [$clog2(N_RADIX)-1:0] cnt;
   div_fsm_t div_state_n;
   div_fsm_t div_state_c;
 
@@ -140,7 +140,7 @@ module r_div
       q_out <= '0;
     end else begin
       if (div_state_c == EXEC || div_state_c == IDLE) begin
-        q_out <= (q_out << $clog2(N_RADIX)) | q_out_stage;
+        q_out <= (q_out << $clog2(N_RADIX)) | {{N_BITS-$clog2(N_RADIX){1'b0}}, q_out_stage};
       end else begin
         q_out <= '0;
       end

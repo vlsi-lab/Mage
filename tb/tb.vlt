@@ -5,4 +5,3 @@ lint_off -rule UNUSED -file "*hw/vendor/mage/hw/mage/execute/pe/s_pe.sv" -match 
 lint_off -rule UNUSED -file "*hw/vendor/mage/hw/mage/execute/pe/s_div_pe.sv" -match "Signal is not used: 'vec_mode'"
 lint_off -rule UNUSED -file "*hw/vendor/mage/hw/mage/configuration/mage_reg_top.sv" -match "Parameter is not used: 'AW'"
 lint_off -rule UNUSED -file "*hw/vendor/mage/hw/mage/execute/pe/fu/div/r_div_stage.sv" -match "Bits of signal are not used: 'r_i'[31]"
-lint_off -rule WIDTH

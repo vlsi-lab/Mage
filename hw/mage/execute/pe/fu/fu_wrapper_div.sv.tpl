@@ -67,6 +67,7 @@ module fu_wrapper_div
   logic [N_BITS:0] add_res;
   logic [N_BITS-1:0] mul_res;
   logic [N_BITS-1:0] shift_res;
+  logic [2*N_BITS-1:0] shift_res_ext;
   logic [N_BITS-1:0] lsh_res;
 
   logic [N_BITS-1:0] mul_op1;
@@ -94,6 +95,7 @@ module fu_wrapper_div
   logic [N_BITS-1:0] remainder_div;
   logic [N_BITS-1:0] div_op1;
   logic [N_BITS-1:0] div_op2;
+
 %endif
 
 %if enable_streaming_interface == str(1):
@@ -134,7 +136,7 @@ module fu_wrapper_div
       acc_loopback_o <= 1'b0;
     end else begin
       if (instr_i == ACC || instr_i == MAX) begin
-        if (acc_cnt == reg_acc_value_i && ops_valid_i && pea_ready_i) begin
+        if (acc_cnt[15:0] == reg_acc_value_i && ops_valid_i && pea_ready_i) begin
           acc_cnt <= '0;
           acc_loopback_o <= 1'b0;
         end else if (ops_valid_i && pea_ready_i) begin
@@ -149,7 +151,7 @@ module fu_wrapper_div
   end
 
   assign acc_ready = 1'b1;
-  assign acc_valid = (acc_cnt == reg_acc_value_i && acc_cnt != '0 && ops_valid_i);
+  assign acc_valid = (acc_cnt[15:0] == reg_acc_value_i && acc_cnt != '0 && ops_valid_i);
 
   ////////////////////////////////////////////////////////////////
   //                           Division                         //
@@ -248,7 +250,7 @@ module fu_wrapper_div
   %if enable_streaming_interface == str(1) and enable_decoupling == str(0):
   ////////////////////////////////////////////////////////////////
   //                FU Input/Output Assignments                 //
-  ///////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////
 
   assign op1_neg = ~a_signed;
   assign op2_neg = ~b_signed;
@@ -256,7 +258,8 @@ module fu_wrapper_div
 
   assign add_res = add_op1 + add_op2;
   assign mul_res = mul_op1 * mul_op2;
-  assign shift_res = shift_op1 >>> shift_op2;
+  assign shift_res_ext = shift_op1 >>> shift_op2;
+  assign shift_res = shift_res_ext[31:0];
   generate
     genvar m;
     for (m = 0; m < 32; m++) begin
@@ -469,7 +472,7 @@ module fu_wrapper_div
         add_op2   = {b_signed, 1'b0};
         mul_op1   = a_signed;
         mul_op2   = b_signed;
-        shift_op1 = a_signed;
+        shift_op1 = {{32{a_signed[N_BITS-1]}}, a_signed};
         shift_op2 = b_signed;
       end
     endcase

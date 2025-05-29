@@ -177,7 +177,7 @@ package pea_pkg;
     D_DOWN    = 2'b11
   } delay_pe_mux_sel_t;
 
-  typedef enum logic [2:0] {
+  typedef enum logic [1:0] {
     D_PE_OP_NONE  = 2'b00,
     D_PE_RES      = 2'b01,
     D_PE_OP_A     = 2'b10,

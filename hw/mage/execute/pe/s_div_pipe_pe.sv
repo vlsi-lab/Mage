@@ -8,7 +8,7 @@
 // Description: This module is the main building block of the Processing Element Array (PEA) for Mage in streaming mode.
 //              It contains the functional unit (FU) and the input operand multiplexers.
 
-module s_pe
+module s_div_pipe_pe
   import pea_pkg::*;
 (
     input  logic                                 clk_i,
@@ -49,6 +49,7 @@ module s_pe
   logic                 [       N_BITS:0]             delay_op_fu;
   logic                 [       N_BITS:0]             delay_op_out;
   logic                 [       N_BITS:0]             delay_op_out_d1;
+  logic                 [N_DIV_STAGE-1:0]             delay_op_out_d1_1;
   logic                 [       N_BITS:0]             delay_op_out_d2;
   logic                                               delay_op_valid;
   logic                                               delay_op_valid_out;
@@ -62,6 +63,7 @@ module s_pe
   logic                                               fu_valid;
   logic                                               fu_ready;
   logic                                               multi_op_instr;
+  logic                                               div_instr;
   // accumulation signals
   logic                                               valid;
   logic                                               acc_loopback;
@@ -69,6 +71,7 @@ module s_pe
   logic                 [            1:0]             vec_mode;
   //fu signals
   logic                 [     N_BITS-1:0]             fu_out;
+  logic                 [     N_BITS-1:0]             rem_q_out;
   fu_instr_t                                          fu_instr;
   // RF
   logic                                               rf_en;
@@ -147,7 +150,7 @@ module s_pe
   ////////////////////////////////////////////////////////////////
   //                         Functional Unit                    //
   ////////////////////////////////////////////////////////////////
-  fu_wrapper fu_wrapper_i (
+  fu_wrapper_div_pipe fu_wrapper_div_pipe_i (
       .clk_i(clk_cg),
       .rst_n_i(rst_n_i),
       .a_i(op_a),
@@ -159,6 +162,7 @@ module s_pe
       .ops_valid_i(fu_ops_valid),
       .valid_o(fu_valid),
       .ready_o(fu_ready),
+      .rem_q_o(rem_q_out),
       .acc_loopback_o(acc_loopback),
       .instr_i(fu_instr),
       .res_o(fu_out)
@@ -168,27 +172,31 @@ module s_pe
   //                    Delay Operand Selection                 //
   ////////////////////////////////////////////////////////////////
 
+  assign div_instr = (fu_instr == DIV || fu_instr == REM || fu_instr == ABSDIV || fu_instr == ABSREM || fu_instr == CADDDIV);
+
   // delayed operand selection, it is one among the possible operands of the PE FU 
-  assign delay_op_fu    = neigh_delay_op_i[delay_pe_mux_sel];
+  assign delay_op_fu = neigh_delay_op_i[delay_pe_mux_sel];
   // delayed operand valid selection
   assign delay_op_valid = neigh_delay_op_valid_i[delay_pe_mux_sel];
   /* output delay data selection
     ->  delay_op_out = fu_out      if delay_pe_mux_sel == D_PE_RES
+    ->  delay_op_out = rem_q_out  if delay_pe_mux_sel == D_PE_RES and fu_instr == REM
     ->  delay_op_out = op_a        if delay_pe_mux_sel == D_PE_OP_A
     ->  delay_op_out = op_b        if delay_pe_mux_sel == D_PE_OP_B
     ->  delay_op_out = delay_op_fu if delay_pe_mux_sel == D_PE_DELAY_OP
     in the default case, delay_op_out is set fed with delay_op_fu,
-    but it can be decided to forward also the result of the PE FU or one of its operands
+    but it can be decided to forward also the result of the PE FU or one of its operands.
+    In case of DIV and REM, the remainder of the division is forwarded.
   */
   always_comb begin
-    delay_op_out = (delay_pe_op_mux_sel == D_PE_RES) ?  {delay_op_fu[N_BITS], fu_out} : (
+    delay_op_out = (delay_pe_op_mux_sel == D_PE_RES) ? ((fu_instr == DIV || fu_instr == REM || fu_instr == ABSDIV || fu_instr == ABSREM) ? {delay_op_fu[N_BITS], rem_q_out} : {delay_op_fu[N_BITS], fu_out}) : (
                    (delay_pe_op_mux_sel == D_PE_OP_A) ? {delay_op_fu[N_BITS], op_a} : (
                    (delay_pe_op_mux_sel == D_PE_OP_B) ? {delay_op_fu[N_BITS], op_b} : delay_op_fu
                   ));
-    delay_op_valid_out = (delay_pe_op_mux_sel == D_PE_RES) ? fu_valid : (
-                         (delay_pe_op_mux_sel == D_PE_OP_A) ? op_a_valid : (
-                         (delay_pe_op_mux_sel == D_PE_OP_B) ? op_b_valid : delay_op_valid
-                         ));
+    delay_op_valid_out = (delay_pe_op_mux_sel == D_PE_RES || div_instr) ? fu_valid : (
+                   (delay_pe_op_mux_sel == D_PE_OP_A) ? op_a_valid : (
+                   (delay_pe_op_mux_sel == D_PE_OP_B) ? op_b_valid : delay_op_valid
+                  ));
   end
 
   // multi_op_instr is asserted when the instruction is a multi-operand one
@@ -203,6 +211,22 @@ module s_pe
       if (!mage_done_i && pea_ready_i) begin
         delay_op_out_d1 <= delay_op_out;
         delay_op_out_d2 <= delay_op_out_d1;
+      end
+    end
+  end
+
+  always_ff @(posedge clk_cg, negedge rst_n_i) begin
+    if (!rst_n_i) begin
+      delay_op_out_d1_1 <= '0;
+    end else begin
+      if (div_instr) begin
+        for (int i = 0; i < N_DIV_STAGE; i++) begin
+          if (i == 0) begin
+            delay_op_out_d1_1[i] <= delay_op_out_d1[N_BITS];
+          end else begin
+            delay_op_out_d1_1[i] <= delay_op_out_d1_1[i-1];
+          end
+        end
       end
     end
   end
@@ -227,21 +251,37 @@ module s_pe
     Otherwise, the output is selected from the first delay register
   */
   always_comb begin
-    if (delay_pe_op_mux_sel == D_PE_RES && multi_op_instr) begin
-      delay_op_o = {delay_op_out_d2[N_BITS], delay_op_out_d1[N_BITS-1:0]};
-      delay_op_valid_o = delay_op_valid_out_d1;
-    end else if (delay_pe_op_mux_sel == D_PE_RES && !multi_op_instr) begin
-      delay_op_o = delay_op_out_d1;
-      delay_op_valid_o = delay_op_valid_out_d1;
-    end else if (delay_pe_op_mux_sel != D_PE_RES && multi_op_instr) begin
-      delay_op_o = delay_op_out_d2;
-      delay_op_valid_o = delay_op_valid_out_d2;
-    end else if (delay_pe_op_mux_sel != D_PE_RES && !multi_op_instr) begin
-      delay_op_o = delay_op_out_d1;
-      delay_op_valid_o = delay_op_valid_out_d1;
+    if (!div_instr) begin
+      if (delay_pe_op_mux_sel == D_PE_RES && multi_op_instr) begin
+        delay_op_o = {delay_op_out_d2[N_BITS], delay_op_out_d1[N_BITS-1:0]};
+        delay_op_valid_o = delay_op_valid_out_d1;
+      end else if (delay_pe_op_mux_sel == D_PE_RES && !multi_op_instr) begin
+        delay_op_o = delay_op_out_d1;
+        delay_op_valid_o = delay_op_valid_out_d1;
+      end else if (delay_pe_op_mux_sel != D_PE_RES && multi_op_instr) begin
+        delay_op_o = delay_op_out_d2;
+        delay_op_valid_o = delay_op_valid_out_d2;
+      end else if (delay_pe_op_mux_sel != D_PE_RES && !multi_op_instr) begin
+        delay_op_o = delay_op_out_d1;
+        delay_op_valid_o = delay_op_valid_out_d1;
+      end else begin
+        delay_op_o = delay_op_out_d1;
+        delay_op_valid_o = delay_op_valid_out_d1;
+      end
     end else begin
-      delay_op_o = delay_op_out_d1;
-      delay_op_valid_o = delay_op_valid_out_d1;
+      if (delay_pe_op_mux_sel == D_PE_RES && multi_op_instr) begin
+        delay_op_o = {delay_op_out_d1_1[N_DIV_STAGE-1], delay_op_out_d1[N_BITS-1:0]};
+        delay_op_valid_o = delay_op_valid_out_d1;
+      end else if (delay_pe_op_mux_sel == D_PE_RES && !multi_op_instr) begin
+        delay_op_o = {delay_op_out_d1_1[N_DIV_STAGE-2], delay_op_out_d1[N_BITS-1:0]};
+        delay_op_valid_o = delay_op_valid_out_d1;
+      end else if (delay_pe_op_mux_sel != D_PE_RES && !multi_op_instr) begin
+        delay_op_o = {delay_op_out_d1_1[N_DIV_STAGE-2], delay_op_out_d1[N_BITS-1:0]};
+        delay_op_valid_o = delay_op_valid_out_d1;
+      end else begin
+        delay_op_o = {delay_op_out_d1_1[N_DIV_STAGE-1], delay_op_out_d1[N_BITS-1:0]};
+        delay_op_valid_o = delay_op_valid_out_d1;
+      end
     end
   end
 
@@ -297,7 +337,7 @@ module s_pe
           valid <= valid_o;
         end
       end else begin
-        valid <= 1'b0;
+        valid <= '0;
       end
     end
   end

@@ -10,14 +10,14 @@
 module r_div
   import pea_pkg::*;
 (
-    input  logic              rst_n_i,
-    input  logic              clk_i,
-    input  logic              en_i,
+    input  logic                     rst_n_i,
+    input  logic                     clk_i,
+    input  logic                     en_i,
     input  logic signed [N_BITS-1:0] n_i,
     input  logic signed [N_BITS-1:0] d_i,
     output logic signed [N_BITS-1:0] r_o,
     output logic signed [N_BITS-1:0] q_o,
-    output logic              valid_o
+    output logic                     valid_o
 );
 
   // divider state
@@ -55,8 +55,8 @@ module r_div
   logic d_is_zero;
 
   // dividend and divisor sign
-  assign n_is_neg  = n_i[N_BITS-1];
-  assign d_is_neg  = d_i[N_BITS-1];
+  assign n_is_neg = n_i[N_BITS-1];
+  assign d_is_neg = d_i[N_BITS-1];
 
   // zero check
   assign n_is_zero = (n_i == '0);

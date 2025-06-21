@@ -33,47 +33,48 @@ module s_div_pe
     // end Streaming Interface
 );
 
+  logic                                               clk_cg;
   // output of operands muxes
-  logic              [     N_BITS-1:0]             op_a;
-  logic              [     N_BITS-1:0]             op_b;
+  logic                 [     N_BITS-1:0]             op_a;
+  logic                 [     N_BITS-1:0]             op_b;
   // mux selectors
-  pe_mux_sel_t                                     mux_sel_a;
-  pe_mux_sel_t                                     mux_sel_b;
+  pe_mux_sel_t                                        mux_sel_a;
+  pe_mux_sel_t                                        mux_sel_b;
   // output of operands-valid muxes
-  logic                                            op_a_valid;
-  logic                                            op_b_valid;
+  logic                                               op_a_valid;
+  logic                                               op_b_valid;
   // delay operands signals
-  delay_pe_mux_sel_t                               delay_pe_mux_sel;
-  delay_pe_op_mux_sel_t                            delay_pe_op_mux_sel;
-  logic              [       N_BITS:0]             delay_op_fu;
-  logic              [       N_BITS:0]             delay_op_out;
-  logic              [       N_BITS:0]             delay_op_out_d1;
-  logic              [       N_BITS:0]             delay_op_out_d1_1;
-  logic              [       N_BITS:0]             delay_op_out_d2;
-  logic                                            delay_op_valid;
-  logic                                            delay_op_valid_out;
-  logic                                            delay_op_valid_out_d1;
-  logic                                            delay_op_valid_out_d2;
+  delay_pe_mux_sel_t                                  delay_pe_mux_sel;
+  delay_pe_op_mux_sel_t                               delay_pe_op_mux_sel;
+  logic                 [       N_BITS:0]             delay_op_fu;
+  logic                 [       N_BITS:0]             delay_op_out;
+  logic                 [       N_BITS:0]             delay_op_out_d1;
+  logic                 [       N_BITS:0]             delay_op_out_d1_1;
+  logic                 [       N_BITS:0]             delay_op_out_d2;
+  logic                                               delay_op_valid;
+  logic                                               delay_op_valid_out;
+  logic                                               delay_op_valid_out_d1;
+  logic                                               delay_op_valid_out_d2;
   // actual inputs to muxes
-  logic              [N_INPUTS_PE-1:0][N_BITS-1:0] operands;
-  logic              [N_INPUTS_PE-1:0]             operands_valid;
+  logic                 [N_INPUTS_PE-1:0][N_BITS-1:0] operands;
+  logic                 [N_INPUTS_PE-1:0]             operands_valid;
   // fu signals
-  logic                                            fu_ops_valid;
-  logic                                            fu_valid;
-  logic                                            fu_ready;
-  logic                                            multi_op_instr;
-  logic                                            div_instr;
+  logic                                               fu_ops_valid;
+  logic                                               fu_valid;
+  logic                                               fu_ready;
+  logic                                               multi_op_instr;
+  logic                                               div_instr;
   // accumulation signals
-  logic                                            valid;
-  logic                                            acc_loopback;
+  logic                                               valid;
+  logic                                               acc_loopback;
   // accumulation signals
-  logic              [            1:0]             vec_mode;
+  logic                 [            1:0]             vec_mode;
   //fu signals
-  logic              [     N_BITS-1:0]             fu_out;
-  logic              [     N_BITS-1:0]             rem_q_out;
-  fu_instr_t                                       fu_instr;
+  logic                 [     N_BITS-1:0]             fu_out;
+  logic                 [     N_BITS-1:0]             rem_q_out;
+  fu_instr_t                                          fu_instr;
   // RF
-  logic                                            rf_en;
+  logic                                               rf_en;
 
   always_comb begin
     for (int i = 0; i < N_INPUTS_PE - 3; i++) begin
@@ -101,8 +102,32 @@ module s_div_pe
   assign fu_instr         = fu_instr_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS - 1 : 2 * LOG_N_INPUTS_PE]);
   assign vec_mode         = ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS];
   assign rf_en = ctrl_pe_i[2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+2];
-  assign delay_pe_mux_sel     = delay_pe_mux_sel_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(N_NEIGH_PE) - 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3]);
-  assign delay_pe_op_mux_sel     = delay_pe_op_mux_sel_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(N_NEIGH_PE) + 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(N_NEIGH_PE)]);
+  assign delay_pe_mux_sel     = delay_pe_mux_sel_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(
+      N_NEIGH_PE
+  )-1 : 2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+3]);
+  assign delay_pe_op_mux_sel     = delay_pe_op_mux_sel_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(
+      N_NEIGH_PE
+  )+1 : 2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+3+$clog2(
+      N_NEIGH_PE
+  )]);
+
+`ifndef VERILATOR
+`ifndef FPGA
+  // PE Clock-gating
+  logic clk_cg_en;
+  assign clk_cg_en = ~(fu_instr == NOP);
+  tc_clk_gating pe_clk_gating_cell (
+      .clk_i(clk_i),
+      .en_i(clk_cg_en),
+      .test_en_i(1'b0),
+      .clk_o(clk_cg)
+  );
+`else
+  assign clk_cg = clk_i;
+`endif
+`else
+  assign clk_cg = clk_i;
+`endif
 
   ////////////////////////////////////////////////////////////////
   //                       Operand Selection                    //
@@ -126,7 +151,7 @@ module s_div_pe
   //                         Functional Unit                    //
   ////////////////////////////////////////////////////////////////
   fu_wrapper_div fu_wrapper_div_i (
-      .clk_i(clk_i),
+      .clk_i(clk_cg),
       .rst_n_i(rst_n_i),
       .a_i(op_a),
       .b_i(op_b),
@@ -148,9 +173,9 @@ module s_div_pe
   ////////////////////////////////////////////////////////////////
 
   assign div_instr = (fu_instr == DIV || fu_instr == REM || fu_instr == ABSDIV || fu_instr == ABSREM || fu_instr == CADDDIV);
-  
+
   // delayed operand selection, it is one among the possible operands of the PE FU 
-  assign delay_op_fu    = neigh_delay_op_i[delay_pe_mux_sel];
+  assign delay_op_fu = neigh_delay_op_i[delay_pe_mux_sel];
   // delayed operand valid selection
   assign delay_op_valid = neigh_delay_op_valid_i[delay_pe_mux_sel];
   /* output delay data selection
@@ -178,7 +203,7 @@ module s_div_pe
   assign multi_op_instr = (fu_instr == ABSDIV || fu_instr == ABSMIN || fu_instr[4] == 1'b1);
 
   // Delay Operand Reg
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
+  always_ff @(posedge clk_cg, negedge rst_n_i) begin
     if (!rst_n_i) begin
       delay_op_out_d1 <= '0;
       delay_op_out_d2 <= '0;
@@ -190,7 +215,7 @@ module s_div_pe
     end
   end
 
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
+  always_ff @(posedge clk_cg, negedge rst_n_i) begin
     if (!rst_n_i) begin
       delay_op_out_d1_1 <= '0;
     end else begin
@@ -201,7 +226,7 @@ module s_div_pe
   end
 
   // Delay Operand Valid Reg
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
+  always_ff @(posedge clk_cg, negedge rst_n_i) begin
     if (!rst_n_i) begin
       delay_op_valid_out_d1 <= 1'b0;
       delay_op_valid_out_d2 <= 1'b0;
@@ -220,7 +245,7 @@ module s_div_pe
     Otherwise, the output is selected from the first delay register
   */
   always_comb begin
-    if(!div_instr) begin
+    if (!div_instr) begin
       if (delay_pe_op_mux_sel == D_PE_RES && multi_op_instr) begin
         delay_op_o = {delay_op_out_d2[N_BITS], delay_op_out_d1[N_BITS-1:0]};
         delay_op_valid_o = delay_op_valid_out_d1;
@@ -254,7 +279,7 @@ module s_div_pe
       -> result of the FU when the instruction is ACC or MAX, the operands are valid and the pea is ready
       -> to itself otherwise, to preserve the current value
   */
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
+  always_ff @(posedge clk_cg, negedge rst_n_i) begin
     if (!rst_n_i) begin
       pe_res_o <= '0;
     end else begin
@@ -282,7 +307,7 @@ module s_div_pe
       -> the FU valid signal when the pea is ready
       -> to itself otherwise, to preserve the current value
   */
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
+  always_ff @(posedge clk_cg, negedge rst_n_i) begin
     if (!rst_n_i) begin
       valid <= '0;
     end else begin

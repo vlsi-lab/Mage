@@ -245,6 +245,12 @@ def main():
                         nargs='?',
                         default="4",
                         help="")
+
+    parser.add_argument("--n_bits_cfg_pe",
+                        metavar="",
+                        nargs='?',
+                        default="4",
+                        help="")
     
     parser.add_argument("--row_div",
                         metavar="",
@@ -345,6 +351,9 @@ def main():
     if args.kernel_len != None and args.kernel_len != '':
         kernel_len = int(args.kernel_len)
 
+    if args.n_bits_cfg_pe != None and args.n_bits_cfg_pe != '':
+        n_bits_cfg_pe = int(args.n_bits_cfg_pe)   
+
     if args.row_div != None and args.row_div != '':
         row_div = int(args.row_div)
 
@@ -378,6 +387,7 @@ def main():
         "n_age_tot"                        : n_age_tot,
         "n_age_per_stream"                 : n_age_per_stream,
         "kernel_len"                       : kernel_len,
+        "n_bits_cfg_pe"                    : n_bits_cfg_pe,
         "row_div"                          : row_div,
         "row_acc"                          : row_acc
     }

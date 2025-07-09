@@ -12,11 +12,13 @@ module fu_wrapper_div_pipe
 (
     input  logic                   clk_i,
     input  logic                   rst_n_i,
+    input  logic                   mage_done_i,
     input  logic      [N_BITS-1:0] a_i,
     input  logic      [N_BITS-1:0] b_i,
     input  fu_instr_t              instr_i,
     input  logic                   delay_sign_i,
     input  logic      [N_BITS-1:0] const_i,
+    input  logic      [N_BITS-1:0] pe_res_i,
     input  logic                   ops_valid_i,
     input  logic                   pea_ready_i,
     input  logic      [      15:0] reg_acc_value_i,
@@ -27,7 +29,9 @@ module fu_wrapper_div_pipe
     output logic      [N_BITS-1:0] res_o
 );
 
+  // gated clock
   logic              clk_cg;
+
   // Internal signed versions of the inputs
   logic [N_BITS-1:0] a_signed;
   logic [N_BITS-1:0] b_signed;
@@ -39,15 +43,14 @@ module fu_wrapper_div_pipe
   ////////////////////////////////////////////////////////////////
 
   // division ready-valid
-  logic                div_input_valid;
   logic                out_div_valid;
+  logic                div_input_valid;
   logic                div_instr;
   // accumulation ready-valid
   logic [  N_BITS-1:0] acc_cnt;
   logic                acc_valid;
   // ready-valid
   logic                valid;
-  logic                ready;
   logic                valid_mo_instr;
   logic                mo_instr;
   // +1 adder
@@ -88,8 +91,9 @@ module fu_wrapper_div_pipe
   logic [  N_BITS-1:0] div_op2;
 
 
-  // Div Clock-gating
+  // div_instr is asserted when the instruction contains a division (it is used to clock gate divider)
   assign div_instr = (instr_i == DIV || instr_i == REM || instr_i == ABSDIV || instr_i == ABSREM || instr_i == CADDDIV);
+
 `ifndef VERILATOR
 `ifndef FPGA
   // Div Clock-gating
@@ -109,12 +113,15 @@ module fu_wrapper_div_pipe
 `endif
 
   /*
-    +1 adder shared between the ACC counter and the ABS operation in ABSMIN
+    +1 adder shared between:
+      -> the ACC, SHACC, MAX, MAXS counter
+      -> the ABS operation in ABSMIN
+      -> the ABS operation in SGNCSUB
   */
   always_comb begin
     add_one_op1 = '0;
     add_one_op2 = '0;
-    if (instr_i == ACC || instr_i == MAX) begin
+    if (instr_i == ACC || instr_i == SHACC || instr_i == MAX || instr_i == MAXS) begin
       add_one_op1 = acc_cnt;
       add_one_op2[0] = 1'b1;
     end else if (instr_i == ABSMIN || instr_i == ABSDIV || instr_i == ABSREM) begin
@@ -135,17 +142,19 @@ module fu_wrapper_div_pipe
   ////////////////////////////////////////////////////////////////
 
   /*
-    ACC counter: counts up to reg_acc_value_i, it is used to know how many elements to accumulate
-    in the ACC instruction. It is also used to know when to stop the max search in the MAX instruction.
-    acc_loopback_o is used to loop back the result of the operation to the input of the PE.
+    ACC counter: 
+      -> counts up to reg_acc_value_i, it is used to know how many elements to accumulate
+          in the ACC instruction
+      -> it is also used to know when to stop the max search in the MAX instruction
+      -> acc_loopback_o is used to loop back the result of the operation to the input of the PE
   */
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
       acc_cnt <= '0;
       acc_loopback_o <= 1'b0;
     end else begin
-      if (instr_i == ACC || instr_i == MAX) begin
-        if (acc_cnt[15:0] == reg_acc_value_i && ops_valid_i && pea_ready_i) begin
+      if (instr_i == ACC || instr_i == SHACC || instr_i == MAX || instr_i == MAXS) begin
+        if ((acc_cnt[15:0] == reg_acc_value_i && ops_valid_i && pea_ready_i) || mage_done_i) begin
           acc_cnt <= '0;
           acc_loopback_o <= 1'b0;
         end else if (ops_valid_i && pea_ready_i) begin
@@ -159,39 +168,72 @@ module fu_wrapper_div_pipe
     end
   end
 
-  assign acc_valid = (acc_cnt[15:0] == reg_acc_value_i && acc_cnt != '0 && ops_valid_i);
+  /*
+    valid signal for accumulation:
+      -> the acc_valid signal is asserted when (in AND):
+        -> the coutner reaches the final value
+        -> the inputs of the FU are valid
+  */
+  //assign acc_valid = (acc_cnt[15:0] == reg_acc_value_i && acc_cnt != '0 && ops_valid_i);
+  assign acc_valid = (acc_cnt[15:0] == reg_acc_value_i && ops_valid_i);
+
 
   ////////////////////////////////////////////////////////////////
   //                           Division                         //
   ////////////////////////////////////////////////////////////////
 
+  // div_input_valid is asserted when the inputs to divider are valid and the instruction has division
   assign div_input_valid = (ops_valid_i && (instr_i == DIV || instr_i == REM)) || (valid_mo_instr && (instr_i == ABSDIV || instr_i == ABSREM || instr_i == CADDDIV));
 
   ////////////////////////////////////////////////////////////////
   //                   Ready-Valid Assignment                   //
   ////////////////////////////////////////////////////////////////
 
+  // mo_instr: asserted if PE instruction is multi-operand (2-cycle instruction)
+  assign mo_instr = instr_i[4] == 1'b1;
 
-  assign mo_instr = instr_i == ABSDIV || instr_i == ABSMIN || instr_i[4] == 1'b1;
+  /*
+    Valid:
+      -> standard case: it is asserted when both inputs are valid
+      -> ACC, SHACC, MAX case: it is asserted when acc_valid is asserted
+        -> NOTE: MAXS has the loopback logic, but its valid is asserted for all the outputs
+      -> 2-cycle instruction case: it is assigned to valid_mo_instr (i.e. ops_valid delayed by one cycle)
+      -> division instruction case: it is asserted when the output of the divider
 
+    Ready:
+      -> the FU is always ready, as also division is pipelined
+  */
   always_comb begin
     valid = ops_valid_i;
-    ready = 1'b1;
     if (div_instr) begin
       valid = out_div_valid;
     end else if (mo_instr) begin
       valid = valid_mo_instr;
     end else begin
-      if (instr_i == ACC) begin
+      if (instr_i == ACC || instr_i == SHACC || instr_i == MAX) begin
         valid = acc_valid;
-      end else if (instr_i == MAX) begin
-        valid = (reg_acc_value_i == '0) ? ops_valid_i : acc_valid;
+      end
+    end
+  end
+
+  // valid_mo_instr is ops_valid_i delayed by one cycle, as it is useful for 2-cycle instructions
+  always_ff @(posedge clk_i, negedge rst_n_i) begin
+    if (!rst_n_i) begin
+      valid_mo_instr <= 1'b0;
+    end else begin
+      if (mo_instr && pea_ready_i) begin
+        valid_mo_instr <= ops_valid_i;
       end
     end
   end
 
   assign valid_o = valid;
-  assign ready_o = ready;
+  assign ready_o = 1'b1;
+
+
+  ////////////////////////////////////////////////////////////////
+  //                Radix-cfg Pipelined Divider                 //
+  ////////////////////////////////////////////////////////////////
 
   div_wrapper_pipe div_wrapper_pipe_i (
       .clk_i(clk_cg),
@@ -209,14 +251,22 @@ module fu_wrapper_div_pipe
   //                FU Input/Output Assignments                 //
   ////////////////////////////////////////////////////////////////
 
+  // Negated versione of a, b and temp_op_reg
   assign op1_neg = ~a_signed;
   assign op2_neg = ~b_signed;
-  assign op2_neg_d1 = ~temp_op_reg;
 
+  assign op2_neg_d1 = ~temp_op_reg;
+  // 32-bit adder
   assign add_res = add_op1 + add_op2;
+
+  // 32-bit mul
   assign mul_res = mul_op1 * mul_op2;
+
+  // 32-bit shifter
   assign shift_res_ext = shift_op1 >>> shift_op2;
   assign shift_res = shift_res_ext[31:0];
+
+  // LHS logic
   generate
     genvar m;
     for (m = 0; m < 32; m++) begin
@@ -224,6 +274,18 @@ module fu_wrapper_div_pipe
     end
   endgenerate
 
+  generate
+    genvar n;
+    for (n = 0; n < 32; n++) begin
+      assign lsh_op1_rev[n] = a_signed[31-n];
+    end
+  endgenerate
+
+  /*
+    Sign of operand a:
+      -> the sign of operand a is taken
+      -> it is delayed of one cycle when instruction is SGNCSUB
+  */
   assign sign_op1 = a_signed[N_BITS-1];
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin
@@ -236,23 +298,10 @@ module fu_wrapper_div_pipe
     end
   end
 
-  generate
-    genvar n;
-    for (n = 0; n < 32; n++) begin
-      assign lsh_op1_rev[n] = a_signed[31-n];
-    end
-  endgenerate
-
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
-    if (!rst_n_i) begin
-      valid_mo_instr <= 1'b0;
-    end else begin
-      if (mo_instr && pea_ready_i) begin
-        valid_mo_instr <= ops_valid_i;
-      end
-    end
-  end
-
+  /*
+    Temporary result for 2-cycle instructions:
+      -> when PE has 2-cycles instruction, the temporary result is stored into a register
+  */
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
       temp_res <= '0;
@@ -289,8 +338,14 @@ module fu_wrapper_div_pipe
     end
   end
 
+  // negated temp_res
   assign temp_res_neg = ~temp_res;
 
+  /*
+    Temporary operand:
+      -> for some 2-cycle instructions, one of the input operands must be stored into a register,
+          as it will be useful for the operation to be done in the second cycle of the instruction
+  */
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
       temp_op_reg <= '0;
@@ -305,6 +360,9 @@ module fu_wrapper_div_pipe
     end
   end
 
+  /*
+    FU Instructions
+  */
   always_comb begin
 
     add_op1   = {a_signed, 1'b0};
@@ -338,6 +396,11 @@ module fu_wrapper_div_pipe
         add_op2 = {op2_neg, 1'b1};
       end
 
+      MAXS: begin
+        add_op1 = {a_signed, 1'b1};
+        add_op2 = {op2_neg, 1'b1};
+      end
+
       MIN: begin
         add_op1 = {a_signed, 1'b1};
         add_op2 = {op2_neg, 1'b1};
@@ -346,6 +409,11 @@ module fu_wrapper_div_pipe
       MAX: begin
         add_op1 = {a_signed, 1'b1};
         add_op2 = {op2_neg, 1'b1};
+      end
+
+      ARSH: begin
+        shift_op1 = {{32{a_signed[N_BITS-1]}}, a_signed};
+        shift_op2 = b_signed;
       end
 
       LRSH: begin
@@ -407,6 +475,13 @@ module fu_wrapper_div_pipe
         div_op2 = temp_op_reg;
       end
 
+      SHACC: begin
+        shift_op1 = {{32{pe_res_i[N_BITS-1]}}, pe_res_i};
+        shift_op2 = a_signed;
+        add_op1   = {shift_res, 1'b0};
+        add_op2   = {b_signed, 1'b0};
+      end
+
       CADDDIV: begin
         add_op1 = {a_signed, 1'b0};
         add_op2 = {const_i, 1'b0};
@@ -446,14 +521,22 @@ module fu_wrapper_div_pipe
       LSH: res_o = lsh_res;
       ARSH: res_o = shift_res;
       LRSH: res_o = shift_res;
-      MAX: res_o = (add_res[N_BITS-1]) ? b_signed : a_signed;
-      MIN: res_o = (add_res[N_BITS-1]) ? a_signed : b_signed;
+      MAX:
+      res_o = (a_signed[N_BITS-1] == 1'b0) ? ((add_res[N_BITS-1] != a_signed[N_BITS-1]) ? b_signed : a_signed) :
+                                                  ((add_res[N_BITS-1] == a_signed[N_BITS-1]) ? b_signed : a_signed);
+      MAXS:
+      res_o = (a_signed[N_BITS-1] == 1'b0) ? ((add_res[N_BITS-1] != a_signed[N_BITS-1]) ? b_signed : a_signed) :
+                                                  ((add_res[N_BITS-1] == a_signed[N_BITS-1]) ? b_signed : a_signed);
+      MIN:
+      res_o = (a_signed[N_BITS-1] == 1'b0) ? ((add_res[N_BITS-1] != a_signed[N_BITS-1]) ? a_signed : b_signed) :
+                                                  ((add_res[N_BITS-1] == a_signed[N_BITS-1]) ? a_signed : b_signed);
       ABS: res_o = sign_op1 ? add_res[N_BITS:1] : a_signed;
       DIV: res_o = quotient_div;
       REM: res_o = remainder_div;
       ADDPOW: res_o = mul_res;
       SUBPOW: res_o = mul_res;
       ABSDIV: res_o = quotient_div;
+      SHACC: res_o = add_res[N_BITS:1];
       ABSREM: res_o = remainder_div;
       CADDDIV: res_o = quotient_div;
       CADDMUL: res_o = mul_res;
@@ -468,6 +551,11 @@ module fu_wrapper_div_pipe
     endcase
   end
 
+  /*
+    rem_q_o:
+      -> assigned to REMAINDER if the main result is the quotient
+      -> assigned to QUOTIENT if the main result is the remainder
+  */
   assign rem_q_o = (instr_i == DIV || instr_i == ABSDIV || instr_i == CADDDIV) ? remainder_div : ((instr_i == REM || instr_i == ABSREM) ? quotient_div : 0);
 
 

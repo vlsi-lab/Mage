@@ -30,8 +30,8 @@ package pea_pkg;
   ////////////////////////////////////////////////////////////////
   localparam unsigned N_BITS = 32;
 
-  localparam unsigned M = ${n_pea_rows};
-  localparam unsigned N = ${n_pea_cols};
+  localparam unsigned M = ${n_pea_cols};
+  localparam unsigned N = ${n_pea_rows};
   localparam unsigned LOG_M = $clog2(M);
   localparam unsigned LOG_N = $clog2(N);
 
@@ -50,14 +50,25 @@ package pea_pkg;
 %endif
 
   localparam unsigned N_NEIGH_PE = ${n_neigh_pe};
-%if enable_streaming_interface == str(1) and enable_decoupling == str(1):
-  localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + n_pe_in_mem + 4};
-%elif enable_streaming_interface == str(1) and enable_decoupling == str(0):
+%if enable_streaming_interface == str(1):
   localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + 4};
-%elif enable_streaming_interface == str(0) and enable_decoupling == str(1):
+  localparam unsigned N_OPERATIONS = 32;
+  localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
+%elif enable_decoupling == str(1):
   localparam unsigned N_INPUTS_PE = ${n_neigh_pe + n_pe_in_mem + 4};
+  localparam unsigned N_OPERATIONS = 16;
+  localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
 %endif
   localparam unsigned LOG_N_INPUTS_PE = (N_INPUTS_PE == 1) ? 1 : $clog2(N_INPUTS_PE);
+
+  localparam unsigned RF_CFG_BITS = 5;
+
+  localparam unsigned END_CFG_MUX_SEL_0       = LOG_N_INPUTS_PE - 1;
+  localparam unsigned END_CFG_MUX_SEL_1       = 2 * LOG_N_INPUTS_PE - 1;
+  localparam unsigned END_CFG_OP              = 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS - 1;
+  localparam unsigned END_RF_CFG              = 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + RF_CFG_BITS - 1;
+  localparam unsigned END_DELAY_PE_MUX_SEL    = 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + RF_CFG_BITS + $clog2(N_NEIGH_PE) - 1;
+  localparam unsigned END_DELAY_PE_OP_MUX_SEL = 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + RF_CFG_BITS + $clog2(N_NEIGH_PE) + 2 - 1;
 %if enable_decoupling == str(1):
   ////////////////////////////////////////////////////////////////
   //                Kernel Controller Parameters                //
@@ -75,40 +86,38 @@ package pea_pkg;
   ////////////////////////////////////////////////////////////////
   //         PE Instructions and Interconnections Types         //
   ////////////////////////////////////////////////////////////////
-%if enable_streaming_interface == str(1) and enable_decoupling == str(0):
-  localparam unsigned N_OPERATIONS = 32;
-  localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
+%if enable_streaming_interface == str(1):
   typedef enum logic[4:0]{
-    NOP         = 5'b00000,
-    ABS         = 5'b00001,
-    ADD         = 5'b00010,
-    SUB         = 5'b00011,
-    MUL         = 5'b00100,
-    LSH         = 5'b00101,
-    ARSH        = 5'b00110,
-    LRSH        = 5'b00111,
-    MAX         = 5'b01000,
-    MIN         = 5'b01001,
-    DIV         = 5'b01010,
-    REM         = 5'b01011,
-    ACC         = 5'b01100,
-    SGNSEL      = 5'b01101,
-    ABSDIV      = 5'b01110,
-    ABSMIN      = 5'b01111,
-    ABSREM      = 5'b10000,
-    ADDPOW      = 5'b10001,
-    SUBPOW      = 5'b10010,
-    SGNCSUB     = 5'b10011,
-    CADDMUL     = 5'b10100,
-    ADDCMUL     = 5'b10101,
-    CMULADD     = 5'b10110,
-    CADDDIV     = 5'b10111,
-    MULCARSH    = 5'b11000,
-    CLSHSUB     = 5'b11001
+    NOP       = 5'b00000,
+    ABS       = 5'b00001,
+    ADD       = 5'b00010,
+    SUB       = 5'b00011,
+    MUL       = 5'b00100,
+    LSH       = 5'b00101,
+    ARSH      = 5'b00110,
+    LRSH      = 5'b00111,
+    MAX       = 5'b01000,
+    MIN       = 5'b01001,
+    DIV       = 5'b01010,
+    REM       = 5'b01011,
+    ACC       = 5'b01100,
+    MAXS      = 5'b01101,
+    SHACC     = 5'b01110,
+    SGNSEL    = 5'b01111,
+    ABSDIV    = 5'b10000,
+    ABSMIN    = 5'b10001,
+    ABSREM    = 5'b10010,
+    ADDPOW    = 5'b10011,
+    SUBPOW    = 5'b10100,
+    SGNCSUB   = 5'b10101,
+    CADDMUL   = 5'b10110,
+    ADDCMUL   = 5'b10111,
+    CMULADD   = 5'b11000,
+    CADDDIV   = 5'b11001,
+    MULCARSH  = 5'b11010,
+    CLSHSUB   = 5'b11011
   } fu_instr_t;
-%elif enable_streaming_interface == str(0) and enable_decoupling == str(1):
-  localparam unsigned N_OPERATIONS = 16;
-  localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
+%elif enable_decoupling == str(1):
   typedef enum logic[3:0]{
     NOP = 4'b0000,
     MUL = 4'b0001,
@@ -122,27 +131,12 @@ package pea_pkg;
     SGNMUL = 4'b1001,
     ADD = 4'b1010
   } fu_instr_t;
-%elif enable_streaming_interface == str(1) and enable_decoupling == str(0):
+%elif enable_streaming_interface == str(1):
 
 %endif
 
   typedef enum logic [LOG_N_INPUTS_PE-1:0]{
-%if enable_streaming_interface == str(1) and enable_decoupling == str(1):
-%for i in range(n_pe_in_stream):
-  STREAM_IN${i} = 4'b${'{:04b}'.format(i+1)},
-%endfor
-  MEMLEFT0   = 4'b0001,
-  MEMLEFT1   = 4'b0010,
-  MEMRIGHT0  = 4'b0011,
-  MEMRIGHT1  = 4'b0100,
-  CONSTANT   = 4'b0101,
-  UP         = 4'b0110,
-  LEFT       = 4'b0111,
-  RIGHT      = 4'b1000,
-  DOWN       = 4'b1001,
-  SELF       = 4'b1010,
-  RF         = 4'b1011
-%elif  enable_streaming_interface == str(1) and enable_decoupling == str(0):
+%if  enable_streaming_interface == str(1):
   CONSTANT   = 4'b0000,
   %for i in range(n_pe_in_stream):
     STREAM_IN${i} = 4'b${'{:04b}'.format(i+1)},
@@ -154,7 +148,7 @@ package pea_pkg;
   SELF       = 4'b${'{:04b}'.format(n_pe_in_stream+5)},
   RF         = 4'b${'{:04b}'.format(n_pe_in_stream+6)},
   DELAY_OP   = 4'b${'{:04b}'.format(n_pe_in_stream+7)}
-%elif  enable_streaming_interface == str(0) and enable_decoupling == str(1):
+%elif enable_decoupling == str(1):
   CONSTANT   = 4'b0000,
   MEMLEFT0   = 4'b0001,
   MEMLEFT1   = 4'b0010,

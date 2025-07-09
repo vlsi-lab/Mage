@@ -7,11 +7,11 @@ filesets:
 
   files_packages:
     files:  
-    - hw/mage/packages/obi_pkg.sv
-    - hw/mage/packages/reg_pkg.sv
+    #- hw/mage/packages/obi_pkg.sv
+    #- hw/mage/packages/reg_pkg.sv
     - hw/mage/packages/stream_intf_pkg.sv
     - hw/mage/packages/pea_pkg.sv
-    - hw/mage/packages/fifo_pkg.sv
+    #- hw/mage/packages/fifo_pkg.sv
     file_type: systemVerilogSource
 
   files_execute:
@@ -28,10 +28,14 @@ filesets:
     - hw/mage/execute/pe/fu/div/r_div_stage.sv
     - hw/mage/execute/pe/fu/div/r_div.sv
     - hw/mage/execute/pe/fu/div/div_wrapper.sv
+    - hw/mage/execute/pe/fu/div/r_div_pipe.sv
+    - hw/mage/execute/pe/fu/div/div_wrapper_pipe.sv
     - hw/mage/execute/pe/fu/fu_wrapper_div.sv
+    - hw/mage/execute/pe/fu/fu_wrapper_div_pipe.sv
     - hw/mage/execute/pe/fu/fu_wrapper.sv
     - hw/mage/execute/pe/s_pe.sv
     - hw/mage/execute/pe/s_div_pe.sv
+    - hw/mage/execute/pe/s_div_pipe_pe.sv
     - hw/mage/execute/pea.sv
     - hw/mage/mage_top.sv
     file_type: systemVerilogSource

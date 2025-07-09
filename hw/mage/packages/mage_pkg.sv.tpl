@@ -20,10 +20,8 @@ package mage_pkg;
   localparam unsigned N_LP = 4;
   //Number of bits required to represent N_LP
   localparam unsigned LOG2_N_LP = $clog2(N_LP);
-  //Maximum number of subscripts for each array
-  localparam unsigned N_SUBSCRIPTS = 2;
-  //Maximum number of loop iteration variables for each subscript
-  localparam signed N_IV_PER_SUBSCRIPT = 2;
+  //Maximum number of loop iteration variables to be used for an address generation
+  localparam signed N_IVS = 4;
   //Number of bits required to represent loop iteration variables
   localparam unsigned NBIT_LP_IV = 8;
   //Number of bits required for the flat address
@@ -135,7 +133,6 @@ package mage_pkg;
     logic [NBIT_LP_IV-1:0] inc;
   } loop_vars_t;
 
-  localparam unsigned N_END_SUBS = LOG2_HWLP_RF_SIZE + (N_SUBSCRIPTS * N_IV_PER_SUBSCRIPT * (LOG2_N_LP + 1));
   localparam unsigned N_END_BANKS = LOG2_HWLP_RF_SIZE + NBIT_N_BANKS;
   localparam unsigned N_END_BANK_START = N_END_BANKS + NBIT_START_BANK;
   localparam unsigned N_END_BS = N_END_BANK_START + NBIT_BLOCK_SIZE;

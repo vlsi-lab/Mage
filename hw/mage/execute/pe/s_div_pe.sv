@@ -16,6 +16,7 @@ module s_div_pe
     input  logic                                 mage_done_i,
     input  logic [N_CFG_BITS_PE-1:0]             ctrl_pe_i,
     // Streaming Interface
+    input  logic [              1:0]             reg_rf_value_i,
     input  logic [             15:0]             reg_acc_value_i,
     input  logic                                 pea_ready_i,
     input  logic [       N_BITS-1:0]             reg_const_i,
@@ -67,50 +68,21 @@ module s_div_pe
   // accumulation signals
   logic                                               valid;
   logic                                               acc_loopback;
-  // accumulation signals
-  logic                 [            1:0]             vec_mode;
   //fu signals
   logic                 [     N_BITS-1:0]             fu_out;
   logic                 [     N_BITS-1:0]             rem_q_out;
   fu_instr_t                                          fu_instr;
   // RF
   logic                                               rf_en;
-
-  always_comb begin
-    for (int i = 0; i < N_INPUTS_PE - 3; i++) begin
-      operands[i] = neigh_pe_op_i[i];
-      operands_valid[i] = neigh_pe_op_valid_i[i];
-    end
-    operands[N_INPUTS_PE-3] = pe_res_o;
-    operands_valid[N_INPUTS_PE-3] = valid_o;
-    operands[N_INPUTS_PE-2] = reg_const_i;
-    operands_valid[N_INPUTS_PE-2] = 1'b1;
-    operands[N_INPUTS_PE-1] = delay_op_fu[N_BITS-1:0];
-    operands_valid[N_INPUTS_PE-1] = delay_op_valid;
-  end
+  logic                 [            1:0]             rf_sel;
+  logic                 [            1:0]             rf_cnt;
+  logic                 [            1:0]             rf_val;
+  logic                 [            4:0]             rf_cfg;
+  logic                 [     N_BITS-1:0]             loopback_shacc;
 
   ////////////////////////////////////////////////////////////////
-  //                      PE Control Word                       //
+  //                     Clock-gating cell                      //
   ////////////////////////////////////////////////////////////////
-  always_comb begin
-    mux_sel_a = pe_mux_sel_t'(ctrl_pe_i[LOG_N_INPUTS_PE-1 : 0]);
-    mux_sel_b = pe_mux_sel_t'(ctrl_pe_i[2*LOG_N_INPUTS_PE-1 : LOG_N_INPUTS_PE]);
-    if (acc_loopback) begin
-      mux_sel_a = SELF;
-    end
-  end
-  assign fu_instr         = fu_instr_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS - 1 : 2 * LOG_N_INPUTS_PE]);
-  assign vec_mode         = ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 1 : 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS];
-  assign rf_en = ctrl_pe_i[2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+2];
-  assign delay_pe_mux_sel     = delay_pe_mux_sel_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(
-      N_NEIGH_PE
-  )-1 : 2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+3]);
-  assign delay_pe_op_mux_sel     = delay_pe_op_mux_sel_t'(ctrl_pe_i[2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + 3 + $clog2(
-      N_NEIGH_PE
-  )+1 : 2*LOG_N_INPUTS_PE+LOG_N_OPERATIONS+3+$clog2(
-      N_NEIGH_PE
-  )]);
-
 `ifndef VERILATOR
 `ifndef FPGA
   // PE Clock-gating
@@ -130,10 +102,75 @@ module s_div_pe
 `endif
 
   ////////////////////////////////////////////////////////////////
+  //                      PE Control Word                       //
+  ////////////////////////////////////////////////////////////////
+
+  /*
+    PE control signals assignment:
+      -> selector for source operand 1 of PE is set to SELF if loopback signal is asserted by FU for ACC instruction
+        -> it is needed to loopback the output of the PE for accumulation
+        -> it is not done if instruction is SHACC, because we cannot waste one source operand for the loopback operand,
+            as the operation is s += (s >> a) + b
+  */
+
+  always_comb begin
+    if (acc_loopback && fu_instr != SHACC) begin
+      mux_sel_a = SELF;
+    end else begin
+      mux_sel_a = pe_mux_sel_t'(ctrl_pe_i[END_CFG_MUX_SEL_0 : 0]);
+    end
+    mux_sel_b = pe_mux_sel_t'(ctrl_pe_i[END_CFG_MUX_SEL_1 : END_CFG_MUX_SEL_0+1]);
+  end
+
+  assign fu_instr = fu_instr_t'(ctrl_pe_i[END_CFG_OP : END_CFG_MUX_SEL_1+1]);
+  assign rf_cfg = ctrl_pe_i[END_RF_CFG : END_CFG_OP+1];
+  assign delay_pe_mux_sel = delay_pe_mux_sel_t'(ctrl_pe_i[END_DELAY_PE_MUX_SEL : END_RF_CFG+1]);
+  assign delay_pe_op_mux_sel  = delay_pe_op_mux_sel_t'(ctrl_pe_i[END_DELAY_PE_OP_MUX_SEL : END_DELAY_PE_MUX_SEL + 1]);
+
+  /*
+    The loopback for SHACC is different, since we cannot waste one source operand for the loopback operand,
+    we directly assign the output of PE in input to FU
+  */
+  always_comb begin
+    if (acc_loopback) begin
+      loopback_shacc = pe_res_o;
+    end else begin
+      loopback_shacc = '0;
+    end
+  end
+
+
+  ////////////////////////////////////////////////////////////////
+  //                 Muxes inputs construction                  //
+  ////////////////////////////////////////////////////////////////
+
+  always_comb begin
+
+    // Assignments of inputs from neighbouring PEs
+    for (int i = 0; i < N_INPUTS_PE - 3; i++) begin
+      operands[i] = neigh_pe_op_i[i];
+      operands_valid[i] = neigh_pe_op_valid_i[i];
+    end
+
+    // SELF
+    operands[N_INPUTS_PE-3] = pe_res_o;
+    operands_valid[N_INPUTS_PE-3] = valid_o;
+
+    // RF
+    operands[N_INPUTS_PE-2] = reg_const_i;
+    operands_valid[N_INPUTS_PE-2] = 1'b1;
+
+    // DELAY_OP
+    operands[N_INPUTS_PE-1] = delay_op_fu[N_BITS-1:0];
+    operands_valid[N_INPUTS_PE-1] = delay_op_valid;
+
+  end
+
+  ////////////////////////////////////////////////////////////////
   //                       Operand Selection                    //
   ////////////////////////////////////////////////////////////////
-  assign op_a = operands[mux_sel_a];
-  assign op_b = operands[mux_sel_b];
+  assign op_a = (mux_sel_a == RF && rf_sel == 2'b00 && reg_pea_rf_de_o) ? reg_pea_rf_d_o : operands[mux_sel_a];
+  assign op_b = (mux_sel_b == RF && rf_sel == 2'b00 && reg_pea_rf_de_o) ? reg_pea_rf_d_o : operands[mux_sel_b];
   assign op_a_valid = (mux_sel_a == SELF) ? 1'b1 : operands_valid[mux_sel_a];
   assign op_b_valid = (mux_sel_b == SELF) ? 1'b1 : operands_valid[mux_sel_b];
   assign fu_ops_valid = op_a_valid && op_b_valid;
@@ -142,9 +179,65 @@ module s_div_pe
   //                   1-entry Register File                    //
   ////////////////////////////////////////////////////////////////
 
+  // RF enable
+  assign rf_en = rf_cfg[0];
+
+  /*
+     RF selector to select which input to latch into RF (reg_cont_i):
+      -> 00 for STREAM_IN0, 01 for OP_A (first FU operand), 10 for OP_B (second FU operand)
+  */
+  assign rf_sel = rf_cfg[2:1];
+
+  //RF value that sets the initial value for the downcounter
+  assign rf_val = rf_cfg[4:3];
+
+  /*
+    RF control downcounter:
+      ? When the input streaming data must be sampled and latched into RF, the user can choose which input to sample
+        This is useful in read fifo sync mode, when temp constants must be latched into PE RF
+      -> The downcounter is initialized to user-defined rf_val, and decremented each time the streaming input is valid
+          and RF is enabled by configurationr register
+      -> when it reaches zero, it is re-initialized
+  */
+  always_ff @(posedge clk_cg, negedge rst_n_i) begin
+    if (~rst_n_i) begin
+      rf_cnt <= '0;
+    end else begin
+      if (rf_en && operands_valid[STREAM_IN0] && pea_ready_i) begin
+        if (rf_cnt == reg_rf_value_i) begin
+          rf_cnt <= '0;
+        end else begin
+          rf_cnt <= rf_cnt + 1;
+        end
+      end
+    end
+  end
+
+  /*
+    RF enable and data_in assignment:
+      -> if RF is enabled
+        -> if 01 or 10, one fu operand is latched (first and second operand respectively)
+        -> if 00, the STREAM_IN0 input is latched, and the enable is asserted when the downcounter is equal to 1
+          -> NOTE: It is 1 and not 0 because if we want to latch the first streaming input we would have to set the rf_val to 0.
+                    However, this would enable the RF forever. Hence, the downcounter match is set to 1 to avoid this.
+  */
+
   always_comb begin
-    reg_pea_rf_de_o = rf_en && valid_o;
-    reg_pea_rf_d_o  = pe_res_o;
+    reg_pea_rf_de_o = '0;
+    reg_pea_rf_d_o  = '0;
+    if (rf_en && pea_ready_i) begin
+      if (rf_sel == 2'b00) begin
+        reg_pea_rf_de_o = operands_valid[STREAM_IN0] && (rf_cnt == rf_val);
+        reg_pea_rf_d_o  = operands[STREAM_IN0];
+      end else if (rf_sel == 2'b01) begin
+        reg_pea_rf_de_o = operands_valid[mux_sel_a];
+        reg_pea_rf_d_o  = operands[mux_sel_a];
+      end
+      if (rf_sel == 2'b10) begin
+        reg_pea_rf_de_o = operands_valid[mux_sel_b];
+        reg_pea_rf_d_o  = operands[mux_sel_b];
+      end
+    end
   end
 
   ////////////////////////////////////////////////////////////////
@@ -153,10 +246,12 @@ module s_div_pe
   fu_wrapper_div fu_wrapper_div_i (
       .clk_i(clk_cg),
       .rst_n_i(rst_n_i),
+      .mage_done_i,
       .a_i(op_a),
       .b_i(op_b),
       .delay_sign_i(delay_op_fu[N_BITS]),
       .const_i(reg_const_i),
+      .pe_res_i(loopback_shacc),
       .reg_acc_value_i,
       .pea_ready_i,
       .ops_valid_i(fu_ops_valid),
@@ -286,7 +381,7 @@ module s_div_pe
       if (!mage_done_i) begin
         if (fu_instr == NOP) begin
           pe_res_o <= '0;
-        end else if((pea_ready_i && fu_valid) || ((fu_instr == ACC || fu_instr == MAX) && fu_ops_valid && pea_ready_i)) begin
+        end else if((pea_ready_i && fu_valid) || ((fu_instr == ACC || fu_instr == SHACC || fu_instr == MAX) && fu_ops_valid && pea_ready_i)) begin
           pe_res_o <= fu_out;
         end else begin
           pe_res_o <= pe_res_o;

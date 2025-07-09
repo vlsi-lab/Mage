@@ -21,18 +21,12 @@ module mage_top
 (
     input  logic                                          clk_i,
     input  logic                                          rst_n_i,
-%if (enable_streaming_interface == str(1)) and (enable_decoupling == str(0)):
+%if enable_streaming_interface == str(1):
     //HW FIFO Interface
     input fifo_req_t [N_DMA_CH-1:0] fifo_req_i,
     output fifo_resp_t [N_DMA_CH-1:0] fifo_resp_o,
     output logic [N_DMA_CH-1:0] mage_done_o,
-%elif enable_streaming_interface == str(1) and enable_decoupling == str(1):
-  //HW FIFO Interface
-    input fifo_req_t [N_DMA_CH-1:0] fifo_req_i,
-    output fifo_resp_t [N_DMA_CH-1:0] fifo_resp_o,
-    output logic [N_DMA_CH-1:0] mage_done_o,
-%endif
-%if enable_decoupling == str(1):
+%elif enable_decoupling == str(1):
     output state_t                                        state_o,
     output logic [3:0]                                    reg_block_size_o,
     //Data Memory Subsystem to Data Memory
@@ -145,12 +139,12 @@ module mage_top
   ////////////////////////////////////////////////////////////////
   //                 Stream Peripheral Registers                //
   ////////////////////////////////////////////////////////////////
-  logic [N_DMA_CH-1:0] reg_sync_dma_ch_trans;
+  logic [N_DMA_CH-1:0][1:0] reg_sync_dma_ch_trans;
   logic [N_DMA_CH-1:0][15:0] reg_trans_size_sync_dma_ch;
   logic [N_DMA_CH-1:0][31:0] reg_trans_size_dma_ch;
   logic [1:0] reg_cols_grouping;
-  logic reg_sync_dma_ch;
-  logic [${n_dma_ch}-1:0] reg_dma_rnw;
+  logic [1:0] reg_rf_val;
+  logic [N_DMA_CH-1:0] reg_dma_rnw;
   logic [M-1:0][LOG_N:0] reg_stream_sel_out_pea;
   logic [N-1:0][M-1:0][15:0] reg_acc_value_pe;
   %if in_stream_xbar == str(1):
@@ -220,7 +214,7 @@ module mage_top
 %endif
 %if enable_streaming_interface == str(1):
       .reg_cols_grouping_o(reg_cols_grouping),
-      .reg_sync_dma_ch_o(reg_sync_dma_ch),
+      .reg_rf_value_o(reg_rf_val),
       .reg_dma_rnw_o(reg_dma_rnw),
       .reg_trans_size_dma_ch_o(reg_trans_size_dma_ch),
       .reg_trans_size_sync_dma_ch_o(reg_trans_size_sync_dma_ch),
@@ -301,6 +295,7 @@ module mage_top
       .reg_pea_rf_d_o(reg_rf_d_pea),
       .reg_pea_rf_i(reg_rf_in_pea),
       .reg_cols_grouping_i(reg_cols_grouping),
+      .reg_rf_value_i(reg_rf_val),
       .reg_acc_value_i(reg_acc_value_pe),
       .reg_stream_sel_out_pea_i(reg_stream_sel_out_pea),
       .stream_valid_o(stream_pea_out_valid),
@@ -509,7 +504,6 @@ module mage_top
       .fifo_req_i(fifo_req_i),
       .fifo_resp_o(fifo_resp_o),
       .reg_cols_grouping_i(reg_cols_grouping),
-      .reg_sync_dma_ch_i(reg_sync_dma_ch),
       .reg_dma_rnw_i(reg_dma_rnw),
 %if out_stream_xbar == str(1):
       .reg_out_stream_sel_i(reg_out_stream_sel),

@@ -30,6 +30,7 @@ module pea
     input  logic [1:0]                                             reg_cols_grouping_i,
     input  logic [M-1:0][ LOG_N:0]                                 reg_stream_sel_out_pea_i,
     input  logic [N-1:0][M-1:0][15:0]                              reg_acc_value_i,
+    input  logic [1:0]                                             reg_rf_value_i,
     input  logic [M-1:0]                                           stream_valid_i,
     input  logic [M-1:0][N_BITS-1:0]                               stream_data_i,
     output logic [M-1:0]                                           pea_ready_o,
@@ -74,7 +75,7 @@ module pea
   ////////////////////////////////////////////////////////////////
   logic [M-1:0][N_BITS-1:0]  stream_data_in_reg;
   logic [M-1:0]              stream_valid_in_reg;
-  logic [M-1:0][N-1:0][15:0]                 reg_acc_value_pe;
+  logic [N-1:0][M-1:0][15:0]                 reg_acc_value_pe;
 
 %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
@@ -411,6 +412,7 @@ logic out_delay_op_valid${r}${c};
       .reg_pea_rf_d_o(reg_pea_rf_d_o[${r}][${c}]),
       .reg_pea_rf_de_o(reg_pea_rf_de_o[${r}][${c}]),
       .reg_acc_value_i(reg_acc_value_pe[${r}][${c}]),
+      .reg_rf_value_i(reg_rf_value_i),
       .pea_ready_i(ready_in_pe[${c}]),
       .neigh_pe_op_valid_i(stream_valid_pe_in${r}${c}),
       .neigh_delay_op_i(in_delay_op${r}${c}),

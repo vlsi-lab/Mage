@@ -45,9 +45,6 @@ filesets:
     - hw/mage/access/hwlp_rf.sv
     - hw/mage/access/hwlp_rou.sv
     - hw/mage/access/k_controller.sv
-    - hw/mage/access/subscripts_gen.sv
-    - hw/mage/access/ba_gen.sv
-    - hw/mage/access/flat_address_gen.sv
     - hw/mage/access/age.sv
     - hw/mage/access/age_unit.sv
     - hw/mage/access/cfg_dispatcher.sv

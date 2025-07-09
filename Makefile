@@ -31,15 +31,28 @@ N_OUT_STREAM = 4
 N_PEA_DOUT_PER_OUT_STREAM = 2
 N_DMA_CH_PER_OUT_STREAM = 1
 
+#N_DMA_CH = 2
+#N_IN_STREAM = 2
+#N_DMA_CH_PER_IN_STREAM = 1
+#N_PEA_DIN_PER_IN_STREAM = 1
+#N_OUT_STREAM = 2
+#N_PEA_DOUT_PER_OUT_STREAM = 2
+#N_DMA_CH_PER_OUT_STREAM = 1
+
 # PEA
 N_PEA_ROWS = 4
 N_PEA_COLS = 4
 N_PE_IN_MEM = 4
 N_PE_IN_STREAM = 2
 N_NEIGH_PE = 4
-#N_PEA_NOC_TYPE = 0
 
-ROW_DIV = 1
+#N_PEA_ROWS = 4
+#N_PEA_COLS = 2
+#N_PE_IN_STREAM = 2
+#N_PE_IN_MEM = 4
+#N_NEIGH_PE = 4
+
+ROW_DIV = 0
 ROW_ACC = 0
 
 re-vendor:
@@ -51,6 +64,7 @@ re-vendor:
 mage-gen:
 	$(PYTHON) util/mage-gen.py  --outdir hw/mage/stream --tpl-sv hw/mage/stream/streaming_interface.sv.tpl \
 	--n_dma_ch $(N_DMA_CH) \
+	--n_pea_cols $(N_PEA_COLS) \
 	--n_in_stream $(N_IN_STREAM) \
 	--n_dma_ch_per_in_stream $(N_DMA_CH_PER_IN_STREAM) \
 	--n_pea_din_per_in_stream $(N_PEA_DIN_PER_IN_STREAM) \
@@ -69,12 +83,6 @@ mage-gen:
 	--n_dma_ch_per_out_stream $(N_DMA_CH_PER_OUT_STREAM) \
 	--in_stream_xbar $(IN_STREAM_XBAR) \
 	--out_stream_xbar $(OUT_STREAM_XBAR)
-	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe/fu --tpl-sv hw/mage/execute/pe/fu/fu_wrapper.sv.tpl \
-	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
-	--enable_decoupling $(ENABLE_DECOUPLED)
-	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute/pe/fu --tpl-sv hw/mage/execute/pe/fu/fu_wrapper_div.sv.tpl \
-	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
-	--enable_decoupling $(ENABLE_DECOUPLED)
 	$(PYTHON) util/mage-gen.py  --outdir hw/mage/execute --tpl-sv hw/mage/execute/pea.sv.tpl \
 	--n_pea_rows $(N_PEA_ROWS) \
 	--n_pea_cols $(N_PEA_COLS) \
@@ -122,6 +130,7 @@ mage-gen:
 	--n_pea_dout_per_out_stream $(N_PEA_DOUT_PER_OUT_STREAM) \
 	--n_dma_ch_per_out_stream $(N_DMA_CH_PER_OUT_STREAM)
 	$(PYTHON) util/mage-gen.py  --outdir hw/mage --tpl-sv hw/mage/mage_top.sv.tpl \
+	--n_dma_ch $(N_DMA_CH) \
 	--kernel_len $(KERNEL_LEN) \
 	--enable_streaming_interface $(ENABLE_STREAMING_INTERFACE) \
 	--enable_decoupling $(ENABLE_DECOUPLED) \

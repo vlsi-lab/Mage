@@ -36,14 +36,14 @@ module hwlp_rou
     output logic [N_AGE_TOT-1:0] pea_acc_reset_o,
     //reordered end signals
     output logic [N_AGE_TOT-1:0] end_lp_o,
-    //for each stream, hwlp_rou_o contains the ordered ivs needed for the calculation of the address/bank for the stream
-    output logic [N_AGE_TOT-1:0][N_SUBSCRIPTS-1:0][N_IV_PER_SUBSCRIPT-1:0][NBIT_LP_IV-1:0] hwlp_rou_o
+    //for each stream,   contains the ordered ivs needed for the calculation of the address/bank for the stream
+    output logic [N_AGE_TOT-1:0][N_IVS-1:0][NBIT_LP_IV-1:0] hwlp_rou_o
 );
 
   logic [N_AGE_TOT-1:0][N_LP-1+1:0][NBIT_LP_IV-1:0] stream_hwlp;
   logic [N_AGE_TOT-1:0] is_constraint_iv_valid;
   logic [N_AGE_TOT-1:0] is_pea_acc_constraint_valid;
-  logic [N_AGE_TOT-1:0][N_SUBSCRIPTS-1:0][N_IV_PER_SUBSCRIPT-1:0][NBIT_LP_IV-1:0] hwlp_rou;
+  logic [N_AGE_TOT-1:0][N_IVS-1:0][NBIT_LP_IV-1:0] hwlp_rou;
   logic init_acc_done;
 
   logic [N_STREAMS-1:0][N_AGE_PER_STREAM-1:0][N_LP-1:0] condition_mask;
@@ -77,13 +77,11 @@ module hwlp_rou
   ////////////////////////////////////////////////////////////////
   always_comb begin
     for (int i = 0; i < N_AGE_TOT; i = i + 1) begin
-      for (int j = 0; j < N_SUBSCRIPTS; j = j + 1) begin
-        for (int k = 0; k < N_IV_PER_SUBSCRIPT; k = k + 1) begin
-          if (is_age_active_i[i] == 1'b0) begin
-            hwlp_rou[i][j][k] = 0;
-          end else begin
-            hwlp_rou[i][j][k] = stream_hwlp[i][j*N_IV_PER_SUBSCRIPT+k];
-          end
+      for (int j = 0; j < N_IVS; j = j + 1) begin
+        if (is_age_active_i[i] == 1'b0) begin
+          hwlp_rou[i][j] = 0;
+        end else begin
+          hwlp_rou[i][j] = stream_hwlp[i][j];
         end
       end
     end

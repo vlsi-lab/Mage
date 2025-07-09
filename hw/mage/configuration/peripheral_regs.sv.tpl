@@ -58,10 +58,10 @@ module peripheral_regs
     ////////////////////////////////////////////////////////////////
     //               Mage Streaming Configuration                 //
     ////////////////////////////////////////////////////////////////
+    output logic [1:0] reg_rf_value_o,
     output logic [1:0] reg_cols_grouping_o,
-    output logic reg_sync_dma_ch_o,
-    output logic [${n_dma_ch}-1:0] reg_sync_dma_ch_trans_o,
-    output logic [${n_dma_ch}-1:0] reg_dma_rnw_o,
+    output logic [N_DMA_CH-1:0][1:0] reg_sync_dma_ch_trans_o,
+    output logic [N_DMA_CH-1:0] reg_dma_rnw_o,
     output logic [N_DMA_CH-1:0][31:0] reg_trans_size_dma_ch_o,
     output logic [N_DMA_CH-1:0][15:0] reg_trans_size_sync_dma_ch_o,
     output logic [M-1:0][LOG_N:0] reg_sel_out_col_pea_o,
@@ -193,10 +193,10 @@ module peripheral_regs
     //                Streaming Mage Configuration                //
     ////////////////////////////////////////////////////////////////
     reg_cols_grouping_o = reg2hw.cols_grouping.q;
-    reg_sync_dma_ch_o = reg2hw.sync_dma_ch.q;
+    reg_rf_value_o = reg2hw.rf_val.q;
   %for i in range(n_dma_ch):
     reg_dma_rnw_o[${i}] = reg2hw.dma_rnw.q[${i}];
-    reg_sync_dma_ch_trans_o[${i}] = reg2hw.sync_dma_ch_trans.q[${i}];
+    reg_sync_dma_ch_trans_o[${i}] = reg2hw.sync_dma_ch_trans.q[${2*i+1}:${2*i}];
     reg_trans_size_dma_ch_o[${i}] = reg2hw.trans_size_dma_ch_${i}.q;
     reg_trans_size_sync_dma_ch_o[${i}] = reg2hw.trans_size_sync_dma_ch_${i}.q;
   %endfor

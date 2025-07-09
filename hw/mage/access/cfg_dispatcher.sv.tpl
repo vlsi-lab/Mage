@@ -56,7 +56,7 @@ module cfg_dispatcher
     for (int i = 0; i < N_AGE_TOT; i = i + 1) begin
 
       stream_inst[i].hwlp_rf_sel = cfg_word[i][LOG2_HWLP_RF_SIZE-1:0];
-      stream_inst[i].n_banks = cfg_word[i][N_END_SUBS+NBIT_N_BANKS-1-:NBIT_N_BANKS];
+      stream_inst[i].n_banks = cfg_word[i][LOG2_HWLP_RF_SIZE+NBIT_N_BANKS-1-:NBIT_N_BANKS];
       stream_inst[i].bank_start = cfg_word[i][N_END_BANKS+NBIT_START_BANK-1-:NBIT_START_BANK];
       stream_inst[i].block_size = cfg_word[i][N_END_BANK_START+NBIT_BLOCK_SIZE-1-:NBIT_BLOCK_SIZE];
       stream_inst[i].lns = cfg_word[i][N_END_BS+1-1-:1];
@@ -68,6 +68,7 @@ module cfg_dispatcher
     end
   end
 
+  // Outputs to ROU exiting the dispatcher without going through registers 
   always_comb begin
     for (int i = 0; i < N_AGE_TOT; i = i + 1) begin
       hwlp_sel_o[i] = stream_inst[i].hwlp_rf_sel;
@@ -78,20 +79,25 @@ module cfg_dispatcher
   end
 
 
-  //Constructing output to BA_GEN which has to go through two registers
+%if kernel_len != 1:
+  //Constructing output to AGU which has to go through registers
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
+      // 1-reg stage
+      is_age_active_o <= '0;
+      // 2-reg stage
+      tmp_const_iv <= '0;
+      // 3-reg stage
       n_banks_o <= '0;
       block_size_o <= '0;
       const_iv_o <= '0;
-      tmp_const_iv <= '0;
-      is_age_active_o <= '0;
       tmp_n_banks <= '0;
       tmp_start_banks <= '0;
       tmp_block_size <= '0;
       tmp_stream_lns <= '0;
-    end else begin
+      end else begin
       for (int i = 0; i < N_AGE_TOT; i = i + 1) begin
+        // 3-reg stage
         tmp_is_acc_store[0][i] <= stream_inst[i].is_acc_store;
         tmp_is_acc_store[1][i] <= tmp_is_acc_store[0][i];
         is_acc_store_o[i] <= tmp_is_acc_store[1][i];
@@ -112,12 +118,27 @@ module cfg_dispatcher
         tmp_stream_lns[1][i] <= tmp_stream_lns[0][i];
         stream_lns_o[i] <= tmp_stream_lns[1][i];
 
+        // 2-reg stage
         tmp_const_iv[i] <= stream_inst[i].iv_const;
         const_iv_o[i] <= tmp_const_iv[i];
 
+        // 1-reg stage
         is_age_active_o[i] <= stream_inst[i].valid;
       end
     end
   end
-
+% else:
+  // Outputs to AGU exiting the dispatcher without going through registers
+  always_comb begin
+    for (int i = 0; i < N_AGE_TOT; i = i + 1) begin
+      is_acc_store_o[i]  = stream_inst[i].is_acc_store;
+      n_banks_o[i]       = stream_inst[i].n_banks;
+      start_banks_o[i]   = stream_inst[i].bank_start;
+      block_size_o[i]    = stream_inst[i].block_size;
+      stream_lns_o[i]    = stream_inst[i].lns; 
+      const_iv_o[i]      = stream_inst[i].iv_const;
+      is_age_active_o[i] = stream_inst[i].valid;
+    end
+  end
+% endif
 endmodule : cfg_dispatcher

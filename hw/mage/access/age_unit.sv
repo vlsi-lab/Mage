@@ -17,10 +17,10 @@ module age_unit
     //input logic end_accumulation_i,
     input logic start_i,
     //CSR containing all column sizes neeeded for calculating flat address
-    input logic [N_AGE_TOT-1:0][N_SUBSCRIPTS-1:0][N_IV_PER_SUBSCRIPT-1:0][NBIT_LP_IV-1:0] reg_age_strides_i,
+    input logic [N_AGE_TOT-1:0][N_IVS-1:0][NBIT_LP_IV-1:0] reg_age_strides_i,
     //from HWLP_ROU
     //oredered ivs for each stream address/bank generation
-    input logic [N_AGE_TOT-1:0][N_SUBSCRIPTS-1:0][N_IV_PER_SUBSCRIPT-1:0][NBIT_LP_IV-1:0] rou_i,
+    input logic [N_AGE_TOT-1:0][N_IVS-1:0][NBIT_LP_IV-1:0] rou_i,
     input logic [N_AGE_TOT-1:0] pea_acc_reset_i,
     //validity of each stream
     input logic [N_AGE_TOT-1:0] stream_valid_i,

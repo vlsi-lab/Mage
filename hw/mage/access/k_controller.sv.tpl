@@ -16,8 +16,8 @@ module k_controller
     input  logic                                      clk_i,
     input  logic                                      rst_n_i,
     input  logic                                      start_i,
-    input  loop_pipeline_info_t                       reg_lp_info_i,
 % if kernel_len != 1:
+    input  loop_pipeline_info_t                       reg_lp_info_i,
     output logic                [N_ADDR_BITS_KMEM-1:0] count_pke_o,
     output logic                [N_ADDR_BITS_KMEM-1:0] count_pke_d_o,
 % endif

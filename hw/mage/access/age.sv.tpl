@@ -47,16 +47,16 @@ module age
 );
 
   // Stage 0
-  logic [                   1:0][NBIT_FLAT_ADDR-1:0] mult_temp_res;
-  logic [             N_IVS-1:0][NBIT_FLAT_ADDR-1:0] mult_ivs_in_reg;
-  logic [             N_IVS-1:0][NBIT_FLAT_ADDR-1:0] mult_ivs_out_reg;
+  logic [1:0][NBIT_FLAT_ADDR-1:0]         mult_temp_res;
+  logic [      N_IVS-1:0][NBIT_FLAT_ADDR-1:0] mult_ivs_in_reg;
+  logic [      N_IVS-1:0][NBIT_FLAT_ADDR-1:0] mult_ivs_out_reg;
   // Stage 1
-  logic [    NBIT_FLAT_ADDR-1:0]                     flat_address_in_reg;
-  logic [    NBIT_FLAT_ADDR-1:0]                     flat_address_out_reg;
+  logic [    NBIT_FLAT_ADDR-1:0]              flat_address_in_reg;
+  logic [    NBIT_FLAT_ADDR-1:0]              flat_address_out_reg;
   // Stage 2
-  logic [    NBIT_FLAT_ADDR-1:0]                     x_div_bs;
-  logic [    NBIT_FLAT_ADDR-1:0]                     x_rem_bs;
-  logic [                 3-1:0]                     age_bank_ls_stream;
+  logic [NBIT_FLAT_ADDR-1:0] x_div_bs;
+  logic [NBIT_FLAT_ADDR-1:0] x_rem_bs;
+  logic [3-1:0] age_bank_ls_stream;
   logic                                              valid;
   logic                                              valid_acc_store;
   logic [N_BANKS_PER_STREAM-1:0]                     age_bank;
@@ -70,26 +70,26 @@ module age
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
-      mult_ivs_out_reg     <= '0;
-      flat_address_out_reg <= '0;
-      valid                <= '0;
-      lns_o                <= 1'b0;
-      pea_acc_reset        <= '0;
+      mult_ivs_out_reg       <= '0;
+      flat_address_out_reg   <= '0;
+      valid                  <= '0;
+      lns_o                  <= 1'b0;
+      pea_acc_reset          <= '0;
     end else begin
       if (start_i == 1'b1 && active_i == 1'b1) begin
-        mult_ivs_out_reg     <= mult_ivs_in_reg;
-        flat_address_out_reg <= flat_address_in_reg;
-        valid                <= valid_i;
-        valid_o              <= valid;
-        pea_acc_reset        <= pea_acc_reset_i;
-        pea_acc_reset_o      <= pea_acc_reset && is_acc_store_i;
-        lns_o                <= lns_i;
+        mult_ivs_out_reg       <= mult_ivs_in_reg;
+        flat_address_out_reg   <= flat_address_in_reg;
+        valid                  <= valid_i;
+        valid_o                <= valid;
+        pea_acc_reset          <= pea_acc_reset_i;
+        pea_acc_reset_o        <= pea_acc_reset && is_acc_store_i;
+        lns_o                  <= lns_i;
       end else begin
-        mult_ivs_out_reg     <= '0;
-        flat_address_out_reg <= '0;
-        valid                <= '0;
-        valid_o              <= 1'b0;
-        lns_o                <= 1'b0;
+        mult_ivs_out_reg       <= '0;
+        flat_address_out_reg   <= '0;
+        valid                  <= '0;
+        valid_o                <= 1'b0;
+        lns_o                  <= 1'b0;
       end
     end
   end
@@ -120,7 +120,7 @@ module age
   ////////////////////////////////////////////////////////////////
   //              Address Generation Engine Stages              //
   ////////////////////////////////////////////////////////////////
-
+  
   // Stage 0
   always_comb begin
     for (int i = 0; i < N_IVS; i = i + 1) begin
@@ -138,7 +138,7 @@ module age
   // Stage 2
   always_comb begin
     x_div_bs = (flat_address_out_reg >> block_size_i);
-    case (n_banks_i)
+    case(n_banks_i)
       2'b00: age_bank_ls_stream = start_bank_i;
       2'b01: age_bank_ls_stream = {2'b0, x_div_bs[0]} + start_bank_i;
       2'b10: age_bank_ls_stream = {1'b0, x_div_bs[1:0]} + start_bank_i;
@@ -147,16 +147,22 @@ module age
 
     age_bank_o = 1 << age_bank_ls_stream;
 
-    case (block_size_i)
+    case(block_size_i)
       2'b00: x_rem_bs = '0;
-      2'b01: x_rem_bs = {{NBIT_FLAT_ADDR - 1{1'b0}}, flat_address_out_reg[0]};
-      2'b10: x_rem_bs = {{NBIT_FLAT_ADDR - 2{1'b0}}, flat_address_out_reg[1:0]};
-      2'b11: x_rem_bs = {{NBIT_FLAT_ADDR - 3{1'b0}}, flat_address_out_reg[2:0]};
+      2'b01: x_rem_bs = {{NBIT_FLAT_ADDR-1{1'b0}},flat_address_out_reg[0]};
+      2'b10: x_rem_bs = {{NBIT_FLAT_ADDR-2{1'b0}},flat_address_out_reg[1:0]};
+      2'b11: x_rem_bs = {{NBIT_FLAT_ADDR-3{1'b0}},flat_address_out_reg[2:0]};
     endcase
 
     age_addr_o = ((flat_address_out_reg >> (block_size_i + n_banks_i)) << (block_size_i)) + x_rem_bs;
 
+% if n_age_per_stream == 4:
+    age_bank_ls_stream_o = age_bank_ls_stream[1:0];
+% elif n_age_per_stream == 2:
     age_bank_ls_stream_o = age_bank_ls_stream[0];
+% elif n_age_per_stream == 8:
+    age_bank_ls_stream_o = age_bank_ls_stream[3:0];
+% endif
   end
 
   assign age_bank_o = age_bank;

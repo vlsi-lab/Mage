@@ -14,10 +14,6 @@ module mage
     input logic clk_i,
     input logic rst_n_i,
     input logic start_i,
-    //input logic reg_is_acc_i,
-    //input logic [LOG2_HWLP_RF_SIZE-1:0] reg_acc_hwlp_sel_i, 
-    //input logic [LOG2_N_LP-1:0] reg_acc_iv_sel_i,
-    //input logic [NBIT_LP_IV-1:0] reg_acc_iv_constraint_i,
     input logic [1:0] reg_acc_vec_mode_i,
     ////////////////////////////////////////////////////////////////
     //                Hardware Loops Configuration                //
@@ -28,9 +24,9 @@ module mage
     ////////////////////////////////////////////////////////////////
 % if kernel_len != 1:
     input logic reg_static_no_timemux_i,
+    input loop_pipeline_info_t reg_lp_info_i,
 % endif
     input logic [NBIT_II-1:0] reg_II_i,
-    input loop_pipeline_info_t reg_lp_info_i,
     ////////////////////////////////////////////////////////////////
     //                Re-Order Unit Configuration                 //
     ////////////////////////////////////////////////////////////////
@@ -38,7 +34,7 @@ module mage
     ////////////////////////////////////////////////////////////////
     //                        Stride Sizes                        //
     ////////////////////////////////////////////////////////////////
-    input logic [N_AGE_TOT-1:0][N_SUBSCRIPTS-1:0][N_IV_PER_SUBSCRIPT-1:0][NBIT_LP_IV-1:0] reg_age_strides_i,
+    input logic [N_AGE_TOT-1:0][N_IVS-1:0][NBIT_LP_IV-1:0] reg_age_strides_i,
     ////////////////////////////////////////////////////////////////
     //                   Streams Configuration                    //
     ////////////////////////////////////////////////////////////////
@@ -48,10 +44,10 @@ module mage
     ////////////////////////////////////////////////////////////////
     output logic start_d_o,
     output logic end_lp_o,
+% if kernel_len != 1:
     ////////////////////////////////////////////////////////////////
     //                PC for Configuration Memory                 //
     ////////////////////////////////////////////////////////////////
-% if kernel_len != 1:
     output logic [N_ADDR_BITS_KMEM-1:0] cfgmem_addr_d_o,
 % endif
     ////////////////////////////////////////////////////////////////
@@ -79,7 +75,7 @@ module mage
   logic [N_AGE_TOT-1:0] is_age_active;
   logic [N_AGE_TOT-1:0][LOG2_HWLP_RF_SIZE-1:0] hwlp_sel;
   logic [N_AGE_TOT-1:0][LOG2_N_LP-1+1:0] iv_contraints_sel;
-  logic [N_AGE_TOT-1:0][N_SUBSCRIPTS-1:0][NBIT_IV_CONST-1:0] const_iv;
+  logic [N_AGE_TOT-1:0][NBIT_IV_CONST-1:0] const_iv;
   logic [N_AGE_TOT-1:0][NBIT_N_BANKS-1:0] n_banks;
   logic [N_AGE_TOT-1:0][NBIT_START_BANK-1:0] start_banks;
   logic [N_AGE_TOT-1:0][NBIT_BLOCK_SIZE-1:0] block_size;
@@ -101,7 +97,7 @@ module mage
   ////////////////////////////////////////////////////////////////
   //                      HWLP ROU Outputs                      //
   ////////////////////////////////////////////////////////////////
-  logic [N_AGE_TOT-1:0][N_SUBSCRIPTS-1:0][N_IV_PER_SUBSCRIPT-1:0][NBIT_LP_IV-1:0] hwlp_rou_in_reg;
+  logic [N_AGE_TOT-1:0][N_IVS-1:0][NBIT_LP_IV-1:0] hwlp_rou_in_reg;
   logic [N_AGE_TOT-1:0] stream_valid_in_reg;
   logic [N_AGE_TOT-1:0] pea_acc_reset_in_reg;
   ////////////////////////////////////////////////////////////////
@@ -109,7 +105,7 @@ module mage
   ////////////////////////////////////////////////////////////////
   logic [N_AGE_TOT-1:0] stream_valid_out_reg;
   logic [N_AGE_TOT-1:0] pea_acc_reset_out_reg;
-  logic [N_AGE_TOT-1:0][N_SUBSCRIPTS-1:0][N_IV_PER_SUBSCRIPT-1:0][NBIT_LP_IV-1:0] hwlp_rou_out_reg;
+  logic [N_AGE_TOT-1:0][N_IVS-1:0][NBIT_LP_IV-1:0] hwlp_rou_out_reg;
   logic [N_STREAMS-1:0][N_AGE_PER_STREAM-1:0] stream_pea_acc_reset_out_reg;
   ////////////////////////////////////////////////////////////////
   //                      AGE Unit Outputs                      //
@@ -138,42 +134,48 @@ module mage
   ////////////////////////////////////////////////////////////////
   always_ff @(posedge clk_i or negedge rst_n_i) begin
     if (~rst_n_i) begin
-      mage_bank_ls_in_reg <= '0;
-      stream_valid_out_reg <= '0;
-      hwlp_rou_out_reg <= '0;
+
+      // AGU outputs
       mage_addr_o <= '0;
       mage_bank_o <= '0;
       mage_bank_ls_o <= '0;
       mage_valid_o <= '0;
       mage_valid_ls_o <= '0;
       mage_lns_o <= '0;
+
+      // AGU bank_ls signal delayed one extra cycle
+      mage_bank_ls_in_reg <= '0;
+
+      // ROU - AGU stream_valid signals
+      stream_valid_out_reg <= '0;
+      hwlp_rou_out_reg <= '0;
+
+      // ROU - AGU pea_acc signals
       pea_acc_reset_out_reg <= '0;
       stream_pea_acc_reset_out_reg <= '0;
+      
     end else begin
       if (start_i) begin
+        
+        // ROU - AGU pea_acc signals
         stream_pea_acc_reset_out_reg <= stream_pea_acc_reset_in_reg;
         pea_acc_reset_out_reg <= pea_acc_reset_in_reg;
+        
+        // ROU - AGU stream_valid signals
         stream_valid_out_reg <= stream_valid_in_reg;
         hwlp_rou_out_reg <= hwlp_rou_in_reg;
-        mage_addr_o <= mage_addr_in_reg;
-        mage_bank_o <= mage_bank_in_reg;
+
+        // AGU bank_ls signal delayed one extra cycle
         mage_bank_ls_in_reg <= mage_bank_ls_out_age;
         mage_bank_ls_o <= mage_bank_ls_in_reg;
+
+        // AGU outputs
+        mage_addr_o <= mage_addr_in_reg;
+        mage_bank_o <= mage_bank_in_reg;
         mage_valid_o <= mage_valid_in_reg;
         mage_valid_ls_o <= mage_valid_o;
         mage_lns_o <= mage_lns_in_reg;
-      end else begin
-        stream_pea_acc_reset_out_reg <= '0;
-        pea_acc_reset_out_reg <= '0;
-        mage_bank_ls_in_reg <= '0;
-        stream_valid_out_reg <= '0;
-        hwlp_rou_out_reg <= '0;
-        mage_bank_ls_o <= '0;
-        mage_addr_o <= '0;
-        mage_bank_o <= '0;
-        mage_valid_o <= '0;
-        mage_valid_ls_o <= '0;
-        mage_lns_o <= '0;
+
       end
     end
   end
@@ -183,8 +185,8 @@ module mage
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
       .start_i(start_i),
-      .reg_lp_info_i(reg_lp_info_i),
 % if kernel_len != 1:
+      .reg_lp_info_i(reg_lp_info_i),
       .count_pke_o(cfgmem_addr_disp),
       .count_pke_d_o(cfgmem_addr_d_o),
 % endif
@@ -305,10 +307,10 @@ module mage
       .hwlp_sel_o(hwlp_sel),
       .iv_constraint_sel_o(iv_contraints_sel),
       .is_acc_store_rou_o(is_acc_store_rou),
+      .is_age_active_rou_o(is_age_active_rou),
       //To age_unit
       .const_iv_o(const_iv),
       .is_age_active_o(is_age_active),
-      .is_age_active_rou_o(is_age_active_rou),
       .n_banks_o(n_banks),
       .start_banks_o(start_banks),
       .block_size_o(block_size),

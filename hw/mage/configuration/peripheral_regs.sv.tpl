@@ -8,10 +8,10 @@
 // Description: This module handles the relationship between the peripheral registers and Mage-Cgra
 
 module peripheral_regs
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   import stream_intf_pkg::*;
 %endif
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   import mage_pkg::*;
   import xbar_pkg::*;
 %endif
@@ -23,7 +23,7 @@ module peripheral_regs
     input logic rst_n_i,
     input reg_req_t reg_req_i,
     output reg_rsp_t reg_rsp_o,
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
     ////////////////////////////////////////////////////////////////
     //                  DAE Mage Configuration                    //
     ////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ module peripheral_regs
     output logic [(N_CFG_REGS_LOAD_STREAM*32)-1:0] reg_cfg_l_stream_sel_o,
     output logic [(N_CFG_REGS_STORE_STREAM*32)-1:0] reg_cfg_s_stream_sel_o,
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
     ////////////////////////////////////////////////////////////////
     //               Mage Streaming Configuration                 //
     ////////////////////////////////////////////////////////////////
@@ -69,10 +69,10 @@ module peripheral_regs
     input logic [N-1:0][M-1:0] reg_pea_rf_de_i,
     input logic [N-1:0][M-1:0][31:0] reg_pea_rf_d_i,
     output logic [N-1:0][M-1:0][31:0] reg_pea_rf_o,
-  %if out_stream_xbar == str(1):
+  %if out_stream_xbar == 1:
     output logic [N_OUT_STREAM-1:0][N_DMA_CH_PER_OUT_STREAM-1:0][LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0] reg_out_stream_sel_o,
   %endif
-  %if in_stream_xbar == str(1):
+  %if in_stream_xbar == 1:
     output logic [N_IN_STREAM-1:0][N_DMA_CH_PER_IN_STREAM-1:0][LOG_N_DMA_CH_PER_IN_STREAM-1:0] reg_in_stream_sel_o,
   %endif
 %endif
@@ -99,7 +99,7 @@ module peripheral_regs
   );
 
   always_comb begin
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
     ////////////////////////////////////////////////////////////////
     //                   DAE Mage Configuration                   //
     ////////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ module peripheral_regs
 %endif
     reg_cfg_sel_out_pea_o = {reg2hw.sel_out_pea[1].q, reg2hw.sel_out_pea[0].q};
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
     ////////////////////////////////////////////////////////////////
     //                Streaming Mage Configuration                //
     ////////////////////////////////////////////////////////////////
@@ -208,14 +208,14 @@ module peripheral_regs
     reg_acc_value_pe_o[${r}][${c}] = reg2hw.acc_value[${r*n_pea_cols+c}].q;
     %endfor 
   %endfor
-  %if out_stream_xbar == str(1):
+  %if out_stream_xbar == 1:
     %for i in range(n_out_stream):
       %for j in range(n_dma_ch_per_out_stream):
     reg_out_stream_sel_o[${i}][${j}] = reg2hw.stream_out_xbar_sel.sel_out_xbar_${i*n_dma_ch_per_out_stream+j}.q[LOG_N_PEA_DOUT_PER_OUT_STREAM-1:0];  
       %endfor
     %endfor
   %endif
-  %if in_stream_xbar == str(1):
+  %if in_stream_xbar == 1:
     %for i in range(n_in_stream):
       %for j in range(n_dma_ch_per_out_stream):
     reg_in_stream_sel_o[${i}][${j}] = reg2hw.stream_in_xbar_sel.sel_in_xbar_${i*n_dma_ch_per_out_stream+j}.q[LOG_N_DMA_CH_PER_IN_STREAM-1:0];  
@@ -231,7 +231,7 @@ module peripheral_regs
     reg_pea_constants_o[${r}][${c}] = reg2hw.pea_constants[${r*n_pea_cols+c}].q; 
   %endfor
 %endfor
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
     reg_pea_rf_o[${r}][${c}] = reg2hw.pea_rf[${r*n_pea_cols+c}].q;

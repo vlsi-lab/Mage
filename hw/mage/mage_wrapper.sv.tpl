@@ -8,11 +8,11 @@
 // Description: Top entity for Mage ecnompassing the SpM, memory decoder and the CGRA
 
 module mage_wrapper
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   import mage_pkg::*;
   import xbar_pkg::*;
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   import fifo_pkg::*;
   import stream_intf_pkg::*;
 %endif
@@ -22,13 +22,13 @@ module mage_wrapper
 (
     input  logic      clk_i,
     input  logic      rst_n_i,
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
     // HW FIFO interface
     input fifo_req_t [N_DMA_CH-1:0] fifo_req_i,
     output fifo_resp_t [N_DMA_CH-1:0] fifo_resp_o,
     output logic [N_DMA_CH-1:0] mage_done_o,
 %endif
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
     // AHB Slave
     input  obi_req_t  slave_req_i,
     output obi_resp_t slave_resp_o,
@@ -39,7 +39,7 @@ module mage_wrapper
     input  reg_req_t  reg_req_i,
     output reg_rsp_t  reg_rsp_o
 );
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   //mage fsm state
   state_t                                                  state;
   //block size for dmem decoder
@@ -78,12 +78,12 @@ module mage_wrapper
   mage_top mage_top_inst (
       .clk_i(clk_i),
       .rst_n_i(rst_n_i),
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
       .fifo_req_i(fifo_req_i),
       .fifo_resp_o(fifo_resp_o),
       .mage_done_o(mage_done_o),
 %endif
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
       .state_o(state),
       .dmem_req_o(mage_dmem_req),
       .dmem_we_o(mage_dmem_we),
@@ -98,7 +98,7 @@ module mage_wrapper
       .reg_rsp_o(reg_rsp_o)
   );
 
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   ////////////////////////////////////////////////////////////////
   //                        Internal SpM                        //
   ////////////////////////////////////////////////////////////////

@@ -307,7 +307,7 @@ module streaming_interface
   % endfor
 % endfor
 
-% if in_stream_xbar == str(1):
+% if in_stream_xbar == 1:
   genvar k;
   generate
     for (k = 0; k < N_IN_STREAM; k++) begin : gen_xbar_dma_pea
@@ -341,7 +341,7 @@ module streaming_interface
     end
   end
 
-% if out_stream_xbar == str(1):
+% if out_stream_xbar == 1:
   genvar l;
   generate
     for (l = 0; l < N_OUT_STREAM; l++) begin : gen_xbar_pea_dma

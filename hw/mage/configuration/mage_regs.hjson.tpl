@@ -4,7 +4,7 @@
     { protocol: "reg_iface", direction: "device" }
   ],
   registers: [
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
     { name:     "STATUS",
       desc:     "MAGE-CGRA status",
       swaccess: "rw",
@@ -209,7 +209,7 @@
     },
     %endfor
 %endfor
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
 <%import math as m%>
     { multireg:
         { name: "SEL_OUT_PEA",
@@ -300,7 +300,7 @@
         ],
         }
     },
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
     { multireg:
         { name: "AGE_IV_CONSTRAINTS",
         desc: "Configuration for AGE IV constraints",
@@ -329,7 +329,7 @@
         }
     },
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   %for i in range(n_dma_ch):
     { name: "TRANS_SIZE_DMA_CH_${i}",
       desc: "Transaction size for DMA channel ${i}. It indicates the number of elements to be read or written by that dma channel. Once the associated down-counter reaches zero, the DMA channel is will receive a done signal",
@@ -386,7 +386,7 @@
       },
       ],
     },
-  %if in_stream_xbar == str(1):
+  %if in_stream_xbar == 1:
     { name: "STREAM_IN_XBAR_SEL",
       desc: "Selection signals for input stream crossbars",
       swaccess: "rw",
@@ -401,7 +401,7 @@
       ],
     },
   %endif
-  %if out_stream_xbar == str(1):
+  %if out_stream_xbar == 1:
     { name: "STREAM_OUT_XBAR_SEL",
       desc: "Selection signals for output stream crossbars",
       swaccess: "rw",

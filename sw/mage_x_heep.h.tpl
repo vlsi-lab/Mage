@@ -12,7 +12,7 @@ extern "C"
 #define EXT_XBAR_NMASTER 4
 #define EXT_XBAR_NSLAVE 1
 
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
 #define MAGE_START_ADDRESS (EXT_SLAVE_START_ADDRESS + 0x000000)
 #define MAGE_SIZE 0x100000
 #define MAGE_END_ADDRESS (MAGE_START_ADDRESS + MAGE_SIZE)
@@ -29,7 +29,7 @@ extern "C"
 // Processing Elements rf
 #define MAGE_PEA_RF_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_PEA_RF_0_REG_OFFSET)
 
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //                          DAE Mage                          //
@@ -59,7 +59,7 @@ extern "C"
 #define START_MAGE_BANK_7 MAGE_START_ADDRESS + 0x7000
 
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //                       Streaming Mage                       //
@@ -93,11 +93,11 @@ extern "C"
 #define MAGE_TRANS_SIZE_2_SYNC_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_TRANS_SIZE_SYNC_DMA_CH_2_REG_OFFSET)     
 // Trans size sync DMA 3
 #define MAGE_TRANS_SIZE_3_SYNC_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_TRANS_SIZE_SYNC_DMA_CH_3_REG_OFFSET)                                          
-%if out_stream_xbar == str(1):
+%if out_stream_xbar == 1:
 // Output xbar
 #define MAGE_OUT_XBAR_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_STREAM_OUT_XBAR_SEL_REG_OFFSET)
 %endif
-%if in_stream_xbar == str(1):
+%if in_stream_xbar == 1:
 // Output xbar
 #define MAGE_IN_XBAR_START_ADDR (MAGE_PERIPH_START_ADDRESS + MAGE_STREAM_IN_XBAR_SEL_REG_OFFSET)
 %endif

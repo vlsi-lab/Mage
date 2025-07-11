@@ -9,13 +9,13 @@
 
 module pea
   import pea_pkg::*;
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   import stream_intf_pkg::*;
 %endif
 (
     input  logic                                                  clk_i,
     input  logic                                                  rst_n_i,
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
     // DAE Interface
     input  logic                                                  start_d_i,
     input  logic                                                  acc_match_i,
@@ -24,7 +24,7 @@ module pea
     output logic   [N_OUT_PEA-1:0][N_BITS-1:0]                    pea_data_o,
     // end DAE Interface
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
     // Streaming Interface
     input  logic   [        N-1:0][     M-1:0][             31:0]  reg_pea_rf_i,
     input  logic [1:0]                                             reg_cols_grouping_i,
@@ -58,7 +58,7 @@ module pea
       %endfor
   %endfor
   
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   ////////////////////////////////////////////////////////////////
   //                 Signals for DAE MAGE PEA                   //
   ////////////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@ module pea
   %endfor
 %endif
 
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   ////////////////////////////////////////////////////////////////
   //              Signals for Streaming MAGE PEA                //
   ////////////////////////////////////////////////////////////////
@@ -136,15 +136,15 @@ logic out_delay_op_valid${r}${c};
   //Input Registers
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (!rst_n_i) begin
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
       in_data_pea <= '0;
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
       stream_data_in_reg <= '0;
       stream_valid_in_reg <= '0;
 %endif
     end else begin
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   %for i in range(n_pea_cols):
       if(ready_in_pe[${i}]) begin
         stream_data_in_reg[${i}]  <= stream_data_i[${i}];
@@ -155,7 +155,7 @@ logic out_delay_op_valid${r}${c};
       end
   %endfor
 %endif
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
       if (start_d_i == 1'b1) begin
         in_data_pea <= pea_data_i;
       end
@@ -164,14 +164,14 @@ logic out_delay_op_valid${r}${c};
   end
 
   // Output muxes
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   %for r in range(n_pea_rows):
       %for c in range(n_pea_cols):
   assign out_data_row${r}[${c}] = out_data_pe${r}${c}; 
       %endfor
   %endfor
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   %for c in range(n_pea_cols):
       %for r in range(n_pea_rows):
   assign out_data_col${c}[${r}] = out_data_pe${r}${c};  
@@ -186,12 +186,12 @@ logic out_delay_op_valid${r}${c};
   %endfor
 %endif
 
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   %for r in range(2*n_pea_rows):
   assign pea_data_o[${r}] = out_data_row${int(r/2)}[sel_output_i[${r}]]; 
   %endfor
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   %for c in range(n_pea_cols):
   assign stream_data_o[${c}] = out_data_col${c}[reg_stream_sel_out_pea_i[${c}]];
   assign stream_valid_o[${c}] = out_valid_col${c}[reg_stream_sel_out_pea_i[${c}]]; 
@@ -202,7 +202,7 @@ logic out_delay_op_valid${r}${c};
   //               Assignments for PEs Din/Dout                 //
   ////////////////////////////////////////////////////////////////
 
-%if enable_streaming_interface == str(1) and enable_decoupling == str(1):
+%if enable_streaming_interface == 1 and enable_decoupling == 1:
   <% k = 0 %>
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
@@ -242,7 +242,7 @@ logic out_delay_op_valid${r}${c};
     %endfor
   %endfor
 
-%elif  enable_streaming_interface == str(1) and enable_decoupling == str(0):
+%elif  enable_streaming_interface == 1 and enable_decoupling == 0:
 
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
@@ -269,7 +269,7 @@ logic out_delay_op_valid${r}${c};
     %endfor
   %endfor
 
-%elif  enable_streaming_interface == str(0) and enable_decoupling == str(1):
+%elif  enable_streaming_interface == 0 and enable_decoupling == 1:
 
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
@@ -303,7 +303,7 @@ logic out_delay_op_valid${r}${c};
   %endfor
 
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   <% k = 0 %>
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols): 
@@ -355,7 +355,7 @@ logic out_delay_op_valid${r}${c};
     %endfor
   %endfor
 %endif
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
 ////////////////////////////////////////////////////////////////
 //               Assignments for PEs Valid I/O                //
 ////////////////////////////////////////////////////////////////
@@ -385,7 +385,7 @@ logic out_delay_op_valid${r}${c};
   %endfor
 %endif
 
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   always_comb begin
     for(int i=0; i<N; i++) begin
         for(int j=0; j<M; j++) begin
@@ -396,11 +396,15 @@ logic out_delay_op_valid${r}${c};
 %endif
 
 
-%if enable_streaming_interface == str(1) and enable_decoupling == str(0):
+%if enable_streaming_interface == 1:
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-      %if row_div == r:
+      %if (int(r) * int(n_pea_cols) + int(c)) in div_pes:
+        % if is_div_pipe == 1:
+  s_div_pipe_pe pe_inst_${r}${c} (
+        %else:
   s_div_pe pe_inst_${r}${c} (
+        %endif
       %else:
   s_pe pe_inst_${r}${c} (
       %endif
@@ -428,10 +432,10 @@ logic out_delay_op_valid${r}${c};
   %endfor
 %endif
 
-%if enable_streaming_interface == str(0) and enable_decoupling == str(1):
+%if enable_decoupling == 1:
   %for r in range(n_pea_rows):
     %for c in range(n_pea_cols):
-      %if row_acc == r:
+      %if (int(r) * int(n_pea_cols) + int(c)) in acc_pes:
   dae_acc_pe pe_inst_${r}${c} (
       .acc_match_i(acc_match_i),
       %else:
@@ -447,7 +451,7 @@ logic out_delay_op_valid${r}${c};
   %endfor
 %endif
 
-%if enable_streaming_interface == str(1) and enable_decoupling == str(0):
+%if enable_streaming_interface == 1:
   assign pea_ready_all_cols = 
 %for r in range(n_pea_rows): 
   %for c in range(n_pea_cols): 

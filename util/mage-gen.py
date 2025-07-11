@@ -47,20 +47,20 @@ def main():
     # It describes how input dma nodes are organized
     # i.e. The elements at position 0 (0) indicates the dma channels connected to fifo 0
     # has to be [N_IN_STREAM[N_DMA_CH_PER_IN_STREAM]]
-    in_stream_dma_ch_placement = [[0], [1], [2], [3]];
+    #in_stream_dma_ch_placement = [[0], [1], [2], [3]];
     
     # It indicates which PEA columns outputs are to be connected to each output dma node
     # i.e. The elements at position 0 (0, 1) are PEA columns connected to dma channel 0 output 
     # has to be [N_OUT_STREAM[N_PEA_DOUT_PER_OUT_STREAM]]
-    out_stream_pea_dout_placement = [[0, 1], [0, 1], [2, 3], [2, 3]];
+    #out_stream_pea_dout_placement = [[0, 1], [0, 1], [2, 3], [2, 3]];
 
     # It describes how PEA inputs coming from DMA must be organized
     # i.e. The elements at position 0 (0, 1) indicates the dma channels that are connected to PEA column 0
     # has to be [N_PEA_COL[N_PE_IN_STREAM]]
-    pea_in_stream_placement = [[0, 1], [1, 0], [2, 3], [3, 2]];
+    #pea_in_stream_placement = [[0, 1], [1, 0], [2, 3], [3, 2]];
 
     # has to be [N_PEA_COL][N_IN_MEM]?
-    pea_in_mem_placement = [[0, 1, 4, 5], [0, 1, 4, 5], [2, 3, 6, 7], [2, 3, 6, 7]];
+    #pea_in_mem_placement = [[0, 1, 4, 5], [0, 1, 4, 5], [2, 3, 6, 7], [2, 3, 6, 7]];
 
     parser = argparse.ArgumentParser(prog="mage-gen")
     
@@ -82,87 +82,12 @@ def main():
                         required=False,
                         help="Target filename, if omitted the template basename is taken.")
 
-    # Parse arguments.
-    # pea
+    # Parse arguments
     parser.add_argument("--num_words",
                         metavar="",
                         nargs='?',
                         default="1024",
                         help="")
-    
-    parser.add_argument("--n_pea_rows",
-                        metavar="",
-                        nargs='?',
-                        default="4",
-                        help="")
-    
-    parser.add_argument("--n_pea_cols",
-                        metavar="",
-                        nargs='?',
-                        default="4",
-                        help="")
-    
-    parser.add_argument("--n_pe_in_mem",
-                        metavar="",
-                        nargs='?',
-                        default="2",
-                        help="")
-    
-    parser.add_argument("--n_pe_in_stream",
-                        metavar="",
-                        nargs='?',
-                        default="2",
-                        help="")
-    
-    parser.add_argument("--n_neigh_pe",
-                        metavar="",
-                        nargs='?',
-                        default="4",
-                        help="")
-
-    parser.add_argument("--pea_in_mem_placement",
-                        metavar="",
-                        nargs='?',
-                        default=pea_in_mem_placement,
-                        help="")
-
-    parser.add_argument("--pea_in_stream_placement",
-                        metavar="",
-                        nargs='?',
-                        default=pea_in_stream_placement,
-                        help="")
-    
-    parser.add_argument("--n_pea_noc_type",
-                        metavar="",
-                        nargs='?',
-                        default="0",
-                        help="")
-    
-    # stream
-    parser.add_argument("--enable_decoupling",
-                        metavar="",
-                        nargs='?',
-                        default="0",
-                        help="")
-    
-    parser.add_argument("--enable_streaming_interface",
-                        metavar="",
-                        nargs='?',
-                        default="0",
-                        help="")
-    
-    parser.add_argument("--in_stream_dma_ch_placement",
-                        metavar="",
-                        nargs='?',
-                        default=in_stream_dma_ch_placement,
-                        help="")
-    
-    parser.add_argument("--out_stream_pea_dout_placement",
-                        metavar="",
-                        nargs='?',
-                        default=out_stream_pea_dout_placement,
-                        help="")
-    
 
     parser.add_argument("--pkg-sv",
                         metavar="PKG_SV",
@@ -172,98 +97,15 @@ def main():
                         metavar="TPL_SV",
                         help="Name of SystemVerilog template for your module (output)")
 
-
-    parser.add_argument("--n_dma_ch",
-                        metavar="from 2 to 16",
-                        nargs='?',
-                        default="4",
-                        help="Number of DMA channels used to stream data into and out of Mage")
     
-    parser.add_argument("--n_in_stream",
-                        metavar="from 2 to 16",
-                        nargs='?',
-                        default="4",
-                        help="Number of input streams from DMA ")
-    
-    parser.add_argument("--n_dma_ch_per_in_stream",
-                        metavar="from 2 to 16",
-                        nargs='?',
-                        default="4",
-                        help="Number of DMA channels per input stream")
-    
-    parser.add_argument("--n_pea_din_per_in_stream",
-                        metavar="from 2 to 16",
-                        nargs='?',
-                        default="4",
-                        help="Number of inputs to PEAs per input stream")
-    
-    parser.add_argument("--n_out_stream",
-                        metavar="from 2 to 16",
-                        nargs='?',
-                        default="4",
-                        help="Number of output streams to DMA")
-    
-    parser.add_argument("--n_pea_dout_per_out_stream",
-                        metavar="from 2 to 16",
-                        nargs='?',
-                        default="4",
-                        help="Number of outputs from PEAs per output stream")
-    
-    parser.add_argument("--n_dma_ch_per_out_stream",
-                        metavar="from 2 to 16",
-                        nargs='?',
-                        default="4",
-                        help="Number of DMA channels per output stream")
-    
-    parser.add_argument("--in_stream_xbar",
-                        metavar="",
-                        nargs='?',
-                        default="0",
-                        help="Enable input stream crossbar")
-    
-    parser.add_argument("--out_stream_xbar",
-                        metavar="",
-                        nargs='?',
-                        default="0",
-                        help="Enable output stream crossbar")
-    
-    # ages
-    parser.add_argument("--n_age_tot",
-                        metavar="",
-                        nargs='?',
-                        default="4",
-                        help="")
-    
-    parser.add_argument("--n_age_per_stream",
-                        metavar="",
-                        nargs='?',
-                        default="4",
-                        help="")
-    
-    parser.add_argument("--kernel_len",
-                        metavar="",
-                        nargs='?',
-                        default="4",
-                        help="")
-
-    parser.add_argument("--n_bits_cfg_pe",
-                        metavar="",
-                        nargs='?',
-                        default="4",
-                        help="")
-    
-    parser.add_argument("--row_div",
-                        metavar="",
-                        nargs='?',
-                        default="4",
-                        help="")
-    
-    parser.add_argument("--row_acc",
-                        metavar="",
-                        nargs='?',
-                        default="4",
-                        help="")
-    
+    parser.add_argument(
+        "--mage_cfg",
+        "-c",
+        metavar="FILE",
+        type=argparse.FileType("r"),
+        required=True,
+        help="Configuration file in HJSON format",
+    )
     
 
     args = parser.parse_args()
@@ -276,120 +118,46 @@ def main():
 
     outfile = args.outfile
 
-    if args.enable_streaming_interface != None and args.enable_streaming_interface != '':
-        enable_streaming_interface = args.enable_streaming_interface
-
-    if args.enable_decoupling != None and args.enable_decoupling != '':
-        enable_decoupling = args.enable_decoupling
-
-    if args.n_dma_ch != None and args.n_dma_ch != '':
-        n_dma_ch = int(args.n_dma_ch)
-
-    if args.num_words != None and args.num_words != '':
-        num_words = int(args.num_words)
-    
-    if args.n_in_stream != None and args.n_in_stream != '':
-        n_in_stream = int(args.n_in_stream)
-    
-    if args.n_dma_ch_per_in_stream != None and args.n_dma_ch_per_in_stream != '':
-        n_dma_ch_per_in_stream = int(args.n_dma_ch_per_in_stream)
-    
-    if args.n_pea_din_per_in_stream != None and args.n_pea_din_per_in_stream != '':
-        n_pea_din_per_in_stream = int(args.n_pea_din_per_in_stream)
-    
-    if args.n_out_stream != None and args.n_out_stream != '':
-        n_out_stream = int(args.n_out_stream)
-    
-    if args.n_pea_dout_per_out_stream != None and args.n_pea_dout_per_out_stream != '':
-        n_pea_dout_per_out_stream = int(args.n_pea_dout_per_out_stream)
-    
-    if args.n_dma_ch_per_out_stream != None and args.n_dma_ch_per_out_stream != '':
-        n_dma_ch_per_out_stream = int(args.n_dma_ch_per_out_stream)
-
-    if args.in_stream_xbar != None and args.in_stream_xbar != '':
-        in_stream_xbar = args.in_stream_xbar
-
-    if args.out_stream_xbar != None and args.out_stream_xbar != '':
-        out_stream_xbar = args.out_stream_xbar
-
-    if args.in_stream_dma_ch_placement != None:
-        in_stream_dma_ch_placement = args.in_stream_dma_ch_placement
-
-    if args.out_stream_pea_dout_placement != None:
-        out_stream_pea_dout_placement = args.out_stream_pea_dout_placement
-
-    if args.n_pea_rows != None and args.n_pea_rows != '':
-        n_pea_rows = int(args.n_pea_rows)
-
-    if args.n_pea_cols != None and args.n_pea_cols != '':
-        n_pea_cols = int(args.n_pea_cols)
-
-    if args.n_pe_in_mem != None and args.n_pe_in_mem != '':
-        n_pe_in_mem = int(args.n_pe_in_mem)  
-
-    if args.n_pe_in_stream != None and args.n_pe_in_stream != '':
-        n_pe_in_stream = int(args.n_pe_in_stream)
-
-    if args.n_neigh_pe != None and args.n_neigh_pe != '':
-        n_neigh_pe = int(args.n_neigh_pe)
-
-    if args.pea_in_mem_placement != None:
-        pea_in_mem_placement = args.pea_in_mem_placement
-
-    if args.pea_in_stream_placement != None:
-        pea_in_stream_placement = args.pea_in_stream_placement  
-
-    if args.n_pea_noc_type != None and args.n_pea_noc_type != '':
-        n_pea_noc_type = args.n_pea_noc_type
-
-    if args.n_age_tot != None and args.n_age_tot != '':
-        n_age_tot = int(args.n_age_tot)
-
-    if args.n_age_per_stream != None and args.n_age_per_stream != '':
-        n_age_per_stream = int(args.n_age_per_stream)
-
-    if args.kernel_len != None and args.kernel_len != '':
-        kernel_len = int(args.kernel_len)
-
-    if args.n_bits_cfg_pe != None and args.n_bits_cfg_pe != '':
-        n_bits_cfg_pe = int(args.n_bits_cfg_pe)   
-
-    if args.row_div != None and args.row_div != '':
-        row_div = int(args.row_div)
-
-    if args.row_acc != None and args.row_acc != '':
-        row_acc = int(args.row_acc)
+    # Read HJSON configuration file
+    with args.mage_cfg as f:
+        try:
+            cfg = hjson.load(f, use_decimal=True)
+            cfg = JsonRef.replace_refs(cfg)
+        except ValueError as exc:
+            raise SystemExit(sys.exc_info()[1]) from exc
 
 
     kwargs = {
-        "num_words"                        : num_words,
-        "n_pea_rows"                       : n_pea_rows,
-        "n_pea_cols"                       : n_pea_cols,
-        "n_pe_in_mem"                      : n_pe_in_mem,
-        "n_pe_in_stream"                   : n_pe_in_stream,
-        "n_neigh_pe"                       : n_neigh_pe,
-        "pea_in_mem_placement"             : pea_in_mem_placement,
-        "pea_in_stream_placement"          : pea_in_stream_placement,
-        "n_pea_noc_type"                   : n_pea_noc_type,
-        "n_dma_ch"                         : n_dma_ch,
-        "enable_streaming_interface"       : enable_streaming_interface,
-        "enable_decoupling"                : enable_decoupling,
-        "n_in_stream"                      : n_in_stream,
-        "n_dma_ch_per_in_stream"           : n_dma_ch_per_in_stream,
-        "n_pea_din_per_in_stream"          : n_pea_din_per_in_stream,
-        "n_out_stream"                     : n_out_stream,
-        "n_pea_dout_per_out_stream"        : n_pea_dout_per_out_stream,
-        "n_dma_ch_per_out_stream"          : n_dma_ch_per_out_stream,
-        "in_stream_xbar"                   : in_stream_xbar,
-        "out_stream_xbar"                  : out_stream_xbar,
-        "in_stream_dma_ch_placement"       : in_stream_dma_ch_placement,
-        "out_stream_pea_dout_placement"    : out_stream_pea_dout_placement,
-        "n_age_tot"                        : n_age_tot,
-        "n_age_per_stream"                 : n_age_per_stream,
-        "kernel_len"                       : kernel_len,
-        "n_bits_cfg_pe"                    : n_bits_cfg_pe,
-        "row_div"                          : row_div,
-        "row_acc"                          : row_acc
+        "enable_decoupling"                : cfg['enable_decoupling'],
+        "enable_streaming_interface"       : cfg['enable_streaming_interface'],
+        
+        "n_pea_rows"                       : cfg['common_params']['n_pea_rows'],
+        "n_pea_cols"                       : cfg['common_params']['n_pea_cols'],
+        "n_neigh_pe"                       : cfg['common_params']['n_neigh_pe'],
+
+        "kernel_len"                       : cfg['dae_params']['kernel_len'],
+        "n_pe_in_mem"                      : cfg['dae_params']['n_pe_in_mem'],
+        "pea_in_mem_placement"             : cfg['dae_params']['pea_in_mem_placement'],
+        "n_age_tot"                        : cfg['dae_params']['n_age_tot'],
+        "n_age_per_stream"                 : cfg['dae_params']['n_age_per_stream'],
+        "num_words"                        : cfg['dae_params']['num_words'],
+        "acc_pes"                          : cfg['dae_params']['acc_pes'],
+
+        "n_pe_in_stream"                   : cfg['streaming_params']['n_pe_in_stream'],
+        "pea_in_stream_placement"          : cfg['streaming_params']['pea_in_stream_placement'],
+        "n_dma_ch"                         : cfg['streaming_params']['n_dma_ch'],
+        "n_in_stream"                      : cfg['streaming_params']['n_in_stream'],
+        "n_dma_ch_per_in_stream"           : cfg['streaming_params']['n_dma_ch_per_in_stream'],
+        "n_pea_din_per_in_stream"          : cfg['streaming_params']['n_pea_din_per_in_stream'],
+        "n_out_stream"                     : cfg['streaming_params']['n_out_stream'],
+        "n_pea_dout_per_out_stream"        : cfg['streaming_params']['n_pea_dout_per_out_stream'],
+        "n_dma_ch_per_out_stream"          : cfg['streaming_params']['n_dma_ch_per_out_stream'],
+        "in_stream_xbar"                   : cfg['streaming_params']['in_stream_xbar'],
+        "out_stream_xbar"                  : cfg['streaming_params']['out_stream_xbar'],
+        "div_pes"                          : cfg['streaming_params']['div_pes'],
+        "is_div_pipe"                      : cfg['streaming_params']['is_div_pipe'],
+        "in_stream_dma_ch_placement"       : cfg['streaming_params']['in_stream_dma_ch_placement'],
+        "out_stream_pea_dout_placement"    : cfg['streaming_params']['out_stream_pea_dout_placement'],
     }
 
     ###########

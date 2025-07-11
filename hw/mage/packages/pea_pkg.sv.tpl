@@ -8,10 +8,10 @@
 // Description: Package for the execute part of Mage
 
 package pea_pkg;
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   import stream_intf_pkg::*;
 %endif
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   import mage_pkg::*;
 %endif
   <%import math as m%>
@@ -32,7 +32,7 @@ package pea_pkg;
   localparam unsigned LOG_M = $clog2(M);
   localparam unsigned LOG_N = $clog2(N);
 
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   localparam unsigned N_PE_GROUP = N_STREAMS;
   localparam unsigned N_PE_PER_GROUP = N_AGE_PER_STREAM;
   localparam unsigned LOG_N_PE_PER_GROUP = $clog2(N_PE_PER_GROUP);
@@ -41,17 +41,17 @@ package pea_pkg;
   localparam unsigned N_OUT_PEA = N_PE_GROUP*N_PE_PER_GROUP;
 %endif
 
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   localparam unsigned N_RADIX = 16;
   localparam unsigned N_DIV_STAGE = 8;
 %endif
 
   localparam unsigned N_NEIGH_PE = ${n_neigh_pe};
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   localparam unsigned N_INPUTS_PE = ${n_pe_in_stream + n_neigh_pe + 4};
   localparam unsigned N_OPERATIONS = 32;
   localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
-%elif enable_decoupling == str(1):
+%elif enable_decoupling == 1:
   localparam unsigned N_INPUTS_PE = ${n_neigh_pe + n_pe_in_mem + 4};
   localparam unsigned N_OPERATIONS = 16;
   localparam unsigned LOG_N_OPERATIONS = (N_OPERATIONS == 1) ? 1 : $clog2(N_OPERATIONS);
@@ -66,7 +66,7 @@ package pea_pkg;
   localparam unsigned END_RF_CFG              = 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + RF_CFG_BITS - 1;
   localparam unsigned END_DELAY_PE_MUX_SEL    = 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + RF_CFG_BITS + $clog2(N_NEIGH_PE) - 1;
   localparam unsigned END_DELAY_PE_OP_MUX_SEL = 2 * LOG_N_INPUTS_PE + LOG_N_OPERATIONS + RF_CFG_BITS + $clog2(N_NEIGH_PE) + 2 - 1;
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   ////////////////////////////////////////////////////////////////
   //                Kernel Controller Parameters                //
   ////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ package pea_pkg;
   ////////////////////////////////////////////////////////////////
   //         PE Instructions and Interconnections Types         //
   ////////////////////////////////////////////////////////////////
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   typedef enum logic[4:0]{
     NOP       = 5'b00000,
     ABS       = 5'b00001,
@@ -114,7 +114,7 @@ package pea_pkg;
     MULCARSH  = 5'b11010,
     CLSHSUB   = 5'b11011
   } fu_instr_t;
-%elif enable_decoupling == str(1):
+%elif enable_decoupling == 1:
   typedef enum logic[3:0]{
     NOP = 4'b0000,
     MUL = 4'b0001,
@@ -128,12 +128,12 @@ package pea_pkg;
     SGNMUL = 4'b1001,
     ADD = 4'b1010
   } fu_instr_t;
-%elif enable_streaming_interface == str(1):
+%elif enable_streaming_interface == 1:
 
 %endif
 
   typedef enum logic [LOG_N_INPUTS_PE-1:0]{
-%if  enable_streaming_interface == str(1):
+%if  enable_streaming_interface == 1:
   CONSTANT   = 4'b0000,
   %for i in range(n_pe_in_stream):
     STREAM_IN${i} = 4'b${'{:04b}'.format(i+1)},
@@ -145,7 +145,7 @@ package pea_pkg;
   SELF       = 4'b${'{:04b}'.format(n_pe_in_stream+5)},
   RF         = 4'b${'{:04b}'.format(n_pe_in_stream+6)},
   DELAY_OP   = 4'b${'{:04b}'.format(n_pe_in_stream+7)}
-%elif enable_decoupling == str(1):
+%elif enable_decoupling == 1:
   CONSTANT   = 4'b0000,
   MEMLEFT0   = 4'b0001,
   MEMLEFT1   = 4'b0010,
@@ -160,7 +160,7 @@ package pea_pkg;
 %endif
   }pe_mux_sel_t;
 
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
   typedef enum logic [$clog2(N_NEIGH_PE)-1:0] {
     D_UP      = 2'b00,
     D_LEFT    = 2'b01,
@@ -175,7 +175,7 @@ package pea_pkg;
     D_PE_OP_B     = 2'b11
   } delay_pe_op_mux_sel_t;
 %endif
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
   ////////////////////////////////////////////////////////////////
   //                         FSM States                         //
   ////////////////////////////////////////////////////////////////

@@ -71,7 +71,7 @@ void mage_set_pe_constant(uint32_t pe_constant, uint8_t pe_row, uint8_t pe_col){
   write_mage_register(pe_constant, mage_pea_constants, 0xFFFFFFFF, 0);
 }
 
-%if enable_decoupling == str(1):
+%if enable_decoupling == 1:
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //                          DAE Mage                          //
@@ -370,7 +370,7 @@ void mage_set_store_stream_reg(uint32_t store_stream, uint32_t reg){
 
 %endif
 
-%if enable_streaming_interface == str(1):
+%if enable_streaming_interface == 1:
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //                       Streaming Mage                       //
@@ -399,7 +399,7 @@ void mage_set_pe_acc_values(uint8_t acc_value, uint8_t pe_row, uint8_t pe_col){
   mage_acc_values_addr += pe_row;
   write_mage_register(acc_value, mage_acc_values_addr, 0xFF, pe_col << 3);
 }
-%if out_stream_xbar == str(1):
+%if out_stream_xbar == 1:
 /**
  * @brief Sets the selector for the outputs of PEA.
  * 

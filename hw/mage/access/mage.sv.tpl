@@ -48,7 +48,7 @@ module mage
     ////////////////////////////////////////////////////////////////
     //                PC for Configuration Memory                 //
     ////////////////////////////////////////////////////////////////
-    output logic [N_ADDR_BITS_KMEM-1:0] cfgmem_addr_d_o,
+    output logic [N_CFG_ADDR_BITS-1:0] cfgmem_addr_d_o,
 % endif
     ////////////////////////////////////////////////////////////////
     //                Interface to Multi-Bank SpM                 //

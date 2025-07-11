@@ -12,7 +12,7 @@ module cfg_regs_out_pea
   import xbar_pkg::*;
 (
     input logic [N-1:0][1:0][KMEM_SIZE-1:0][LOG_M-1:0] reg_cfg_sel_out_pea_i,
-    input logic [N_ADDR_BITS_KMEM-1:0] rcfg_ctrl_addr_i,
+    input logic [N_CFG_ADDR_BITS-1:0] rcfg_ctrl_addr_i,
     output logic [N-1:0][1:0][LOG_M-1:0] sel_output_o
 );
 

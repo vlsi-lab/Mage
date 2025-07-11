@@ -14,7 +14,7 @@ module cfg_regs_ls_stream_sel
 (
     input logic [N_BANKS_GROUP-1:0][N_BANKS_PER_STREAM-1:0][KMEM_SIZE-1:0][LOG_N_AGE_PER_STREAM-1:0] reg_cfg_l_stream_sel_i,
     input logic [N_BANKS_GROUP-1:0][N_BANKS_PER_STREAM-1:0][KMEM_SIZE-1:0][LOG_N_PE_PER_GROUP-1:0] reg_cfg_s_stream_sel_i,
-    input logic [N_ADDR_BITS_KMEM-1:0] rcfg_ctrl_addr_i,
+    input logic [N_CFG_ADDR_BITS-1:0] rcfg_ctrl_addr_i,
     output logic [N_BANKS_GROUP-1:0][N_BANKS_PER_STREAM-1:0][LOG_N_AGE_PER_STREAM-1:0] l_stream_sel_o,
     output logic [N_BANKS_GROUP-1:0][N_BANKS_PER_STREAM-1:0][LOG_N_PE_PER_GROUP-1:0] s_stream_sel_o
 );

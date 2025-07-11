@@ -13,7 +13,7 @@ module cfg_regs_pea
   import pea_pkg::*;
 (
     input logic [N-1:0][M-1:0][KMEM_SIZE-1:0][N_CFG_BITS_PE-1:0] reg_cfg_pea_i,
-    input logic [N_ADDR_BITS_KMEM-1:0] rcfg_ctrl_addr_i,
+    input logic [N_CFG_ADDR_BITS-1:0] rcfg_ctrl_addr_i,
     output logic [N-1:0][M-1:0][N_CFG_BITS_PE-1:0] ctrl_pea_o
 );
 

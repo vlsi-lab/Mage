@@ -159,7 +159,7 @@ module mage_top
   ////////////////////////////////////////////////////////////////
   //           Processing Element Array Configuration           //
   ////////////////////////////////////////////////////////////////
-  logic [N-1:0][M-1:0][N_CFG_REGS_PE-1:0][32-1:0] reg_cfg_pea;
+  logic [N-1:0][M-1:0][KMEM_SIZE-1:0][32-1:0] reg_cfg_pea;
   logic [N-1:0][M-1:0][N_CFG_BITS_PE-1:0] cfg_pea;
   logic [N-1:0][M-1:0][31:0] reg_constant_op_pea;
 %if enable_streaming_interface == str(1):
@@ -273,13 +273,21 @@ module mage_top
   ////////////////////////////////////////////////////////////////
   //            MAGE Processing Element Array (PEA)             //
   ////////////////////////////////////////////////////////////////
+% if kernel_len != 1:
   cfg_regs_pea cfg_regs_pea_inst (
       .reg_cfg_pea_i(reg_cfg_pea),
-  % if kernel_len != 1:
       .rcfg_ctrl_addr_i(actual_cfg_addr_pea),
-  % endif
       .ctrl_pea_o(cfg_pea)
   );
+% else:
+  always_comb begin
+    for (int i = 0; i < N; i = i + 1) begin
+      for (int j = 0; j < M; j = j + 1) begin
+        cfg_pea[i][j] = reg_cfg_pea[i][j][0];
+      end
+    end
+  end
+% endif
 
 %if enable_streaming_interface == str(1):
   assign mage_done = &mage_done_o;

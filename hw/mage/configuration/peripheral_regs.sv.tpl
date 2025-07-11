@@ -80,7 +80,7 @@ module peripheral_regs
     //           Processing Element Array Configuration           //
     ////////////////////////////////////////////////////////////////
     output logic [N-1:0][M-1:0][31:0] reg_pea_constants_o,
-    output logic [N-1:0][M-1:0][N_CFG_REGS_PE-1:0][32-1:0] reg_cfg_pea_o
+    output logic [N-1:0][M-1:0][KMEM_SIZE-1:0][32-1:0] reg_cfg_pea_o
 );
   mage_hw2reg_t hw2reg;
   mage_reg2hw_t reg2hw;
@@ -240,7 +240,7 @@ module peripheral_regs
     %endfor
   %endfor
 %endif
-    for (int i = 0; i < N_CFG_REGS_PE; i++) begin
+    for (int i = 0; i < KMEM_SIZE; i++) begin
 %for r in range(n_pea_rows):
   %for c in range(n_pea_cols):
       reg_cfg_pea_o[${r}][${c}][i] = reg2hw.cfg_pe_${r}${c}[i].q; 

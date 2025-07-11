@@ -18,12 +18,9 @@ package pea_pkg;
   ////////////////////////////////////////////////////////////////
   //             Configuration Registers Parameters             //
   ////////////////////////////////////////////////////////////////
-%if enable_decoupling == str(1):
   localparam unsigned KMEM_SIZE = ${kernel_len};
   localparam unsigned N_CFG_ADDR_BITS = (KMEM_SIZE == 1) ? 1 : $clog2(KMEM_SIZE);
-%endif
   localparam unsigned N_CFG_BITS_PE = 32;
-  localparam unsigned N_CFG_REGS_PE = ${m.ceil(kernel_len)};
 
   ////////////////////////////////////////////////////////////////
   //         Processing Element Array (PEA) Parameters          //

@@ -18,8 +18,8 @@ module k_controller
     input  logic                                      start_i,
 % if kernel_len != 1:
     input  loop_pipeline_info_t                       reg_lp_info_i,
-    output logic                [N_ADDR_BITS_KMEM-1:0] count_pke_o,
-    output logic                [N_ADDR_BITS_KMEM-1:0] count_pke_d_o,
+    output logic                [N_CFG_ADDR_BITS-1:0] count_pke_o,
+    output logic                [N_CFG_ADDR_BITS-1:0] count_pke_d_o,
 % endif
     output logic                                      start_d_o
 );
@@ -27,8 +27,8 @@ module k_controller
   logic [3:0] start;
 
 % if kernel_len != 1:
-  logic [N_ADDR_BITS_KMEM-1:0] count_pke;
-  logic [4:0][N_ADDR_BITS_KMEM-1:0] count_pke_d;
+  logic [N_CFG_ADDR_BITS-1:0] count_pke;
+  logic [4:0][N_CFG_ADDR_BITS-1:0] count_pke_d;
 
   always_ff @(posedge clk_i, negedge rst_n_i) begin : pke_controller_proc
     if (!rst_n_i) begin
